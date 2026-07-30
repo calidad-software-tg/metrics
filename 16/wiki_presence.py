@@ -1,41 +1,41 @@
-def calcular_wiki_presence(metadata_repositorio):
+import sys
+from pathlib import Path
+from datetime import datetime
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from base_metric import GitHubMetric
+
+
+class WikiPresence(GitHubMetric):
     """
-    Calcula la presencia y activación del sistema de Wiki en el repositorio.
-
-    Esta métrica de Producto y Proceso actúa como un proxy de madurez técnica.
-    Según la literatura (Jarczyk et al., 2014), la habilitación de una Wiki
-    indica una inversión deliberada del equipo en la transferencia de
-    conocimiento y el soporte al usuario, factores que correlacionan con la
-    popularidad del proyecto.
-
-    Parámetros:
-    -----------
-    metadata_repositorio : Diccionario.
-        Objeto obtenido directamente de la API v3 de GitHub (endpoint /repos/:owner/:repo)
-        o de un volcado de GHTorrent, que debe contener:
-        - 'has_wiki': Booleano, indica si la funcionalidad de wiki está activa.
-        - 'fork': Booleano, para controlar si es un repositorio original o derivado.
-
-    Retorna:
-    --------
-    presencia_wiki : Int
-        Retorna 1 si la Wiki está habilitada y el repositorio no es una
-        bifurcación (fork) sin cambios significativos; de lo contrario, retorna 0.
+    Métrica binaria: 1 si el repo tiene Wiki habilitada y no es fork, 0 si no.
+    Proxy de Documentation Quality (Jarczyk et al., 2014).
+    Solo aplica por producto — es un atributo del repositorio, no de personas.
     """
 
-    # El campo 'has_wiki' es un metadato escalar estándar en la API de GitHub.
-    # Es fundamental para distinguir proyectos personales de proyectos
-    # con estructura de equipo quirúrgico (Brooks, 1975).
-    wiki_activa = metadata_repositorio.get('has_wiki', False)
+    def fetch(self, **kwargs):
+        self._meta = self._rest(f"/repos/{self.org}/{self.repo}")
 
-    # En Software Analytics, se debe validar que el repositorio sea la
-    # fuente primaria de información, ya que las bifurcaciones (forks) suelen
-    # heredar este campo pero ser "dumps" de código inactivos.
-    es_fork = metadata_repositorio.get('fork', False)
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> int:
+        has_wiki = self._meta.get("has_wiki", False)
+        is_fork  = self._meta.get("fork", False)
+        return 1 if (has_wiki and not is_fork) else 0
 
-    if wiki_activa and not es_fork:
-        # Se asigna un valor binario para su posterior uso en modelos
-        # de regresión logística o redes Bayesianas.
-        return 1
-    else:
-        return 0
+    def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):
+        raise NotImplementedError("Wiki Presence es un atributo del repo, no aplica por persona.")
+
+    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto", **kwargs):
+        if por == "persona":
+            print("Wiki Presence no aplica por persona: es un atributo del repositorio.")
+            return
+        self.fetch()
+        valor    = self.por_producto(fecha_inicio, fecha_fin)
+        has_wiki = self._meta.get("has_wiki", False)
+        is_fork  = self._meta.get("fork", False)
+        print(f"WP (Wiki Presence): {valor}  (has_wiki={has_wiki}, fork={is_fork})")
+        if valor == 1:
+            print("→ El repositorio tiene Wiki habilitada y es un proyecto original.")
+        elif has_wiki and is_fork:
+            print("→ Wiki habilitada pero es un fork: no se considera presencia genuina.")
+        else:
+            print("→ El repositorio no tiene Wiki habilitada.")

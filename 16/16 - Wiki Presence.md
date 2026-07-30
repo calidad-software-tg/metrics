@@ -75,8 +75,23 @@ Solo si la Wiki está activa **y** el repositorio no es un fork, se considera qu
 En otras palabras: la métrica funciona como un **indicador booleano compuesto** — combina dos condiciones de la metadata del repositorio para determinar si existe una inversión real en documentación mediante Wiki, filtrando los falsos positivos que introducirían los *forks*.
 
 ---
+## 4. Salida Obtenida
 
-## 4. Referencias
+**Repositorios analizados:** tldr-pages/tldr (original) y calidad-software-tg/tldr (fork)
+
+| Repositorio | ¿Es fork? | Wiki activa | WP |
+|---|---|---|---|
+| tldr-pages/tldr | No | Sí | **1** |
+| calidad-software-tg/tldr | Sí | (heredado) | **0** |
+
+> El repo original `tldr-pages/tldr` invirtió deliberadamente en documentación extendida vía Wiki (guías de contribución, formato, guía de estilo, etc.). El fork de `calidad-software-tg` hereda pasivamente esa configuración sin representar una inversión propia del equipo, por lo que la métrica correctamente lo discrimina con WP = 0. La métrica distingue así entre inversión genuina en documentación estructurada y herencia pasiva de configuración por fork.
+
+## 5. Limitación del Indicador
+
+`has_wiki=True` solo indica que la funcionalidad está **habilitada** en la configuración del repositorio — no informa qué tan completa, actualizada o utilizada está esa Wiki. Por tratarse de una métrica binaria, funciona como un *proxy* crudo de inversión en documentación, no como una medición de calidad real de su contenido.
+---
+
+## 5. Referencias
 
 - Jarczyk, O. et al. (2014). Relación entre habilitación de Wiki, transferencia de conocimiento y popularidad del proyecto en GitHub.
 - Brooks, F. P. (1975). *The Mythical Man-Month* — noción de equipo "quirúrgico" aplicada a la estructura de proyectos.

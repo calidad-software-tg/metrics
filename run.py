@@ -13,11 +13,17 @@ if env_path.exists():
 sys.path.insert(0, str(Path(__file__).resolve().parent / "35"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "10"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "16"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "20"))
 
 from nci import NumberOfClosedIssues
 from anmcc import AverageNumberOfModifiedComponentsPerCommit
 from mttr import MeanTimeToRepair
 from cd import CommentDensity
+from readme_completeness import ReadmeCompleteness
+from wiki_presence import WikiPresence
+from doc_issue_survival import DocIssueSurvival
+from dloc import DocumentationLinesOfCode
+from dc import SocialContribution
 
 # --- Configuración ---
 token = os.environ.get("GITHUB_TOKEN", "")
@@ -28,7 +34,7 @@ now = datetime.now(timezone.utc)
 fecha_inicio = now - timedelta(days=365)
 fecha_fin    = now
 
-metrica   = "cd"
+metrica   = "sc"
 por       = "persona"  # "producto" | "persona"
 max_files = 500        # solo aplica a "cd": máximo de archivos a analizar
 
@@ -44,6 +50,11 @@ metricas = {
     "anmcc": AverageNumberOfModifiedComponentsPerCommit,
     "mttr":  MeanTimeToRepair,
     "cd":    CommentDensity,
+    "rc":    ReadmeCompleteness,
+    "wp":    WikiPresence,
+    "dis":   DocIssueSurvival,
+    "dloc":  DocumentationLinesOfCode,
+    "sc":    SocialContribution,
 }
 
 metric = metricas[metrica](token, org, repo)

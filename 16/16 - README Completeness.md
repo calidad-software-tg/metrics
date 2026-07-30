@@ -74,8 +74,28 @@ Finalmente, se calcula la proporción de categorías detectadas sobre el total d
 En otras palabras: la métrica funciona como una **checklist ponderada** — verifica la presencia de un conjunto estándar de secciones de documentación y expresa el resultado como proporción de cobertura.
 
 ---
+## 4. Salida Obtenida
 
-## 4. Referencias
+**Repositorio analizado:** calidad-software-tg/tldr (3 READMEs encontrados)
+
+**Por producto (global):**
+
+| Métrica | Valor |
+|---|---|
+| **RC** | 0.5714 — cubre 4 de 7 secciones (Prana et al.) |
+
+**Por persona:**
+
+| Colaborador | RC |
+|---|---|
+| Managor | 0.8571 (6/7) |
+| sebastiaanspeck | 0.4286 (3/7) |
+| kbdharun | 0.4286 (3/7) |
+
+> Managor tiene el README más completo. El promedio de 0.57 indica que el repo cubre más de la mitad de las secciones recomendadas, aunque le faltan algunas (probablemente "When"/"References").
+---
+
+## 5. Referencias
 
 - Prana, G. A. A. et al. (2018). Esquema de las 8 categorías de contenido esencial en README de proyectos OSS.
 - Jarczyk, O. et al. Esquema de codificación de contenido de documentación en repositorios.
