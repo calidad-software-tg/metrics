@@ -8,11 +8,12 @@ from base_metric import GitHubMetric
 _QUERY_ISSUES = """
 query($owner: String!, $name: String!, $after: String) {
   repository(owner: $owner, name: $name) {
-    issues(first: 50, after: $after) {
+    issues(first: 50, after: $after, orderBy: {field: UPDATED_AT, direction: DESC}) {
       pageInfo { hasNextPage endCursor }
       nodes {
         author { login }
         createdAt
+        updatedAt
         closedAt
         timelineItems(last: 1, itemTypes: [CLOSED_EVENT]) {
           nodes { ... on ClosedEvent { actor { login } } }
@@ -26,11 +27,12 @@ query($owner: String!, $name: String!, $after: String) {
 _QUERY_PRS = """
 query($owner: String!, $name: String!, $after: String) {
   repository(owner: $owner, name: $name) {
-    pullRequests(first: 50, after: $after) {
+    pullRequests(first: 50, after: $after, orderBy: {field: UPDATED_AT, direction: DESC}) {
       pageInfo { hasNextPage endCursor }
       nodes {
         author { login }
         createdAt
+        updatedAt
         closedAt
         mergedAt
         mergedBy { login }
@@ -103,7 +105,17 @@ class RecentReviewExperience(GitHubMetric):
             data = self._graphql(_QUERY_ISSUES, {"owner": self.org, "name": self.repo, "after": cursor})
             conexion = data["data"]["repository"]["issues"]
             print(f"  ...issues página {page}", end="\r")
+            fuera_de_ventana = False
             for node in conexion["nodes"]:
+                # Orden UPDATED_AT DESC: en cuanto un nodo quede antes de
+                # fecha_inicio, todos los siguientes también (updatedAt nunca
+                # es anterior a createdAt ni a closedAt, así que no se pierde
+                # ningún evento de apertura ni de cierre dentro de la ventana).
+                updated = datetime.fromisoformat(node["updatedAt"].replace("Z", "+00:00"))
+                if updated < fecha_inicio:
+                    fuera_de_ventana = True
+                    break
+
                 created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
                 if fecha_inicio <= created <= fecha_fin:
                     login = (node.get("author") or {}).get("login", "desconocido")
@@ -114,7 +126,7 @@ class RecentReviewExperience(GitHubMetric):
                     if fecha_inicio <= closed <= fecha_fin:
                         login = self._closer_login(node) or "desconocido"
                         self.eventos.append({"tipo": "issues_closed", "login": login, "fecha": closed})
-            if not conexion["pageInfo"]["hasNextPage"]:
+            if fuera_de_ventana or not conexion["pageInfo"]["hasNextPage"]:
                 break
             cursor = conexion["pageInfo"]["endCursor"]
         print()
@@ -126,7 +138,13 @@ class RecentReviewExperience(GitHubMetric):
             data = self._graphql(_QUERY_PRS, {"owner": self.org, "name": self.repo, "after": cursor})
             conexion = data["data"]["repository"]["pullRequests"]
             print(f"  ...PRs página {page}", end="\r")
+            fuera_de_ventana = False
             for node in conexion["nodes"]:
+                updated = datetime.fromisoformat(node["updatedAt"].replace("Z", "+00:00"))
+                if updated < fecha_inicio:
+                    fuera_de_ventana = True
+                    break
+
                 created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
                 if fecha_inicio <= created <= fecha_fin:
                     login = (node.get("author") or {}).get("login", "desconocido")
@@ -137,7 +155,7 @@ class RecentReviewExperience(GitHubMetric):
                     if fecha_inicio <= closed <= fecha_fin:
                         login = self._closer_login(node, es_pr=True) or "desconocido"
                         self.eventos.append({"tipo": "pull_requests_closed", "login": login, "fecha": closed})
-            if not conexion["pageInfo"]["hasNextPage"]:
+            if fuera_de_ventana or not conexion["pageInfo"]["hasNextPage"]:
                 break
             cursor = conexion["pageInfo"]["endCursor"]
         print()

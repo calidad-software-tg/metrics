@@ -66,6 +66,8 @@ def calcular_exprev(metadata_usuario_repo):
 
 Todos los eventos se filtran al período `[fecha_inicio, fecha_fin]` y se agrupan por usuario antes de aplicar `calcular_exprev`.
 
+> **Optimización de paginación (ver sección 4):** las queries GraphQL piden `orderBy: {field: UPDATED_AT, direction: DESC}` y la paginación corta apenas aparece un nodo con `updatedAt < fecha_inicio`. Como `updatedAt` nunca es anterior a `createdAt` ni a `closedAt`, este corte no pierde eventos de apertura ni de cierre dentro de la ventana, pero evita recorrer todo el historial del repositorio — antes se paginaba TODOS los issues/PRs sin importar el período pedido.
+
 - **`por_persona`**: EXPRev por colaborador.
 - **`por_producto`**: no aplica (métrica de Persona/Proceso, sin agregación de producto).
 
@@ -81,9 +83,22 @@ Todos los eventos se filtran al período `[fecha_inicio, fecha_fin]` y se agrupa
 
 **Repositorio configurado en `.env`:** `calidad-software-tg/tldr` — este fork **no tiene issues ni pull requests** (0 nodos en ambas queries GraphQL), por lo que no arroja actividad de revisión.
 
-**Validación de la query** contra `tldr-pages/tldr` (repositorio original, con actividad real): la consulta GraphQL responde correctamente con campos `author`, `createdAt`, `closedAt`, `mergedBy` y el actor del evento de cierre — confirmando que la implementación es correcta. Una corrida completa no se ejecutó en esta sesión por el volumen del repositorio (~278 issues y ~5.700 PRs), lo que insumiría una cantidad considerable de páginas GraphQL y de la cuota de la API.
+**Corrida completa contra `tldr-pages/tldr`** (ventana de 30 días, 1.471 eventos totales, **34.4s**):
 
-**Recomendación:** correr `exprev.py` contra el repositorio objetivo real del trabajo de grado, idealmente acotando el período (`fecha_inicio`/`fecha_fin`) para reducir el volumen de páginas a recorrer.
+| Colaborador | EXPRev |
+|---|---|
+| Managor | 343 |
+| ivanbaluta | 341 |
+| tldr-bot | 87 |
+| cyforkk | 65 |
+| sebastiaanspeck | 62 |
+| SpikeTheDragon40k | 62 |
+| CLAassistant | 59 |
+| kant | 55 |
+
+> Antes de la optimización de paginación (orden `UPDATED_AT DESC` + corte temprano, ver sección 3.3), la misma consulta sin acotar quedó corriendo **más de 10 minutos sin terminar** para esta misma ventana de 30 días — porque paginaba los ~5.700 PRs históricos del repo completo antes de filtrar por fecha. Con el corte temprano, la corrida solo recorrió 1 página de issues y 10 de PRs.
+
+**Recomendación:** para el análisis final de la tesis, correr `exprev.py` directamente sobre el repositorio objetivo con la ventana real de interés — ya no hace falta acotar artificialmente el período por costo de API.
 
 ---
 

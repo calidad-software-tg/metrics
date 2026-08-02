@@ -66,6 +66,8 @@ def calcular_rexprev(eventos_usuario_repo, fecha_actual):
 
 `metrics/15/rexprev.py` reutiliza la misma recolección de eventos que EXPRev (GraphQL sobre issues/PRs + REST sobre comentarios de issues y de revisión de PRs), pero en lugar de sumar conteos, conserva la fecha de cada evento y aplica `calcular_rexprev` por colaborador usando `fecha_fin` del período como `fecha_actual`.
 
+> **Optimización de paginación:** misma que EXPRev — `orderBy: {field: UPDATED_AT, direction: DESC}` + corte apenas `updatedAt < fecha_inicio` (ver `15 - EXPRev.md`, sección 3.3, para el detalle de por qué no pierde eventos de cierre).
+
 - **`por_persona`**: REXPRev por colaborador.
 - **`por_producto`**: no aplica (métrica de Persona/Proceso).
 
@@ -81,9 +83,21 @@ def calcular_rexprev(eventos_usuario_repo, fecha_actual):
 
 **Repositorio configurado en `.env`:** `calidad-software-tg/tldr` — sin issues ni PRs (fork sin actividad de revisión), por lo que no arroja eventos.
 
-**Validación:** la query GraphQL compartida con EXPRev fue verificada contra `tldr-pages/tldr` (ver `15 - EXPRev.md`, sección 4), confirmando estructura y campos correctos. No se ejecutó una corrida completa en esta sesión por el volumen de PRs del repositorio original (~5.700), que insumiría muchas páginas GraphQL.
+**Corrida completa contra `tldr-pages/tldr`** (ventana de 30 días, mismos 1.471 eventos base que EXPRev):
 
-**Recomendación:** correr `rexprev.py` contra el repositorio objetivo real del trabajo de grado, acotando el período de análisis para limitar el volumen de páginas.
+| Colaborador | REXPRev |
+|---|---|
+| ivanbaluta | 51.9102 |
+| Managor | 46.7713 |
+| tldr-bot | 14.1023 |
+| cyforkk | 13.0 |
+| CLAassistant | 9.8258 |
+| sebastiaanspeck | 7.3139 |
+| kant | 6.8201 |
+
+> Nótese que el ranking cambia respecto de EXPRev: `ivanbaluta` pasa a liderar por sobre `Managor` a pesar de tener menos eventos totales (341 vs. 343) — su actividad está más concentrada en los días recientes de la ventana, mientras que la de `Managor` está más repartida. Es exactamente el comportamiento esperado de la ponderación temporal.
+
+**Recomendación:** para el análisis final de la tesis, correr `rexprev.py` directamente sobre el repositorio objetivo con la ventana real de interés — ya no hace falta acotar artificialmente el período por costo de API.
 
 ---
 
