@@ -14,6 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "35"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "10"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "16"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "20"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "15"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "18"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "23"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "27"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "40"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "43"))
 
 from nci import NumberOfClosedIssues
 from anmcc import AverageNumberOfModifiedComponentsPerCommit
@@ -24,6 +30,23 @@ from wiki_presence import WikiPresence
 from doc_issue_survival import DocIssueSurvival
 from dloc import DocumentationLinesOfCode
 from dc import SocialContribution
+from le import LearningEase
+from ss import SkillSimilarity
+from rexp import RecentExperience
+from fexp import FileExperience
+from exprev import ReviewExperience
+from rexprev import RecentReviewExperience
+from cdiv import ContributionDiversity
+from nc import NumberOfComments
+from disc_centrality import DiscussionCentrality
+from sc import SocialContribution as SocialContributionDiscussion
+from schedule_compliance import ScheduleCompliance
+from cfdr import CustomerFoundDefectsAndRegressions
+from process_performance import DevelopmentProcessPerformance
+from noi import NumberOfOpenIssues
+from nci_reuse import NumberOfClosedIssues as NumberOfClosedIssuesProcess
+from tasa_exito import JarczykSuccessRate
+from nci_reuse_43 import NumberOfClosedIssues as NumberOfClosedIssuesResolutionTime
 
 # --- Configuración ---
 token = os.environ.get("GITHUB_TOKEN", "")
@@ -55,6 +78,23 @@ metricas = {
     "dis":   DocIssueSurvival,
     "dloc":  DocumentationLinesOfCode,
     "sc":    SocialContribution,
+    "le":      LearningEase,
+    "ss":      SkillSimilarity,
+    "rexp":    RecentExperience,
+    "fexp":    FileExperience,
+    "exprev":  ReviewExperience,
+    "rexprev": RecentReviewExperience,
+    "cdiv":    ContributionDiversity,
+    "nc":              NumberOfComments,
+    "disc_centrality": DiscussionCentrality,
+    "sc_disc":         SocialContributionDiscussion,
+    "schedule_compliance": ScheduleCompliance,
+    "cfdr": CustomerFoundDefectsAndRegressions,
+    "process_performance": DevelopmentProcessPerformance,
+    "noi": NumberOfOpenIssues,
+    "nci_process": NumberOfClosedIssuesProcess,
+    "jarczyk_success_rate": JarczykSuccessRate,
+    "nci_resolution_time": NumberOfClosedIssuesResolutionTime,
 }
 
 metric = metricas[metrica](token, org, repo)
