@@ -93,9 +93,19 @@ def calcular_discussion_centrality(metadata_comentarios, login_usuario_objetivo)
 
 **Repositorio configurado en `.env`:** `calidad-software-tg/tldr` — sin comentarios (mismo fork sin issues/PRs que afecta a NC, EXPRev y REXPRev).
 
-**Validación de la lógica:** se probó `calcular_discussion_centrality` con datos sintéticos (dos usuarios compartiendo un hilo, un tercero en otro hilo distinto) y devolvió el grado esperado. Los endpoints REST fueron validados con datos reales de `tldr-pages/tldr` (`issue_url`, `pull_request_url`, `commit_id` presentes y parseables).
+**Corrida completa contra `tldr-pages/tldr`** (ventana de 90 días, 2.028 comentarios procesados):
 
-**Recomendación:** correr `disc_centrality.py` contra el repositorio objetivo real de la tesis para obtener valores representativos.
+| Colaborador | Centralidad |
+|---|---|
+| Managor | 78 |
+| ivanbaluta | 58 |
+| CLAassistant | 52 |
+| tldr-bot | 41 |
+| acuteenvy | 17 |
+| SpikeTheDragon40k | 13 |
+| msaf9 | 12 |
+
+> Managor e ivanbaluta lideran tanto NC como Discussion Centrality — volumen alto y alcance social alto van de la mano acá. `CLAassistant` y `tldr-bot` (bots) tienen centralidad alta porque comentan automáticamente en casi todos los hilos, no por conexión social real — mismo filtro a considerar que en NC.
 
 ---
 

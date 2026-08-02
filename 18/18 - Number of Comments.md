@@ -85,9 +85,21 @@ Cada comentario obtenido se normaliza a `{'type': ..., 'login': ..., 'fecha': ..
 
 **Repositorio configurado en `.env`:** `calidad-software-tg/tldr` — este fork **no tiene issues, PRs ni comentarios de commits** (0 resultados en los tres endpoints), consistente con lo ya observado para EXPRev/REXPRev y para "Doc Issue Survival" en la consigna 16.
 
-**Validación de los endpoints** contra `tldr-pages/tldr` (repositorio original, con actividad real): los tres endpoints devuelven datos correctamente estructurados (`issue_url`, `pull_request_url`, `commit_id`, `user.login`, `created_at`), y `calcular_nc` procesa la salida sin errores. No se ejecutó una corrida completa por el volumen de comentarios del repositorio original.
+**Corrida completa contra `tldr-pages/tldr`** (ventana de 90 días): 2.028 comentarios totales en el período.
 
-**Recomendación:** correr `nc.py` contra el repositorio objetivo real de la tesis.
+**Top colaboradores por NC:**
+
+| Colaborador | NC |
+|---|---|
+| Managor | 428 |
+| ivanbaluta | 424 |
+| tldr-bot | 254 |
+| CLAassistant | 152 |
+| acuteenvy | 67 |
+| SpikeTheDragon40k | 42 |
+| TheRootDaemon | 35 |
+
+> Los tres endpoints (`/issues/comments`, `/comments`, `/pulls/comments`) filtran por `since` del lado del servidor, así que la corrida sobre una ventana acotada es rápida (~20 páginas en total). `tldr-bot` y `CLAassistant` son bots de automatización — vale la pena filtrarlos si el análisis de la tesis busca aislar la comunicación humana.
 
 ---
 
