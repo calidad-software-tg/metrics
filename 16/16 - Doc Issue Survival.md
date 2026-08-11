@@ -75,9 +75,49 @@ En otras palabras: la métrica funciona como un **filtro por etiqueta + análisi
 
 ---
 ## 4. Salida Obtenida
-**Resultado de la última ejecución:** `0`
+## 4. Salida Obtenida
 
-Este valor se debe a que el repositorio tldr de entrada no contiene issues reales.
+**Resultado de la última ejecución:**
+
+| Colaborador       | DIS (días) |
+|--------------------|-----------:|
+| pepa65             | 0.0        |
+| Aracki             | 0.0        |
+| pandyah5           | 0.0        |
+| the-c0d3r          | 1.0        |
+| MachiavelliII      | 1.33       |
+| rprieto            | 3.0        |
+| mebeim             | 3.0        |
+| aminelch           | 3.0        |
+| owenvoke           | 4.0        |
+| FazleArefin        | 5.0        |
+| ktz-dev            | 5.0        |
+| KristopherLeads    | 5.0        |
+| Very-cool-guy      | 5.0        |
+| acuteenvy          | 10.0       |
+| nelsonfigueroa     | 18.0       |
+| igorshubovych      | 30.0       |
+| Waples             | 38.0       |
+| navarroaxel        | 44.0       |
+| MasterOdin         | 53.0       |
+| ivanbaluta         | 60.0       |
+| gutjuri            | 65.5       |
+| msaf9              | 66.0       |
+| bl-ue              | 73.0       |
+| dmmqz              | 104.67     |
+| zlatanvasovic      | 133.75     |
+| marchersimon       | 146.0      |
+| waldyrious         | 232.8      |
+| sebastiaanspeck    | 244.75     |
+| spageektti         | 271.5      |
+| leostera           | 321.0      |
+| Managor            | 377.44     |
+| agnivade           | 453.67     |
+| CleanMachine1      | 550.33     |
+| kbdharun           | 607.23     |
+| sbrl               | 1073.12    |
+
+**35 colaboradores únicos encontrados.** El promedio global es **305.16 días**, con un rango de **0 días** (pepa65, Aracki, pandyah5) a **1073 días** (sbrl).
 
 ## 5. Referencias
 

@@ -57,7 +57,7 @@ now = datetime.now(timezone.utc)
 fecha_inicio = now - timedelta(days=365)
 fecha_fin    = now
 
-metrica   = "sc"
+metrica   = "mttr"
 por       = "persona"  # "producto" | "persona"
 max_files = 500        # solo aplica a "cd": máximo de archivos a analizar
 

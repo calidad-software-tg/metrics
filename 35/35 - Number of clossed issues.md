@@ -77,9 +77,29 @@ En otras palabras: la métrica funciona como un **filtro + contador** — filtra
 
 ## 4. Salida Obtenida
 
-**Resultado de la última ejecución:** `0`
+### NCI por persona
 
-Este valor se debe a que el repositorio tldr de entrada no contiene issues ni pull requests reales.
+| Colaborador        | NCI |
+|----------------------|----:|
+| Managor             | 99  |
+| ivanbaluta          | 37  |
+| kbdharun            | 19  |
+| acuteenvy           | 10  |
+| znarfm              | 8   |
+| sebastiaanspeck     | 8   |
+| dmmqz               | 8   |
+| SpikeTheDragon40k   | 6   |
+| KristopherLeads     | 6   |
+| nelsonfigueroa      | 4   |
+| msaf9               | 4   |
+| spageektti          | 2   |
+| emmanuel-ferdman    | 2   |
+| pixelcmtd           | 2   |
+| **Total**           | **228** |
+
+*[13 colaboradores adicionales con NCI=1]*
+
+**Managor** domina con 99 issues cerrados (43% del total). De 1558 issues cerrados históricos, 228 cayeron dentro del último año.
 
 ## 5. Referencias
 

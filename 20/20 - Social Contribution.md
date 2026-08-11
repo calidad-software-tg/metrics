@@ -72,27 +72,38 @@ En otras palabras: la métrica funciona como un **agregador de actividad** — s
 ---
 ## 4. Salida Obtenida
 
-**Repositorio analizado:** tldr-pages/tldr
+## Social Contribution (métrica 20) — tldr-pages/tldr
+**Período:** 2025-08-11 → 2026-08-11
 
-**Volumen general en el período:**
+**Resumen:**
+- Issues en período: 275
+- PRs en período: 5614
+- Colaboradores únicos: 706
 
-| Métrica | Valor |
-|---|---|
-| Issues en período | 278 |
-| PRs en período | 5.704 |
-| Contribuidores únicos | ~700+ |
+| Colaborador        | Issues | I.Cerr | PRs  | PR.Cerr | PR.Merge | SC   |
+|---------------------|-------:|-------:|-----:|--------:|---------:|-----:|
+| Managor             | 117    | 86     | 1025 | 12      | 1006     | 2246 |
+| kant                | 0      | 0      | 610  | 19      | 575      | 1204 |
+| nelsonfigueroa      | 0      | 0      | 401  | 1       | 400      | 802  |
+| SpikeTheDragon40k   | 0      | 0      | 300  | 6       | 293      | 599  |
+| dmmqz               | 11     | 8      | 230  | 2       | 228      | 479  |
+| emmanuel-ferdman    | 2      | 0      | 228  | 2       | 225      | 457  |
+| IMHOJEONG           | 0      | 0      | 213  | 2       | 198      | 413  |
+| ivanbaluta          | 18     | 10     | 191  | 1       | 190      | 410  |
+| sebastiaanspeck     | 3      | 2      | 99   | 3       | 96       | 203  |
+| reinhart1010        | 3      | 0      | 80   | 1       | 77       | 161  |
+| dependabot          | 0      | 0      | 78   | 1       | 77       | 156  |
+| badhon495           | 0      | 0      | 76   | 1       | 75       | 152  |
+| msaf9               | 3      | 1      | 64   | 4       | 60       | 132  |
+| FazleArefin         | 1      | 1      | 65   | 1       | 64       | 132  |
+| cyforkk             | 0      | 0      | 65   | 65      | 0        | 130  |
+| acuteenvy           | 1      | 0      | 61   | 0       | 61       | 123  |
+| znarfm              | 8      | 5      | 50   | 3       | 46       | 112  |
+| TheRootDaemon       | 1      | 0      | 50   | 0       | 50       | 101  |
 
-**Top 5 colaboradores por Social Contributions (SC):**
+*[685 colaboradores más con SC entre 1-66]*
 
-| Colaborador | Issues | Issues Cerrados | PRs | PRs Cerradas | PRs Fusionadas | SC |
-|---|---|---|---|---|---|---|
-| Managor | 116 | 86 | 1093 | 12 | 1076 | 2383 |
-| kant | 0 | 0 | 602 | 19 | 581 | 1202 |
-| nelsonfigueroa | 0 | 0 | 401 | 1 | 400 | 802 |
-| SpikeTheDragon40k | 0 | 0 | 301 | 6 | 294 | 601 |
-| dmmqz | 11 | 8 | 240 | 2 | 238 | 499 |
-
-> La mayoría de los contribuidores tiene SC = 2 (un PR fusionado o un issue cerrado). La distribución presenta una cola muy larga: un pequeño grupo de colaboradores concentra la mayor parte de la actividad, mientras que el resto son contribuidores ocasionales (*one-time contributors*).
+El top contributor es **Managor** con SC=2246, dominado por sus 1025 PRs (1006 mergeadas) y 117 issues. Los últimos 10 tienen SC=1 (solo 1 issue abierto sin cerrar o 1 PR sin mergear).
 ---
 ## 5. Referencias
 
