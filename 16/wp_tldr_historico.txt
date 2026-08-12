@@ -1,0 +1,4 @@
+Repo   : tldr-pages/tldr
+
+WP (Wiki Presence): 1  (has_wiki=True, fork=False)
+→ El repositorio tiene Wiki habilitada y es un proyecto original.

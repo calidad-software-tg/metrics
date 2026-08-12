@@ -1,0 +1,182 @@
+Repo   : tldr-pages/tldr
+Período: histórico completo
+
+  ...25 issues descargados  ...50 issues descargados  ...75 issues descargados  ...100 issues descargados  ...125 issues descargados  ...150 issues descargados  ...175 issues descargados  ...200 issues descargados  ...225 issues descargados  ...250 issues descargados  ...275 issues descargados  ...300 issues descargados  ...325 issues descargados  ...350 issues descargados  ...375 issues descargados  ...400 issues descargados  ...425 issues descargados  ...450 issues descargados  ...475 issues descargados  ...500 issues descargados  ...525 issues descargados  ...550 issues descargados  ...575 issues descargados  ...600 issues descargados  ...625 issues descargados  ...650 issues descargados  ...675 issues descargados  ...700 issues descargados  ...725 issues descargados  ...750 issues descargados  ...775 issues descargados  ...800 issues descargados  ...825 issues descargados  ...850 issues descargados  ...875 issues descargados  ...900 issues descargados  ...925 issues descargados  ...950 issues descargados  ...975 issues descargados  ...1000 issues descargados  ...1025 issues descargados  ...1050 issues descargados  ...1075 issues descargados  ...1100 issues descargados  ...1125 issues descargados  ...1150 issues descargados  ...1175 issues descargados  ...1200 issues descargados  ...1225 issues descargados  ...1250 issues descargados  ...1275 issues descargados  ...1300 issues descargados  ...1325 issues descargados  ...1350 issues descargados  ...1375 issues descargados  ...1400 issues descargados  ...1425 issues descargados  ...1450 issues descargados  ...1475 issues descargados  ...1500 issues descargados  ...1525 issues descargados  ...1550 issues descargadosIssues descargados: 1558
+
+=== POR PRODUCTO ===
+MTTR (Mean Time to Repair): 3736.24 horas
+
+=== POR PERSONA ===
+Colaborador                    MTTR (horas)
+----------------------------------------------
+Felipe-noob                    0.0
+suyashbhawsar                  0.01
+bharateshwq                    0.01
+StefanLobbenmeierObjego        0.01
+mooreye                        0.02
+acestronautical                0.04
+ilius                          0.04
+Oglo12                         0.07
+stanleyogada                   0.09
+nilsandrey                     0.15
+Zminghua                       0.16
+g-ongenae                      0.16
+royborgen                      0.16
+Dom-TC                         0.26
+DeepHiwase                     0.28
+sjackman                       0.31
+adoyle-h                       0.34
+GabLeRoux                      0.39
+FreifunkerEZ                   0.46
+mortenfyhn                     0.55
+ttv20                          0.61
+pepa65                         0.78
+driftcrow                      1.79
+long-nguyenxuan                2.43
+gonejack                       2.86
+Buliet                         3.7
+JacobCallahan                  4.07
+michaeleisel                   4.56
+jasonkarns                     4.8
+pqiaohaoq                      4.8
+Kreijstal                      5.39
+Torfab                         6.07
+Sarijen                        6.88
+NSExceptional                  8.25
+demo-err                       9.09
+megan201296                    9.15
+CrimsonTome                    10.26
+josephernest                   11.45
+Scarsz                         11.72
+progval                        13.38
+mflint                         14.54
+pandyah5                       14.59
+sanesai                        15.0
+mansoorbarri                   15.52
+grzkv                          15.72
+BananaaaKING                   15.81
+shynekomaid                    15.99
+Ninzero                        16.7
+niklasmohrin                   18.78
+soulomoon                      19.62
+meetwudi                       19.68
+scottwhudson                   20.95
+patricedenis                   22.68
+jn64                           23.85
+guilhermeleobas                24.17
+AMATEURTOSS                    24.75
+megamattron                    25.14
+colinmorris                    25.43
+gd-codes                       26.28
+mihainsto                      26.47
+yikerman                       27.19
+corentincam                    28.72
+ifuchs                         30.37
+rachithaiyappa                 30.39
+thiswind                       36.91
+Wesalius                       39.13
+AndreiCherniaev                42.8
+sarnobat                       45.52
+isaacvicente                   45.91
+the-c0d3r                      46.57
+lakhininenina                  47.69
+tansiret                       53.31
+eval-exec                      65.42
+dozortsev                      69.72
+ldorigo                        70.27
+Rudloff                        70.84
+0xf0xx0                        71.23
+gingerbeardman                 72.65
+chamini2                       72.84
+witt-bit                       82.21
+aminelch                       89.15
+ve-nt                          95.31
+aherst                         98.88
+oakrotka                       107.42
+CodePsy-2001                   109.34
+jxu                            114.0
+Sadeeed                        130.89
+Cyberhan123                    134.82
+cmoel                          136.94
+ktz-dev                        140.57
+AnimiVulpis                    142.34
+Very-cool-guy                  142.81
+popey456963                    166.88
+k12ish                         194.54
+desconocido                    201.43
+KristopherLeads                224.94
+Waples                         256.55
+jonatasleon                    266.33
+MachiavelliII                  283.12
+KSroido                        284.34
+FazleArefin                    295.71
+maxsxu                         310.78
+jipiboily                      325.67
+runmaxde                       355.41
+jeeftor                        400.99
+halloleo                       407.41
+cjappl                         414.87
+imlucyd                        422.28
+yassinecc                      429.62
+SethFalco                      454.25
+ivanhercaz                     470.74
+Izzur                          473.4
+mfrw                           476.53
+mebeim                         490.91
+emileber                       492.8
+nelsonfigueroa                 508.76
+tbarusseau                     590.12
+okineadev                      598.97
+Saevyn                         601.6
+AngelODeath                    632.35
+spageektti                     868.71
+msaf9                          872.14
+rubenvereecken                 912.97
+wzlove                         939.02
+emmanuel-ferdman               944.7
+blueskyson                     963.01
+andrik                         988.06
+rprieto                        1103.95
+SpikeTheDragon40k              1247.42
+zlatanvasovic                  1273.54
+glenacota                      1274.08
+igorshubovych                  1370.59
+Aracki                         1422.52
+schneiderl                     1435.92
+ivanbaluta                     1526.44
+dmmqz                          1819.6
+leostera                       2128.57
+sgotand                        2195.18
+acuteenvy                      2276.88
+pixelcmtd                      2371.47
+einverne                       2372.45
+sebastiaanspeck                2388.55
+EmilyGraceSeville7cf           2607.6
+agnivade                       2633.21
+Liquid-system                  2639.56
+owenvoke                       2789.4
+navarroaxel                    2909.58
+StewAlexander-com              3168.21
+marchersimon                   3344.56
+RominYue                       4223.81
+blueglyph                      4246.8
+kbdharun                       4354.84
+miracle372                     4483.26
+bl-ue                          4533.91
+reinhart1010                   4542.02
+znarfm                         4687.75
+viztor                         4837.95
+older-pack                     5099.36
+waldyrious                     5185.44
+nicokosi                       5667.98
+CleanMachine1                  5843.09
+sbrl                           6075.37
+vitorhcl                       6190.73
+MasterOdin                     6204.82
+ramwin                         6545.67
+github-actions                 8014.58
+cyqsimon                       9065.29
+Managor                        9334.22
+gutjuri                        10266.47
+fallenpixel                    19389.6
+Parth                          26328.73

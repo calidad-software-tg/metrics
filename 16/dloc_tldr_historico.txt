@@ -1,0 +1,661 @@
+Archivos de documentación encontrados: 35741
+Construyendo mapa de autores con git log...
+Mapa de autores construido: 42240 archivos
+
+=== POR PRODUCTO ===
+DLOC (Documentation Lines of Code): 334585 lineas
+  Archivos analizados: 35741
+
+=== POR PERSONA ===
+Colaborador                                  DLOC
+----------------------------------------------------
+Managor                                    144902
+Nelson Figueroa                             30419
+Sebastiaan Speck                            28269
+코드싸이                                        13691
+HoJeong Im                                  11055
+Dylan                                        8602
+Lena Pastwa                                  7034
+Darío Hereñú                                 6926
+github-actions[bot]                          6367
+Vitor Henrique                               5880
+Adriano Inghingolo                           5786
+Emmanuel Ferdman                             5221
+Reinhart Previano Koentjoro                  5194
+Ivan Baluta                                  3934
+K.B.Dharun Krishna                           3041
+Fazle Arefin                                 1917
+Meinard Francisco                            1799
+badhon                                       1643
+Kristopher                                   1533
+Starsoon                                     1491
+desconocido                                  1273
+Daniel Konstantinov                          1185
+Chooooo                                      1123
+Juri Dispan                                   977
+Machiavelli                                   955
+Ninzero                                       936
+Wiktor Perskawiec                             872
+marchersimon                                  850
+Igor Támara                                   705
+Waldir Pimenta                                703
+Jin                                           638
+Muhammad Willdhan Arya Putra                  637
+Ninzero Xu                                    629
+Emily Grace Seville                           548
+Tan Siret A                                   547
+Tamanec                                       545
+Jack Lin                                      533
+Sahil Afrid Farookhi                          529
+pixie                                         510
+Andrei Murariu                                458
+Alexandre ZANNI                               434
+Vítor Henrique                                417
+Magrid                                        405
+Karthik Vallamsetla                           394
+Sarijen                                       384
+Rafael Fontenelle                             350
+Shelly David                                  350
+Alejandro Cervera                             341
+Ricky                                         317
+Omar Moustafa                                 313
+trolzen                                       250
+Irina                                         250
+Erlan Rangel                                  221
+axrona                                        219
+Bevan Kay                                     204
+Pranav Lawate                                 203
+Francesco Franchina                           202
+Mohammad Reza Soleimani                       201
+crispyfires                                   194
+Seth Falco                                    190
+Nicolas Hansse                                190
+Renie Siqueira                                189
+Owen Voke                                     187
+Ali Nazzal                                    185
+Andre                                         180
+Harshavardhan                                 174
+Axel Navarro                                  171
+Andrew Stefankiv                              164
+Cristian Bastidas                             161
+Alessandro Chitarrini                         157
+Guido                                         152
+Paulina Kalicka                               152
+mana-byte                                     142
+Tadeo                                         142
+Om Singh Bais                                 140
+Dmytro Voytko                                 139
+Haydar                                        138
+4G3NT                                         136
+Juan Pablo                                    136
+CleanMachine1                                 135
+Marek Küthe                                   134
+runn3r                                        134
+Marco Bonelli                                 134
+Kishore B                                     130
+tranzystorekk                                 129
+mister-ben                                    126
+bl-ue                                         126
+William Aboucaya                              122
+Lucas Gabriel Schneider                       117
+Sencyy                                        116
+kekwlboy12469                                 112
+elfiyka                                       112
+Amine LOUHICHI                                110
+piedroconti                                   108
+lexion                                        107
+Vedant Yadav                                  101
+jordi martinez                                 98
+Daniel                                         97
+iTrooz                                         93
+Gabriel de Souza                               93
+Sadeed                                         91
+Harrison                                       90
+Daniel Guerrero                                89
+David Lazarevic                                88
+rozie                                          85
+Kabiir Krishna                                 84
+Naman Soni                                     84
+Kemel Zaidan                                   80
+陈文悠                                            80
+Samuele Facenda                                80
+LucasFA                                        79
+Godwin Iheuwa                                  79
+Sarah THEOULLE                                 78
+cyqsimon                                       76
+Olivier Toussaint                              75
+Rodrigo Decuir                                 74
+Fabio Perrella                                 74
+curry798                                       73
+umutKaracelebi                                 72
+k-a-rthik                                      71
+Rafael Gordon Paves                            71
+depgod                                         68
+James C Craven                                 67
+Swasti Mishra                                  67
+Bernd Stellwag                                 66
+Pouya Karazmayan                               66
+Adam Herst                                     66
+Harikrishna C                                  65
+Brook                                          65
+zhuhong_bo                                     65
+Andréia Bohner                                 64
+Sainjargal Ishdorj                             64
+Krystian                                       64
+jeyvid                                         62
+Moch. Bima Pangestu                            62
+Cem AÇAR                                       62
+Isaac Vicente                                  61
+Christoph                                      61
+sebschil                                       60
+Philipp Wallrich                               60
+caduvieira                                     60
+Bohdan Karashchuk                              59
+Tapu                                           59
+Lakshyajeet Singh Goyal                        59
+Cornelius Roemer                               58
+Alexandros Tzimas                              58
+Peter Bittner                                  57
+Joel Tony                                      57
+Neluji                                         57
+Kauan Modolo                                   57
+JanviNandre                                    57
+Rinas                                          57
+ramadasmr                                      56
+dwalex                                         56
+jkoro1                                         55
+Ulices                                         54
+Stig124                                        54
+Rohith ND                                      54
+Alexandru Rusu                                 54
+Matteo Piffari                                 53
+roshawn                                        52
+Gin                                            52
+sapbotgit                                      52
+Ethan J                                        52
+Ashwath                                        52
+unixkiwi                                       51
+syleung                                        51
+Azrael JD                                      51
+Nikiforos Kliafas                              51
+Pranav                                         50
+Byoung Hoon, Yoon                              50
+Guido Lena Cota                                49
+Kyle Mohr                                      49
+Pierre Rudloff                                 49
+fankex                                         48
+Ayad seghiri                                   47
+mCaballero1224                                 47
+Shantanu Pai                                   46
+Peter Babič                                    45
+Coba                                           45
+bradleyJT-CS                                   45
+Gajjela Vasudev                                44
+Varnika Sinha                                  43
+Daniel Fahl                                    42
+Nemo D'ACREMONT                                42
+Ilya Chernishev                                42
+Gabriel Paiva de Almeida                       41
+zhb4                                           41
+openbit                                        40
+Simon Verhoeven                                40
+Gabriel Rodrigues                              40
+John Haugabook                                 40
+Jeet Jawale                                    40
+Brooks YU                                      39
+Andrzej Voss                                   39
+Mariana Corrêa                                 39
+Pedro Mariano                                  39
+24f1000749                                     39
+Wolmer                                         39
+Raul Piraces Alastuey                          39
+Keziah Prado                                   39
+lightsky9627                                   38
+Zachary Talis                                  38
+Paul Mana                                      38
+lyj                                            38
+Nazar K. Poladian                              38
+Anish Kumar                                    38
+Abhishek Kaith                                 38
+TheRealGabHas                                  38
+Lukas                                          37
+Deuchnord                                      37
+Sri Sethu Madhavan S                           37
+Sahil Dhiman                                   37
+shanegeorge7                                   37
+Rafal Sasinski                                 37
+Vaishnavi5Singh                                37
+mrusme                                         37
+Slotharmy                                      36
+Luis Antonio Argüelles González                36
+Andres Espin                                   36
+Afra                                           36
+Seifer23                                       36
+Alexandros Paliakoudis                         36
+4ae4d                                          36
+Praveen Kumar                                  36
+Emanuele Rocca                                 36
+Aqeel Abbas                                    36
+Robson Cruz                                    36
+AntoineKoiko                                   35
+Salvatore Maria Italiano                       35
+Ryan                                           35
+alison                                         35
+dinaisrael                                     35
+raf                                            34
+Sohang Chopra                                  34
+Methran Gunasekaran                            34
+Andy Li                                        33
+DEBADRIBASAK                                   33
+Joachim Schwarm                                32
+koalp                                          32
+Kyle                                           32
+Rolv Apneseth                                  32
+Suryansh Pal                                   32
+Miles Glapa-Grossklag                          32
+Johan Degn                                     32
+Julian Ste                                     32
+Md. Asaduzzaman Rony                           32
+Shuwei Ye                                      32
+xuzhangheng                                    32
+Umair Khurshid                                 32
+Okinea Dev                                     31
+Rafael Julio                                   31
+dmorozov001                                    31
+mamasch19                                      30
+Saikat Sengupta                                30
+sighrelief                                     30
+Abhishek                                       30
+FlowareR-E                                     29
+Molntussen                                     29
+Joshua Shanks                                  29
+Aiglelevant                                    28
+John Toohey                                    28
+Triad                                          28
+Cool Guy                                       28
+Patrizio Bekerle                               28
+Pradeep Tarakar                                28
+Pranav Mangal                                  28
+Adinda Praditya                                27
+roundedrectangle                               27
+Marco Omainska                                 26
+Hermann AGOSSOU                                26
+dr3ySanox                                      26
+Poy Chang                                      26
+Aidan Coyle                                    26
+LIPIKA KANKARIA                                26
+Margu                                          25
+Jennifer Falco                                 25
+SamyOffer                                      25
+Sarah Haïm-Lubczanski                          25
+locnide                                        24
+Felipe Furquim                                 24
+DawidStruzik                                   24
+Ahamed_Meyan                                   24
+Jakub Wlodek                                   24
+lloyd-dada                                     24
+RAJ RAUT                                       23
+0x61nas                                        23
+Alexei M                                       23
+David Pape                                     22
+Lena                                           22
+Danila Vershinin                               22
+Andreia Bohner                                 22
+git-em                                         22
+MubarakSec                                     21
+Hadeer Ramadan                                 21
+Marcel Brode                                   21
+Suggon                                         21
+Renner0E                                       21
+Krish Rakesh Dave                              21
+DustMerlin                                     21
+Mohammad Salim                                 20
+Dheenadayalan                                  20
+dmakth                                         20
+pji2918                                        20
+Choi Young-jin                                 20
+Jeremy Aza                                     20
+Eric Cheng                                     20
+Bartłomiej Tota                                20
+aminelch                                       20
+vitalmotif                                     20
+Barry Weiss                                    20
+qubixq                                         20
+Christopher Finch                              20
+Rover van der Noort                            20
+Diyar Niyazov                                  20
+CodeTo                                         20
+Ecko                                           20
+Sebastian                                      19
+Mia Combeau                                    19
+trouyer                                        19
+Marcos Aparicio                                19
+Ahsen Zühal Göl                                19
+Daniel Mantovani                               19
+Cleyton Macedo                                 19
+Patryk Krawaczyński                            19
+Leandro Villari                                19
+Rudransh Shrivastava                           19
+Huy Nguyen                                     19
+Hahihula                                       19
+Elijah Shackelford                             19
+Ratheshan Sathiyamoorthy                       19
+Farzad Zarasvand                               19
+Waled Khatiz                                   19
+oakrotka                                       19
+roguehashrate                                  19
+CreeperFace                                    19
+Willard Washington Ford                        19
+Francesco Lucarelli                            19
+SeWook Oh                                      19
+vatsal chaudhari                               19
+Abhishek M J                                   19
+patrick                                        19
+aoqia194                                       19
+Pranaov S                                      19
+Paul Garaud                                    19
+Zach                                           19
+Vangeepuram Sreekesari                         19
+Florian Wilhelm                                19
+谢友添                                            19
+aabs82                                         18
+manojponnusamy2032-star                        18
+Laykon4                                        18
+Muhammad Hanif Amrullah                        18
+Jorge Natalino Zenun                           18
+Mohamed Taher Mosbah                           18
+Nguyễn Huỳnh Anh Khoa                          18
+Krzysztof Bociurko                             18
+Harry Wu                                       18
+Callum Rafter                                  18
+Toxikuu                                        18
+Pineapple                                      18
+Esakki Sundaram                                18
+3voltAmperes                                   17
+Andreas Diesner                                17
+Paul                                           17
+Florian B.                                     17
+Titouan-joseph Cicorella                       17
+Gustek                                         17
+Henrique                                       17
+Jacob                                          17
+elfehr                                         17
+a1346054                                       17
+Roberto Luna-Rojas                             17
+Brian Choromanski                              17
+Kefaku                                         17
+Tom Nicklin                                    17
+Ali Malek                                      17
+Chaitanya Mishra                               17
+Modi Meet                                      17
+Hans Behrens                                   17
+Radhesh Pai                                    17
+Tim McMackin                                   17
+Gabriel Francischini C. Pereira                17
+Ivan Grubišić                                  17
+krotka                                         17
+Ishaan Bhimwal                                 17
+th0ughtcrime                                   17
+x69van                                         17
+Giovanni Paolo                                 17
+Tanay Deshmukh                                 17
+Red Earth                                      16
+tshofmann                                      16
+Kaan AYDIN                                     16
+Taisei Uemura                                  16
+grafst                                         16
+Gabbar                                         16
+Myroslav Repin                                 16
+Yifan Ruan                                     16
+Aditya Gaurav                                  16
+Jonas Weich                                    16
+Supakorn Ieamgomol                             16
+licon                                          16
+Shubham Kshetre                                16
+sharaf2215                                     16
+MohammedTharikS                                16
+rafikhouzam                                    16
+Emily Freeman                                  16
+Başar Subaşı                                   16
+NeuralNine                                     16
+Prithviraj03                                   16
+Abhiram Mangipudi                              16
+rishisrivastava0812                            15
+Aakanksha Arun Desai                           15
+Jonas                                          15
+melvinxeu                                      15
+Joe Nichols                                    15
+Victor Luna                                    15
+Ein Verne                                      15
+tango8                                         15
+Robin Gower                                    15
+Emily                                          15
+dorocha                                        15
+Hugo Locurcio                                  15
+Anay Nayak                                     15
+oleksii-kulyk                                  15
+Abhisek Phago limbu                            15
+Coko                                           15
+mbsmith                                        15
+NEXNC                                          15
+Ulysse Buonomo                                 15
+23f3001101                                     15
+Máté Gyöngyösi                                 15
+William Chua                                   15
+Simon St-Pierre                                15
+Aswin girish                                   15
+Paul Somers                                    15
+Christoph Thiede                               15
+Mosapeizer                                     15
+Isidro                                         15
+koolape                                        15
+Suresh Jagtap                                  15
+MIfoodie                                       15
+Angad Singh Grover                             15
+Tsvetomir Bonev                                15
+noarchwastaken                                 15
+Abhiyan Dhakal                                 15
+DrMaxNix                                       15
+Tom Webber                                     15
+Colin Westwater                                15
+akhilennu                                      15
+omahs                                          14
+Lucas Munhoz                                   14
+mrskizzex                                      14
+DNEGEL3125                                     14
+Janek                                          14
+Yassine Zouggari                               14
+Alan                                           14
+arpit-source                                   14
+Jacobus Burger                                 14
+Th0ught09                                      14
+ohyahgit                                       14
+Birb                                           14
+skyjx                                          13
+Lars Niesen                                    13
+Sayna                                          13
+すろか                                            13
+Jeongwook Park                                 13
+JJByun                                         13
+Aerex                                          13
+Jaime                                          13
+Syafa Adena                                    13
+mortalpuppet                                   13
+Victoria Kruczek                               13
+Steve Milano                                   13
+meowmeowcat                                    13
+Dan Wood                                       13
+FantasyCookie17                                13
+sumit-8305                                     13
+Gavin Douch                                    13
+dwdh                                           13
+Vansh Pandey                                   13
+Michael Cale                                   13
+Nethum Lamahewage                              13
+Laaarge                                        13
+Shou-Chi Chen                                  13
+CalC                                           13
+whitemuu                                       13
+Adel Hasic                                     13
+the0xdev                                       13
+Girdhar Agrawal                                13
+Uriel Acosta                                   13
+Ofer Sadan                                     13
+Kunal Singh                                    13
+ARK                                            13
+satteomama                                     13
+Bruno Schaatsbergen                            13
+Danche Choi                                    13
+rexept                                         13
+u0_a390                                        13
+rajat mohan                                    13
+Aadish M                                       13
+renner0e                                       13
+Brett Krueger                                  13
+kazoni                                         13
+hidetzu                                        12
+Morgan Howard                                  12
+Anirudh Gupta                                  12
+SaiTeja-002                                    12
+Suraj Devatha                                  12
+Nguyễn Đức Chiến                               12
+Adam Bisinella                                 12
+P2Tree                                         12
+tellmeY18                                      12
+Dyo-nisos                                      12
+You Gao                                        12
+Alistair Young                                 12
+Alpha                                          12
+Coontzy1                                       12
+kongwak                                        12
+Anton Friberg                                  12
+kabir1439                                      12
+Braintelligence                                11
+NeoCode                                        11
+Taeyoon Kim                                    11
+Andros Fenollosa                               11
+Zarif León                                     11
+LSigala                                        11
+Amir H. Moayeri                                11
+kp                                             11
+Andrew McIntosh                                11
+Aiphru                                         11
+Timo Taskinen                                  11
+Cyrus Yip                                      11
+Adrian Pop                                     11
+dyegoaurelio                                   11
+xxchan                                         11
+Paul Vatterott                                 11
+TeaLeavesJumping                               11
+nilendrasinghsisodiya                          11
+LunaChocken                                    11
+z7y8hsBP                                       11
+Abhay Mittal                                   11
+Furkan                                         11
+marcel                                         11
+Lauren Szlosek                                 11
+Daniel Berlin                                  11
+Tristan Jahnke                                 11
+Dany Marcoux                                   11
+Sophia Behling                                 11
+Felipe Pena                                    11
+endorama                                       11
+vatana7                                        11
+maybeetree                                     11
+Vitor Appolinario                              11
+shellheim                                      11
+Matthew Piercey                                11
+FL                                             11
+Suyash Bhawsar                                 11
+plastik-flasche                                11
+serjepatoff                                    11
+Danesh Manoharan                               11
+AKILAN C K                                     11
+singhishan                                     10
+Pierre Hoffmeister                             10
+Jan                                            10
+BoolPurist                                     10
+Jordan Lambrecht                               10
+Abdulsalaam Noibi                              10
+George Karras                                  10
+Q                                               9
+Garvit Singh                                    9
+Shaswat Srivastava                              9
+Abhishek Keshri                                 9
+ivanhercaz                                      9
+David Ansart                                    9
+T16K                                            9
+Adam Monsen                                     9
+William Underwood                               9
+Lambert Rao                                     9
+Myzel394                                        9
+Tyler Lutz                                      9
+CanonNi                                         9
+Muralikrishnan                                  9
+diver                                           9
+Austin                                          9
+Graham                                          9
+Fern Dragonborn                                 9
+Michał Gąsior                                   9
+Rail                                            9
+Florian B                                       9
+lsomm                                           9
+mihailstoynov                                   9
+Ewen Le Bihan                                   9
+Dainis                                          9
+h-bunny                                         9
+Alfred                                          9
+Isaac-Carrascal                                 8
+Siriusmart                                      8
+Lee Katz                                        8
+Arvind Selva Jas J S                            8
+Harry Cui Kepler                                7
+Proscream                                       7
+Hash-AK                                         7
+Lucas Soares                                    7
+debghs                                          7
+Clathweppes                                     7
+TornaxO7                                        7
+Starbeamrainbowlabs                             7
+wangme88                                        7
+Quentin Klein                                   7
+subhash-iiitm                                   7
+Primedi                                         7
+Alwin Lohrie                                    7
+Caughlin Bohn                                   7
+Abdul Rafay                                     7
+funwaa                                          7
+Santosh Shrestha                                7
+Bacchus Jackson (JaX)                           7
+Terence Chen                                    7
+AA                                              5
+Riyaz Siddiqui                                  5
+Enrique Matías Sánchez                          5
+Yrsa97                                          5
+Fossen93                                        5
+Stefan Herpich                                  5
+Mohit Agarwal                                   5
+PARTH PRATYUSH                                  5
+Franz                                           5
+Randy Sugianto (Yuku)                           5
+dz-at-tc                                        5
+ElnurBDa                                        5
+Farzad Hayat                                    5
+Maas                                            5
+Merjem Bajramovic                               4
+Vedika Rathi                                    4
+Javad Razi                                      4
+Martin Blume                                    4
+Johannes                                        4
+Alexx                                           4
+Ethan Kinnear                                   4
+Martin Hübner                                   4
+Keith                                           4
+IACS CSU 2020                                   4
+Kieran                                          4
+Varad Rane                                      4
+Narfinger                                       4
+Nissaar                                         4
+Horizon Chaser                                  4
+dependabot[bot]                                 3
+Zlatan Vasović                                  2
