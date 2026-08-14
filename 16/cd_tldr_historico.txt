@@ -1,0 +1,670 @@
+Archivos a analizar: 35766
+
+=== POR PRODUCTO ===
+CD (Comment Density): 0.0005  (ref. NASA optimo ~0.15)
+  Total CLOC : 183
+  Total LLOC : 337412
+  Archivos   : 35766
+
+=== POR PERSONA ===
+Colaborador                           CLOC     LLOC       CD
+--------------------------------------------------------------
+dependabot[bot]                          7      258   0.0271
+RuiNtD                                   1       69   0.0145
+Waldir Pimenta                           9      867   0.0104
+Lena Pastwa                             11     1140   0.0096
+Marek Küthe                              1      133   0.0075
+K.B.Dharun Krishna                      20     3239   0.0062
+Sebastiaan Speck                       100    29408   0.0034
+Vitor Henrique                           2     6089   0.0003
+Managor                                 32   146076   0.0002
+Ninzero Xu                               0      629      0.0
+Ivan Baluta                              0     3557      0.0
+Fazle Arefin                             0     2010      0.0
+Andrew Stefankiv                         0      164      0.0
+Nelson Figueroa                          0    30419      0.0
+Sarijen                                  0      384      0.0
+Machiavelli                              0      955      0.0
+Jin                                      0      638      0.0
+Adriano Inghingolo                       0     5806      0.0
+github-actions[bot]                      0     6367      0.0
+Ricky                                    0      317      0.0
+Ninzero                                  0      936      0.0
+curry798                                 0       73      0.0
+Emmanuel Ferdman                         0     5221      0.0
+lightsky9627                             0       38      0.0
+Red Earth                                0       16      0.0
+Harry Cui Kepler                         0        7      0.0
+unixkiwi                                 0       51      0.0
+openbit                                  0       40      0.0
+Q                                        0        9      0.0
+Seth Falco                               0      190      0.0
+Lena                                     0     6403      0.0
+Brooks YU                                0       39      0.0
+aabs82                                   0       18      0.0
+lincc                                    0      523      0.0
+Dmytro Voytko                            0      139      0.0
+trolzen                                  0      250      0.0
+Okinea Dev                               0       31      0.0
+Bohdan Karashchuk                        0       59      0.0
+Kristopher                               0     1533      0.0
+marchersimon                             0      850      0.0
+Merjem Bajramovic                        0        4      0.0
+jeyvid                                   0       62      0.0
+Omar Moustafa                            0      313      0.0
+Ali Nazzal                               0      185      0.0
+Ayad seghiri                             0       47      0.0
+Mohammad Salim                           0       20      0.0
+Dheenadayalan                            0       20      0.0
+MubarakSec                               0       21      0.0
+AA                                       0        5      0.0
+Hadeer Ramadan                           0       21      0.0
+Dylan                                    0     8719      0.0
+manojponnusamy2032-star                  0       18      0.0
+Garvit Singh                             0        9      0.0
+Karthik Vallamsetla                      0      394      0.0
+rishisrivastava0812                      0       15      0.0
+Vedant Yadav                             0      101      0.0
+Shaswat Srivastava                       0        9      0.0
+Abhishek Keshri                          0        9      0.0
+Juri Dispan                              0      935      0.0
+Aakanksha Arun Desai                     0       15      0.0
+Aiglelevant                              0       28      0.0
+Pranav                                   0       50      0.0
+Vedika Rathi                             0        4      0.0
+Meinard Francisco                        0     1799      0.0
+RAJ RAUT                                 0       23      0.0
+singhishan                               0       10      0.0
+Reinhart Previano Koentjoro              0     5194      0.0
+Andre                                    0      180      0.0
+LucasFA                                  0       79      0.0
+tshofmann                                0       16      0.0
+4G3NT                                    0      136      0.0
+Marco Omainska                           0       26      0.0
+David Pape                               0       22      0.0
+Daniel                                   0       97      0.0
+Lukas                                    0       37      0.0
+Slotharmy                                0       36      0.0
+mamasch19                                0       30      0.0
+sebschil                                 0       60      0.0
+Pierre Hoffmeister                       0       10      0.0
+mister-ben                               0      126      0.0
+3voltAmperes                             0       17      0.0
+Kemel Zaidan                             0       80      0.0
+Joachim Schwarm                          0       32      0.0
+Bernd Stellwag                           0       66      0.0
+syleung                                  0       51      0.0
+pixie                                    0       19      0.0
+skyjx                                    0       13      0.0
+Lars Niesen                              0       13      0.0
+pixel                                    0      455      0.0
+Bevan Kay                                0      204      0.0
+Jan                                      0       10      0.0
+Sayna                                    0       13      0.0
+Andreas Diesner                          0       17      0.0
+Marcel Brode                             0       21      0.0
+Peter Bittner                            0       57      0.0
+Braintelligence                          0       11      0.0
+Margu                                    0       25      0.0
+NeoCode                                  0       11      0.0
+BoolPurist                               0       10      0.0
+Sebastian                                0       19      0.0
+Magrid                                   0      405      0.0
+Jonas                                    0       15      0.0
+HoJeong Im                               0    11070      0.0
+코드싸이                                     0    13691      0.0
+すろか                                      0       13      0.0
+runn3r                                   0      134      0.0
+jkoro1                                   0       55      0.0
+Philipp Wallrich                         0       60      0.0
+Andy Li                                  0       33      0.0
+Chooooo                                  0     1123      0.0
+bl-ue                                    0      184      0.0
+Jeongwook Park                           0       13      0.0
+dmakth                                   0       20      0.0
+piedroconti                              0      108      0.0
+Alexandre ZANNI                          0      446      0.0
+JJByun                                   0       13      0.0
+Byoung Hoon, Yoon                        0       50      0.0
+Paul                                     0       17      0.0
+Danila Vershinin                         0       22      0.0
+cyqsimon                                 0       76      0.0
+Deuchnord                                0       37      0.0
+spageektti                               0      796      0.0
+pji2918                                  0       20      0.0
+Aerex                                    0       13      0.0
+Harshavardhan                            0      174      0.0
+Taeyoon Kim                              0       11      0.0
+Marco Bonelli                            0      134      0.0
+Proscream                                0        7      0.0
+Ryan Rotter                              0       15      0.0
+tranzystorekk                            0      129      0.0
+Choi Young-jin                           0       20      0.0
+Zachary Talis                            0       38      0.0
+Paul Mana                                0       38      0.0
+CleanMachine1                            0      135      0.0
+lyj                                      0       38      0.0
+Andrzej Voss                             0       39      0.0
+Simon Verhoeven                          0       40      0.0
+Jennifer Falco                           0       25      0.0
+Florian B.                               0       17      0.0
+Daniel Konstantinov                      0     1185      0.0
+badhon                                   0     1643      0.0
+Tapu                                     0       59      0.0
+Riyaz Siddiqui                           0        5      0.0
+Olivier Toussaint                        0       75      0.0
+Joel Tony                                0       57      0.0
+iTrooz                                   0       93      0.0
+SamyOffer                                0       25      0.0
+Irina                                    0      250      0.0
+AntoineKoiko                             0       35      0.0
+Nicolas Hansse                           0      190      0.0
+Hermann AGOSSOU                          0       26      0.0
+Sarah THEOULLE                           0       78      0.0
+Laykon4                                  0       18      0.0
+Mia Combeau                              0       19      0.0
+trouyer                                  0       19      0.0
+Neluji                                   0       57      0.0
+Titouan-joseph Cicorella                 0       17      0.0
+melvinxeu                                0       15      0.0
+mana-byte                                0      142      0.0
+Sahil Afrid Farookhi                     0      529      0.0
+koalp                                    0       32      0.0
+locnide                                  0       24      0.0
+Amine LOUHICHI                           0      110      0.0
+Gustek                                   0       17      0.0
+Hash-AK                                  0        7      0.0
+omahs                                    0       14      0.0
+William Aboucaya                         0      122      0.0
+Darío Hereñú                             0     6926      0.0
+Alejandro Cervera                        0      341      0.0
+roshawn                                  0       52      0.0
+Ulices                                   0       54      0.0
+Igor Támara                              0      705      0.0
+jordi martinez                           0       98      0.0
+Rodrigo Decuir                           0       74      0.0
+Jaime                                    0       13      0.0
+Juan Pablo                               0      154      0.0
+Andros Fenollosa                         0       11      0.0
+Axel Navarro                             0      184      0.0
+k-a-rthik                                0       71      0.0
+ivanhercaz                               0        9      0.0
+Cristian Bastidas                        0      161      0.0
+Erlan Rangel                             0      221      0.0
+Luis Antonio Argüelles González          0       36      0.0
+James C Craven                           0       67      0.0
+Marcos Aparicio                          0       19      0.0
+Zarif León                               0       11      0.0
+LSigala                                  0       11      0.0
+Guido                                    0      152      0.0
+Kauan Modolo                             0       57      0.0
+dr3ySanox                                0       26      0.0
+Stig124                                  0       54      0.0
+David Ansart                             0        9      0.0
+Enrique Matías Sánchez                   0        5      0.0
+Starsoon                                 0     1491      0.0
+Jeremy Aza                               0       20      0.0
+FlowareR-E                               0       29      0.0
+Andres Espin                             0       36      0.0
+Tadeo                                    0      142      0.0
+Syafa Adena                              0       13      0.0
+Moch. Bima Pangestu                      0       62      0.0
+Haydar                                   0      138      0.0
+Adinda Praditya                          0       27      0.0
+陈文悠                                      0       80      0.0
+Muhammad Willdhan Arya Putra             0      637      0.0
+Azrael JD                                0       51      0.0
+Muhammad Hanif Amrullah                  0       18      0.0
+Mohammad Reza Soleimani                  0      201      0.0
+Amir H. Moayeri                          0       11      0.0
+mortalpuppet                             0       13      0.0
+Joe Nichols                              0       15      0.0
+Pouya Karazmayan                         0       66      0.0
+Rohith ND                                0       54      0.0
+Tan Siret A                              0      547      0.0
+umutKaracelebi                           0       72      0.0
+Kaan AYDIN                               0       16      0.0
+Cem AÇAR                                 0       62      0.0
+Ahsen Zühal Göl                          0       19      0.0
+lexion                                   0      107      0.0
+axrona                                   0      219      0.0
+Afra                                     0       36      0.0
+Yrsa97                                   0        5      0.0
+Molntussen                               0       29      0.0
+Andréia Bohner                           0       64      0.0
+Rafael Fontenelle                        0      350      0.0
+Andreia Bohner                           0       22      0.0
+Rafael Gordon Paves                      0       71      0.0
+Gabriel Paiva de Almeida                 0       41      0.0
+Lucas Munhoz                             0       14      0.0
+Isaac Vicente                            0       61      0.0
+Renie Siqueira                           0      189      0.0
+caduvieira                               0       60      0.0
+kp                                       0       11      0.0
+Victor Luna                              0       15      0.0
+Sencyy                                   0      116      0.0
+Henrique                                 0       17      0.0
+Gabriel Rodrigues                        0       40      0.0
+Felipe Furquim                           0       24      0.0
+Mariana Corrêa                           0       39      0.0
+Lucas Soares                             0        7      0.0
+Daniel Mantovani                         0       19      0.0
+John Toohey                              0       28      0.0
+Pedro Mariano                            0       39      0.0
+Cleyton Macedo                           0       19      0.0
+T16K                                     0        9      0.0
+Jorge Natalino Zenun                     0       18      0.0
+Rafael Julio                             0       31      0.0
+git-em                                   0       22      0.0
+Vítor Henrique                           0      417      0.0
+Paulina Kalicka                          0      152      0.0
+mrskizzex                                0       14      0.0
+rozie                                    0       85      0.0
+Victoria Kruczek                         0       13      0.0
+Wiktor Perskawiec                        0       76      0.0
+DawidStruzik                             0       24      0.0
+Patryk Krawaczyński                      0       19      0.0
+Fossen93                                 0        5      0.0
+Taisei Uemura                            0       16      0.0
+hidetzu                                  0       12      0.0
+Nikiforos Kliafas                        0       51      0.0
+raf                                      0       34      0.0
+Kyle                                     0       32      0.0
+Andrei Murariu                           0      458      0.0
+lucas schneider                          0       49      0.0
+Guido Lena Cota                          0       49      0.0
+Francesco Franchina                      0      202      0.0
+Matteo Piffari                           0       53      0.0
+Andrew McIntosh                          0       11      0.0
+Salvatore Maria Italiano                 0       35      0.0
+Lucas Gabriel Schneider                  0       68      0.0
+Samuele Facenda                          0       80      0.0
+Aiphru                                   0       11      0.0
+Triad                                    0       28      0.0
+Leandro Villari                          0       19      0.0
+Seifer23                                 0       36      0.0
+Mohamed Taher Mosbah                     0       18      0.0
+Nguyễn Huỳnh Anh Khoa                    0       18      0.0
+Ryan                                     0       35      0.0
+Emily Grace Seville                      0      548      0.0
+Jacob                                    0       17      0.0
+Steve Milano                             0       13      0.0
+meowmeowcat                              0       13      0.0
+Jordan Lambrecht                         0       10      0.0
+Saikat Sengupta                          0       30      0.0
+Dan Wood                                 0       13      0.0
+Ein Verne                                0       15      0.0
+DNEGEL3125                               0       14      0.0
+Timo Taskinen                            0       11      0.0
+Morgan Howard                            0       12      0.0
+Cornelius Roemer                         0       67      0.0
+grafst                                   0       16      0.0
+Om Singh Bais                            0      140      0.0
+Anirudh Gupta                            0       12      0.0
+Daniel Guerrero                          0       89      0.0
+SaiTeja-002                              0       12      0.0
+Gabbar                                   0       16      0.0
+Adam Herst                               0       66      0.0
+chris                                    0       36      0.0
+Eric Cheng                               0       20      0.0
+Alexandros Paliakoudis                   0       36      0.0
+Bartłomiej Tota                          0       20      0.0
+Adam Monsen                              0        9      0.0
+Rudransh Shrivastava                     0       19      0.0
+Gabriel de Souza                         0       93      0.0
+Javad Razi                               0        4      0.0
+4ae4d                                    0       36      0.0
+Sri Sethu Madhavan S                     0       37      0.0
+Harikrishna C                            0       65      0.0
+Sahil Dhiman                             0       37      0.0
+Cyrus Yip                                0       11      0.0
+Myroslav Repin                           0       16      0.0
+Shelly David                             0      350      0.0
+Praveen Kumar                            0       36      0.0
+Sainjargal Ishdorj                       0       64      0.0
+Rolv Apneseth                            0       32      0.0
+Poy Chang                                0       26      0.0
+sighrelief                               0       30      0.0
+Kyle Mohr                                0       49      0.0
+Suraj Devatha                            0       12      0.0
+Godwin Iheuwa                            0       79      0.0
+Sohang Chopra                            0       34      0.0
+Nazar K. Poladian                        0       38      0.0
+Alessandro Chitarrini                    0      157      0.0
+Peter Babič                              0       45      0.0
+FantasyCookie17                          0       13      0.0
+ramadasmr                                0       56      0.0
+Owen Voke                                0      113      0.0
+dz-at-tc                                 0       12      0.0
+debghs                                   0        7      0.0
+Suryansh Pal                             0       32      0.0
+dwalex                                   0       56      0.0
+elfehr                                   0       17      0.0
+Adrian Pop                               0       11      0.0
+kekwlboy12469                            0      112      0.0
+24f1000749                               0       39      0.0
+Daniel Fahl                              0       42      0.0
+William Underwood                        0        9      0.0
+Gin                                      0       52      0.0
+Pierre Rudloff                           0       49      0.0
+Jack Lin                                 0       23      0.0
+shanegeorge7                             0       37      0.0
+David Lazarevic                          0       88      0.0
+Varnika Sinha                            0       43      0.0
+Ivan                                     0      377      0.0
+crispyfires                              0      194      0.0
+Brook                                    0       65      0.0
+Miles Glapa-Grossklag                    0       32      0.0
+Martin Blume                             0        4      0.0
+JanviNandre                              0       57      0.0
+aminelch                                 0       20      0.0
+Janek                                    0       14      0.0
+Swasti Mishra                            0       67      0.0
+Johannes                                 0        4      0.0
+Clathweppes                              0        7      0.0
+sumit-8305                               0       13      0.0
+TornaxO7                                 0        7      0.0
+Alexx                                    0        4      0.0
+Ahamed_Meyan                             0       24      0.0
+Johan Degn                               0       32      0.0
+Rinas                                    0       57      0.0
+Yifan Ruan                               0       16      0.0
+Kabiir Krishna                           0       84      0.0
+depgod                                   0       68      0.0
+Christoph                                0       61      0.0
+sapbotgit                                0       52      0.0
+dyegoaurelio                             0       11      0.0
+Gavin Douch                              0       13      0.0
+tango8                                   0       15      0.0
+xxchan                                   0       11      0.0
+Wolmer                                   0       39      0.0
+Huy Nguyen                               0       19      0.0
+roundedrectangle                         0       27      0.0
+Aditya Gaurav                            0       16      0.0
+Starbeamrainbowlabs                      0        7      0.0
+Raul Piraces Alastuey                    0       39      0.0
+Sadeed                                   0       91      0.0
+Nguyễn Đức Chiến                         0       12      0.0
+Juri                                     0       42      0.0
+Stefan Herpich                           0        5      0.0
+Fabio Perrella                           0       74      0.0
+wangme88                                 0        7      0.0
+Hahihula                                 0       19      0.0
+Yassine Zouggari                         0       14      0.0
+Robin Gower                              0       15      0.0
+alison                                   0       35      0.0
+John Haugabook                           0       40      0.0
+Mohit Agarwal                            0        5      0.0
+pxgamer                                  0       74      0.0
+vitalmotif                               0       20      0.0
+Cool Guy                                 0       28      0.0
+Anish Kumar                              0       38      0.0
+a1346054                                 0       17      0.0
+Alexandros Tzimas                        0       58      0.0
+Emily                                    0       15      0.0
+Keziah Prado                             0       39      0.0
+Paul Vatterott                           0       11      0.0
+TeaLeavesJumping                         0       11      0.0
+dorocha                                  0       15      0.0
+Abhishek                                 0       30      0.0
+Julian Ste                               0       32      0.0
+Hugo Locurcio                            0       15      0.0
+dwdh                                     0       13      0.0
+Elijah Shackelford                       0       19      0.0
+PARTH PRATYUSH                           0        5      0.0
+Ratheshan Sathiyamoorthy                 0       19      0.0
+nilendrasinghsisodiya                    0       11      0.0
+Roberto Luna-Rojas                       0       17      0.0
+Anay Nayak                               0       15      0.0
+Barry Weiss                              0       20      0.0
+Brian Choromanski                        0       17      0.0
+oleksii-kulyk                            0       15      0.0
+Lambert Rao                              0        9      0.0
+Lakshyajeet Singh Goyal                  0       59      0.0
+Vansh Pandey                             0       13      0.0
+Kefaku                                   0       17      0.0
+Farzad Zarasvand                         0       19      0.0
+Myzel394                                 0        9      0.0
+Waled Khatiz                             0       19      0.0
+Md. Asaduzzaman Rony                     0       32      0.0
+Tyler Lutz                               0        9      0.0
+Quentin Klein                            0        7      0.0
+oakrotka                                 0       19      0.0
+LunaChocken                              0       11      0.0
+Joshua Shanks                            0       29      0.0
+Ethan Kinnear                            0        4      0.0
+Abhisek Phago limbu                      0       15      0.0
+fankex                                   0       48      0.0
+Jeet Jawale                              0       40      0.0
+z7y8hsBP                                 0       11      0.0
+Michael Cale                             0       13      0.0
+Abhay Mittal                             0       11      0.0
+Nethum Lamahewage                        0       13      0.0
+subhash-iiitm                            0        7      0.0
+Laaarge                                  0       13      0.0
+roguehashrate                            0       19      0.0
+Tom Nicklin                              0       17      0.0
+CanonNi                                  0        9      0.0
+Coko                                     0       15      0.0
+Ethan J                                  0       52      0.0
+Shou-Chi Chen                            0       13      0.0
+Kishore B                                0      130      0.0
+Muralikrishnan                           0        9      0.0
+Nemo D'ACREMONT                          0       42      0.0
+mbsmith                                  0       15      0.0
+Rafal Sasinski                           0       37      0.0
+Coba                                     0       45      0.0
+diver                                    0        9      0.0
+Ali Malek                                0       17      0.0
+NEXNC                                    0       15      0.0
+CreeperFace                              0       19      0.0
+Willard Washington Ford                  0       19      0.0
+Isaac-Carrascal                          0        8      0.0
+Furkan                                   0       11      0.0
+Patrizio Bekerle                         0       28      0.0
+Francesco Lucarelli                      0       19      0.0
+SeWook Oh                                0       19      0.0
+qubixq                                   0       20      0.0
+Christopher Finch                        0       20      0.0
+Ulysse Buonomo                           0       15      0.0
+vatsal chaudhari                         0       19      0.0
+Chaitanya Mishra                         0       17      0.0
+Pradeep Tarakar                          0       28      0.0
+CalC                                     0       13      0.0
+mCaballero1224                           0       47      0.0
+Austin                                   0        9      0.0
+Abhishek M J                             0       19      0.0
+marcel                                   0       11      0.0
+23f3001101                               0       15      0.0
+patrick                                  0       19      0.0
+Lauren Szlosek                           0       11      0.0
+Modi Meet                                0       17      0.0
+Shuwei Ye                                0       32      0.0
+Jonas Weich                              0       16      0.0
+Rover van der Noort                      0       20      0.0
+Abdulsalaam Noibi                        0       10      0.0
+Shantanu Pai                             0       46      0.0
+aoqia194                                 0       19      0.0
+Máté Gyöngyösi                           0       15      0.0
+whitemuu                                 0       13      0.0
+Adam Bisinella                           0       12      0.0
+Hans Behrens                             0       17      0.0
+Graham                                   0        9      0.0
+Franz                                    0        5      0.0
+Pranav Mangal                            0       28      0.0
+Martin Hübner                            0        4      0.0
+Supakorn Ieamgomol                       0       16      0.0
+Krzysztof Bociurko                       0       18      0.0
+Pranaov S                                0       19      0.0
+Adel Hasic                               0       13      0.0
+Fern Dragonborn                          0        9      0.0
+the0xdev                                 0       13      0.0
+Keith                                    0        4      0.0
+William Chua                             0       15      0.0
+Primedi                                  0        7      0.0
+IACS CSU 2020                            0        4      0.0
+Daniel Berlin                            0       11      0.0
+Simon St-Pierre                          0       15      0.0
+Aidan Coyle                              0       26      0.0
+P2Tree                                   0       12      0.0
+Girdhar Agrawal                          0       13      0.0
+Tristan Jahnke                           0       11      0.0
+Radhesh Pai                              0       17      0.0
+Aswin girish                             0       15      0.0
+Uriel Acosta                             0       13      0.0
+Dany Marcoux                             0       11      0.0
+Sophia Behling                           0       11      0.0
+Alan                                     0       14      0.0
+Ofer Sadan                               0       13      0.0
+Kieran                                   0        4      0.0
+LIPIKA KANKARIA                          0       26      0.0
+Emanuele Rocca                           0       36      0.0
+Randy Sugianto (Yuku)                    0        5      0.0
+Kunal Singh                              0       13      0.0
+arpit-source                             0       14      0.0
+Felipe Pena                              0       11      0.0
+Tim McMackin                             0       17      0.0
+Michał Gąsior                            0        9      0.0
+Gabriel Francischini C. Pereira          0       17      0.0
+ARK                                      0       13      0.0
+Paul Somers                              0       15      0.0
+Sarah Haïm-Lubczanski                    0       25      0.0
+Alwin Lohrie                             0        7      0.0
+Jacobus Burger                           0       14      0.0
+Gajjela Vasudev                          0       44      0.0
+Rail                                     0        9      0.0
+Florian B                                0        9      0.0
+Siriusmart                               0        8      0.0
+Th0ught09                                0       14      0.0
+satteomama                               0       13      0.0
+Christoph Thiede                         0       15      0.0
+endorama                                 0       11      0.0
+Mosapeizer                               0       15      0.0
+Paul Garaud                              0       19      0.0
+Bruno Schaatsbergen                      0       13      0.0
+Harry Wu                                 0       18      0.0
+Abhishek Kaith                           0       38      0.0
+Zach                                     0       19      0.0
+lsomm                                    0        9      0.0
+ElnurBDa                                 0        5      0.0
+Ivan Grubišić                            0       17      0.0
+zhuhong_bo                               0       65      0.0
+licon                                    0       16      0.0
+Suggon                                   0       21      0.0
+Isidro                                   0       15      0.0
+Pranav Lawate                            0      203      0.0
+tellmeY18                                0       12      0.0
+Lee Katz                                 0        8      0.0
+Arvind Selva Jas J S                     0        8      0.0
+Ashwath                                  0       52      0.0
+Danche Choi                              0       13      0.0
+mihailstoynov                            0        9      0.0
+Vaishnavi5Singh                          0       37      0.0
+krotka                                   0       17      0.0
+vatana7                                  0       11      0.0
+Naman Soni                               0       84      0.0
+koolape                                  0       15      0.0
+Diyar Niyazov                            0       20      0.0
+xuzhangheng                              0       32      0.0
+zhb4                                     0       41      0.0
+Aqeel Abbas                              0       36      0.0
+maybeetree                               0       11      0.0
+DEBADRIBASAK                             0       33      0.0
+rexept                                   0       13      0.0
+Krystian                                 0       64      0.0
+Dyo-nisos                                0       12      0.0
+dinaisrael                               0       35      0.0
+bradleyJT-CS                             0       45      0.0
+Shubham Kshetre                          0       16      0.0
+You Gao                                  0       12      0.0
+sharaf2215                               0       16      0.0
+Harrison                                 0       90      0.0
+Phil Clifford                            0       18      0.0
+u0_a390                                  0       13      0.0
+Ishaan Bhimwal                           0       17      0.0
+rajat mohan                              0       13      0.0
+Vitor Appolinario                        0       11      0.0
+th0ughtcrime                             0       17      0.0
+Vangeepuram Sreekesari                   0       19      0.0
+Jakub Wlodek                             0       24      0.0
+Florian Wilhelm                          0       19      0.0
+Alistair Young                           0       12      0.0
+Suresh Jagtap                            0       15      0.0
+Renner0E                                 0       21      0.0
+MIfoodie                                 0       15      0.0
+Varad Rane                               0        4      0.0
+shellheim                                0       11      0.0
+Angad Singh Grover                       0       15      0.0
+Caughlin Bohn                            0        7      0.0
+Farzad Hayat                             0        5      0.0
+Narfinger                                0        4      0.0
+MohammedTharikS                          0       16      0.0
+Krish Rakesh Dave                        0       21      0.0
+Callum Rafter                            0       18      0.0
+Matthew Piercey                          0       11      0.0
+Alpha                                    0       12      0.0
+CodeTo                                   0       20      0.0
+lloyd-dada                               0       24      0.0
+Aadish M                                 0       13      0.0
+renner0e                                 0       13      0.0
+Tsvetomir Bonev                          0       15      0.0
+rafikhouzam                              0       16      0.0
+FL                                       0       11      0.0
+Coontzy1                                 0       12      0.0
+Ecko                                     0       20      0.0
+DustMerlin                               0       21      0.0
+x69van                                   0       17      0.0
+Abdul Rafay                              0        7      0.0
+Suyash Bhawsar                           0       11      0.0
+Methran Gunasekaran                      0       34      0.0
+funwaa                                   0        7      0.0
+Ewen Le Bihan                            0        9      0.0
+Nissaar                                  0        4      0.0
+plastik-flasche                          0       11      0.0
+Dainis                                   0        9      0.0
+Toxikuu                                  0       18      0.0
+ohyahgit                                 0       14      0.0
+serjepatoff                              0       11      0.0
+noarchwastaken                           0       15      0.0
+Maas                                     0        5      0.0
+Abhiyan Dhakal                           0       15      0.0
+Giovanni Paolo                           0       17      0.0
+h-bunny                                  0        9      0.0
+Santosh Shrestha                         0        7      0.0
+Bacchus Jackson (JaX)                    0        7      0.0
+Emily Freeman                            0       16      0.0
+谢友添                                      0       19      0.0
+Danesh Manoharan                         0       11      0.0
+Başar Subaşı                             0       16      0.0
+Brett Krueger                            0       13      0.0
+NeuralNine                               0       16      0.0
+Tanay Deshmukh                           0       17      0.0
+Birb                                     0       14      0.0
+kongwak                                  0       12      0.0
+DrMaxNix                                 0       15      0.0
+Terence Chen                             0        7      0.0
+Umair Khurshid                           0       32      0.0
+Anton Friberg                            0       12      0.0
+Prithviraj03                             0       16      0.0
+AKILAN C K                               0       11      0.0
+Alfred                                   0        9      0.0
+Tom Webber                               0       15      0.0
+George Karras                            0       10      0.0
+mrusme                                   0       37      0.0
+Colin Westwater                          0       15      0.0
+kabir1439                                0       12      0.0
+0x61nas                                  0       23      0.0
+Pineapple                                0       18      0.0
+Robson Cruz                              0       36      0.0
+kazoni                                   0       13      0.0
+akhilennu                                0       15      0.0
+Horizon Chaser                           0        4      0.0
+Abhiram Mangipudi                        0       16      0.0
+Esakki Sundaram                          0       18      0.0
+TheRealGabHas                            0       38      0.0
+Tamanec                                  0      545      0.0
+elfiyka                                  0      112      0.0
+Ilya Chernishev                          0       42      0.0
+dmorozov001                              0       31      0.0
+Alexei M                                 0       23      0.0
+Alexandru Rusu                           0       54      0.0

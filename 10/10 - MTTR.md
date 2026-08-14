@@ -81,6 +81,21 @@ En los tres casos, la métrica funciona como un promedio: suma duraciones indivi
 
 ## 4. Salida Obtenida
 
-**Resultado de la última ejecución:** `0`
+**Período:** 2025-08-11 → 2026-08-11
 
-Este valor se debe a que el repositorio tldr de entrada no contiene issues reales.
+**Por producto:** MTTR = 3778.23 horas (~157 días promedio para cerrar un issue)
+
+**Por persona:**
+
+| Colaborador                | MTTR (horas) |
+|------------------------------|-------------:|
+| StefanLobbenmeierObjego     | 0.01          |
+| ilius                       | 0.04          |
+| DeepHiwase                  | 0.28          |
+| Sarijen                     | 6.88          |
+| BananaaaKING                | 15.81         |
+| Ninzero                     | 16.7          |
+| niklasmohrin                 | 18.78         |
+| AndreiCherniaev              | 42.8          |
+| Waples                       | 47.01         |
+| CleanMachine1                | 65.42         |

@@ -1,0 +1,19 @@
+Repo   : tldr-pages/tldr
+Período: histórico completo
+
+=== POR PRODUCTO ===
+Obteniendo árbol del repositorio...
+README.md encontrados: 3
+  ...1/3 README analizados  ...2/3 README analizados  ...3/3 README analizados
+RC (README Completeness): 0.5714  (ref. óptimo = 1.0, 7 secciones Prana et al.)
+
+=== POR PERSONA ===
+Obteniendo árbol del repositorio...
+README.md encontrados: 3
+  ...1/3 README analizados  ...2/3 README analizados  ...3/3 README analizados
+  ...1/3 READMEs con autor resuelto  ...2/3 READMEs con autor resuelto  ...3/3 READMEs con autor resuelto
+Colaborador                    RC
+----------------------------------------
+Managor                        0.8571
+sebastiaanspeck                0.4286
+kbdharun                       0.4286

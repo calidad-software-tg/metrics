@@ -68,8 +68,8 @@ now = datetime.now(timezone.utc)
 fecha_inicio = now - timedelta(days=365)
 fecha_fin    = now
 
-metrica   = "nob_42"
-por       = "producto"  # "producto" | "persona"
+metrica   = "mttr"
+por       = "persona"  # "producto" | "persona"
 max_files = 500        # solo aplica a "cd": máximo de archivos a analizar
 
 if not all([token, org, repo]):
