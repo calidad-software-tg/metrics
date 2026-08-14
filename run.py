@@ -20,6 +20,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "23"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "27"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "40"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "43"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "28"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "38"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "39"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "42"))
+
+
 
 from nci import NumberOfClosedIssues
 from anmcc import AverageNumberOfModifiedComponentsPerCommit
@@ -47,6 +53,11 @@ from noi import NumberOfOpenIssues
 from nci_reuse import NumberOfClosedIssues as NumberOfClosedIssuesProcess
 from tasa_exito import JarczykSuccessRate
 from nci_reuse_43 import NumberOfClosedIssues as NumberOfClosedIssuesResolutionTime
+from open_issues import NumberOfOpenIssues as NumberOfOpenIssuesRegistro28
+from dev_experience import DevelopmentExperience
+from user_reported_bugs import NumberOfBugsDetectedByUsers
+from nob import NumberOfBranches
+
 
 # --- Configuración ---
 token = os.environ.get("GITHUB_TOKEN", "")
@@ -57,8 +68,8 @@ now = datetime.now(timezone.utc)
 fecha_inicio = now - timedelta(days=365)
 fecha_fin    = now
 
-metrica   = "sc"
-por       = "persona"  # "producto" | "persona"
+metrica   = "nob_42"
+por       = "producto"  # "producto" | "persona"
 max_files = 500        # solo aplica a "cd": máximo de archivos a analizar
 
 if not all([token, org, repo]):
@@ -95,6 +106,11 @@ metricas = {
     "nci_process": NumberOfClosedIssuesProcess,
     "jarczyk_success_rate": JarczykSuccessRate,
     "nci_resolution_time": NumberOfClosedIssuesResolutionTime,
+    "noi_28": NumberOfOpenIssuesRegistro28,
+    "dev_exp": DevelopmentExperience,
+    "nub": NumberOfBugsDetectedByUsers,
+    "nob_42": NumberOfBranches,
+
 }
 
 metric = metricas[metrica](token, org, repo)
