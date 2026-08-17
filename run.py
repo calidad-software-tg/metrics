@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "28"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "38"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "39"))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "42"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "Notion"))
 
 
 
@@ -57,6 +58,17 @@ from open_issues import NumberOfOpenIssues as NumberOfOpenIssuesRegistro28
 from dev_experience import DevelopmentExperience
 from user_reported_bugs import NumberOfBugsDetectedByUsers
 from nob import NumberOfBranches
+from loc import LinesOfCode
+from collaborators import NumberOfCollaborators
+from commit_frequency import CommitFrequency
+from commit_entropy import CommitEntropy
+from ci_presence import ContinuousIntegrationPresence
+from commits_per_author import CommitsPerAuthor
+from developer_ownership import DeveloperOwnership
+from forks import NumberOfForks
+from issues_total import TotalIssues
+from pull_requests_summary import PullRequestsSummary
+from core_devs_prs import CoreDevsPullRequests
 
 
 # --- Configuración ---
@@ -68,8 +80,8 @@ now = datetime.now(timezone.utc)
 fecha_inicio = now - timedelta(days=365)
 fecha_fin    = now
 
-metrica   = "mttr"
-por       = "persona"  # "producto" | "persona"
+metrica   = "loc_notion"
+por       = "producto"  # "producto" | "persona"
 max_files = 500        # solo aplica a "cd": máximo de archivos a analizar
 
 if not all([token, org, repo]):
@@ -110,6 +122,17 @@ metricas = {
     "dev_exp": DevelopmentExperience,
     "nub": NumberOfBugsDetectedByUsers,
     "nob_42": NumberOfBranches,
+    "loc_notion": LinesOfCode,
+    "collab_notion": NumberOfCollaborators,
+    "commit_freq_notion": CommitFrequency,
+    "commit_entropy_notion": CommitEntropy,
+    "ci_presence_notion": ContinuousIntegrationPresence,
+    "commits_per_author_notion": CommitsPerAuthor,
+    "developer_ownership_notion": DeveloperOwnership,
+    "forks_notion": NumberOfForks,
+    "issues_total_notion": TotalIssues,
+    "prs_summary_notion": PullRequestsSummary,
+    "core_devs_prs_notion": CoreDevsPullRequests,
 
 }
 

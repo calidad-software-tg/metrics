@@ -1,0 +1,17 @@
+Repo: tldr-pages/tldr
+Periodo: 2025-08-16 -> 2026-08-16
+
+=== POR PRODUCTO ===
+LOC (Lines of Code): 3272 lineas en 19 archivos
+
+=== POR PERSONA ===
+Colaborador                    LOC (por ultimo autor del archivo)
+-------------------------------------------------------
+danielzgtg                     1733
+sebastiaanspeck                684
+vitorhcl                       274
+kbdharun                       242
+Managor                        163
+RuinTD                         86
+acuteenvy                      54
+CleanMachine1                  36
