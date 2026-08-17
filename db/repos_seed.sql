@@ -1,7 +1,5 @@
 INSERT INTO repos (org, repo, full_name, url, plataforma) VALUES
   ('tldr-pages', 'tldr', 'tldr-pages/tldr', 'https://github.com/tldr-pages/tldr', 'GitHub'),
-  ('facebook', 'react', 'facebook/react', 'https://github.com/facebook/react', 'GitHub'),
-  ('nodejs', 'node', 'nodejs/node', 'https://github.com/nodejs/node', 'GitHub'),
   ('flutter', 'flutter', 'flutter/flutter', 'https://github.com/flutter/flutter', 'GitHub'),
   ('home-assistant', 'core', 'home-assistant/core', 'https://github.com/home-assistant/core', 'GitHub'),
   ('microsoft', 'vscode', 'microsoft/vscode', 'https://github.com/microsoft/vscode', 'GitHub'),

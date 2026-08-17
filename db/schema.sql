@@ -10,13 +10,11 @@ CREATE TABLE IF NOT EXISTS repos (
 
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS metric_catalog (
-    metric_key       TEXT PRIMARY KEY,
-    metric_name      TEXT NOT NULL,
-    dimension        TEXT,
-    unidad_analisis  TEXT,
-    calculable       TEXT,
-    fuente           TEXT,
-    notas            TEXT
+    metric_key    TEXT PRIMARY KEY,
+    metric_name   TEXT NOT NULL,
+    dim_producto  BOOLEAN DEFAULT FALSE,
+    dim_proceso   BOOLEAN DEFAULT FALSE,
+    dim_persona  BOOLEAN DEFAULT FALSE
 );
 
 -- ---------------------------------------------------------------------------
@@ -29,9 +27,25 @@ CREATE TABLE IF NOT EXISTS metric_isl_map (
     metrica_original_isl    TEXT
 );
 -- ---------------------------------------------------------------------------
+-- Partición del historial de un repo en bloques temporales, para correr
+-- las métricas bloque por bloque y analizar evolución en el tiempo.
+CREATE TABLE IF NOT EXISTS bloques_temporales (
+    bloque_id     SERIAL PRIMARY KEY,
+    repo_id       INTEGER NOT NULL REFERENCES repos(repo_id),
+    bloque_num    INTEGER NOT NULL,        -- orden dentro del repo: 1, 2, 3...
+    fecha_inicio  TIMESTAMPTZ NOT NULL,
+    fecha_fin     TIMESTAMPTZ NOT NULL,
+    criterio      TEXT,                    -- 'trimestral' | 'semestral' | 'por release' | 'N commits' | ...
+    etiqueta      TEXT,                    -- humano-legible, ej. '2023-Q1'
+    UNIQUE(repo_id, bloque_num),
+    UNIQUE(repo_id, fecha_inicio, fecha_fin)
+);
+
+-- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS runs (
     run_id        SERIAL PRIMARY KEY,
     repo_id       INTEGER NOT NULL REFERENCES repos(repo_id),
+    bloque_id     INTEGER REFERENCES bloques_temporales(bloque_id),  -- NULL si es una corrida "snapshot" sin partición
     fecha_inicio  TIMESTAMPTZ,   -- inicio de la ventana medida
     fecha_fin     TIMESTAMPTZ,   -- fin de la ventana medida
     ejecutado_en  TIMESTAMPTZ,   -- cuándo se corrió de verdad
@@ -64,3 +78,5 @@ CREATE TABLE IF NOT EXISTS results_persona (
 CREATE INDEX IF NOT EXISTS idx_results_producto_run ON results_producto(run_id);
 CREATE INDEX IF NOT EXISTS idx_results_persona_run ON results_persona(run_id);
 CREATE INDEX IF NOT EXISTS idx_isl_map_metric ON metric_isl_map(metric_key);
+CREATE INDEX IF NOT EXISTS idx_runs_bloque ON runs(bloque_id);
+CREATE INDEX IF NOT EXISTS idx_bloques_repo ON bloques_temporales(repo_id);
