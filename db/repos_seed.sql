@@ -8,4 +8,5 @@ INSERT INTO repos (org, repo, full_name, url, plataforma) VALUES
   ('tensorflow', 'tensorflow', 'tensorflow/tensorflow', 'https://github.com/tensorflow/tensorflow', 'GitHub'),
   ('python', 'cpython', 'python/cpython', 'https://github.com/python/cpython', 'GitHub'),
   ('raysan5', 'raylib', 'raysan5/raylib', 'https://github.com/raysan5/raylib', 'GitHub'),
-  ('GNOME', 'gimp', 'GNOME/gimp', 'https://gitlab.gnome.org/GNOME/gimp', 'GitLab');
+  ('GNOME', 'gimp', 'GNOME/gimp', 'https://gitlab.gnome.org/GNOME/gimp', 'GitLab')
+ON CONFLICT (full_name) DO NOTHING;
