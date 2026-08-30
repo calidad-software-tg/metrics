@@ -32,9 +32,9 @@ from loc import _CODE_EXTENSIONS, _is_excluded
 #    sin paginación posible dentro del archivo mismo.
 
 _BLAME_QUERY = """
-query($owner: String!, $name: String!, $path: String!) {
+query($owner: String!, $name: String!, $path: String!, $ref: String!) {
   repository(owner: $owner, name: $name) {
-    object(expression: "HEAD") {
+    object(expression: $ref) {
       ... on Commit {
         blame(path: $path) {
           ranges {
@@ -67,9 +67,9 @@ class DeveloperOwnership(GitHubMetric):
         self.propiedad: dict[str, int] = defaultdict(int)
         self.total_lineas: int = 0
 
-    def _listar_archivos(self, max_files: int) -> list[str]:
+    def _listar_archivos(self, ref: str, max_files: int) -> list[str]:
         tree = self._rest(
-            f"/repos/{self.org}/{self.repo}/git/trees/HEAD",
+            f"/repos/{self.org}/{self.repo}/git/trees/{ref}",
             {"recursive": "1"},
         )
         archivos = [
@@ -83,14 +83,15 @@ class DeveloperOwnership(GitHubMetric):
         print(f"Archivos de código encontrados: {total} (analizando {len(archivos)})")
         return archivos
 
-    def fetch(self, max_files: int = 300, **kwargs):
-        archivos = self._listar_archivos(max_files)
+    def fetch(self, fecha_fin: datetime, max_files: int = 300, **kwargs):
+        ref = self._resolve_ref(fecha_fin)
+        archivos = self._listar_archivos(ref, max_files)
         propiedad: dict[str, int] = defaultdict(int)
         total_lineas = 0
 
         for i, archivo in enumerate(archivos):
             data = self._graphql(_BLAME_QUERY, {
-                "owner": self.org, "name": self.repo, "path": archivo,
+                "owner": self.org, "name": self.repo, "path": archivo, "ref": ref,
             })
             obj = data["data"]["repository"]["object"]
             rangos = (obj or {}).get("blame", {}).get("ranges", []) if obj else []
@@ -141,7 +142,7 @@ class DeveloperOwnership(GitHubMetric):
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "persona",
             max_files: int = 300, **kwargs):
         print(f"Calculando Developer Ownership de {self.org}/{self.repo}...")
-        self.fetch(max_files=max_files)
+        self.fetch(fecha_fin, max_files=max_files)
 
         if por == "producto":
             r = self.por_producto(fecha_inicio, fecha_fin)

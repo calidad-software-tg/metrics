@@ -19,10 +19,11 @@ class DocumentationLinesOfCode(GitHubMetric):
         super().__init__(token, org, repo)
         self.files: list[dict] = []  # [{path, lines}]
 
-    def fetch(self, max_files: int = 500, **kwargs):
+    def fetch(self, fecha_fin: datetime, max_files: int = 500, **kwargs):
         print("Obteniendo árbol del repositorio...")
+        ref = self._resolve_ref(fecha_fin)
         tree = self._rest(
-            f"/repos/{self.org}/{self.repo}/git/trees/HEAD",
+            f"/repos/{self.org}/{self.repo}/git/trees/{ref}",
             {"recursive": "1"},
         )
         doc_files = [
@@ -47,10 +48,10 @@ class DocumentationLinesOfCode(GitHubMetric):
         print()
         self.files = files
 
-    def _fetch_last_author(self, path: str) -> str:
+    def _fetch_last_author(self, path: str, fecha_fin: datetime) -> str:
         commits = self._rest(
             f"/repos/{self.org}/{self.repo}/commits",
-            {"path": path, "per_page": 1},
+            {"path": path, "per_page": 1, "until": fecha_fin.isoformat()},
         )
         if not commits:
             return "desconocido"
@@ -68,7 +69,7 @@ class DocumentationLinesOfCode(GitHubMetric):
         by_author: dict[str, int] = {}
         total = len(self.files)
         for i, f in enumerate(self.files):
-            login = self._fetch_last_author(f["path"])
+            login = self._fetch_last_author(f["path"], fecha_fin)
             by_author[login] = by_author.get(login, 0) + f["lines"]
             print(f"  ...{i + 1}/{total} archivos con autor resuelto", end="\r")
         print()
@@ -76,7 +77,7 @@ class DocumentationLinesOfCode(GitHubMetric):
 
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto",
             max_files: int = 500, **kwargs):
-        self.fetch(max_files=max_files)
+        self.fetch(fecha_fin, max_files=max_files)
         if por == "persona":
             resultado = self.por_persona(fecha_inicio, fecha_fin)
             print(f"{'Colaborador':<30} DLOC")

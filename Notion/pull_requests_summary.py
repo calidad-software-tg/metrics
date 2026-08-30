@@ -21,6 +21,12 @@ from base_metric import GitHubMetric
 #
 # Por persona requiere paginar por los nodos de PR (author + state) en vez
 # de usar `totalCount`, que es agregado y no distingue autor.
+#
+# fetch() trae TODAS las PRs (sin filtro), y el filtro por [fecha_inicio,
+# fecha_fin] se aplica en por_producto/por_persona sobre createdAt — mismo
+# criterio que nci.py. Ojo: "abiertas" con ventana filtrada significa "PRs
+# creadas en el período que siguen abiertas HOY", no "abiertas al cierre
+# del período" (la API no da un snapshot histórico del estado de una PR).
 
 _QUERY = """
 query($owner: String!, $name: String!, $after: String) {
@@ -30,6 +36,7 @@ query($owner: String!, $name: String!, $after: String) {
       nodes {
         author { login }
         state
+        createdAt
       }
     }
   }
@@ -48,7 +55,7 @@ class PullRequestsSummary(GitHubMetric):
 
     def __init__(self, token: str, org: str, repo: str):
         super().__init__(token, org, repo)
-        self.prs: list[dict] = []  # [{author, state}]
+        self.prs: list[dict] = []  # [{author, state, created_at}]
 
     def fetch(self, **kwargs):
         prs = []
@@ -62,6 +69,7 @@ class PullRequestsSummary(GitHubMetric):
                 prs.append({
                     "author": author_node.get("login") or "desconocido",
                     "state": node["state"],
+                    "created_at": datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00")),
                 })
             print(f"  ...PRs página {page} ({len(prs)} acumuladas)", end="\r")
             if not conexion["pageInfo"]["hasNextPage"]:
@@ -69,6 +77,9 @@ class PullRequestsSummary(GitHubMetric):
             cursor = conexion["pageInfo"]["endCursor"]
         print()
         self.prs = prs
+
+    def _en_periodo(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
+        return [p for p in self.prs if fecha_inicio <= p["created_at"] <= fecha_fin]
 
     @staticmethod
     def _resumir(prs: list[dict]) -> dict[str, int]:
@@ -80,11 +91,11 @@ class PullRequestsSummary(GitHubMetric):
         }
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, int]:
-        return self._resumir(self.prs)
+        return self._resumir(self._en_periodo(fecha_inicio, fecha_fin))
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, dict]:
         by_author: dict[str, list[dict]] = {}
-        for pr in self.prs:
+        for pr in self._en_periodo(fecha_inicio, fecha_fin):
             by_author.setdefault(pr["author"], []).append(pr)
 
         resultado = {login: self._resumir(prs) for login, prs in by_author.items()}

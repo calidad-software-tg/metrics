@@ -39,6 +39,21 @@ class GitHubMetric:
             sys.exit(1)
         return data
 
+    def _resolve_ref(self, fecha_fin) -> str:
+        """SHA del último commit de la rama default con fecha <= fecha_fin.
+
+        Para métricas que leen contenido del repo (árbol de archivos,
+        blobs): usar este ref en vez de "HEAD" hace que reflejen el estado
+        del repo a una fecha dada, no siempre el estado actual. Si no hay
+        ningún commit antes de fecha_fin (fecha anterior a la creación del
+        repo), cae de vuelta a "HEAD".
+        """
+        commits = self._rest(
+            f"/repos/{self.org}/{self.repo}/commits",
+            {"until": fecha_fin.isoformat(), "per_page": 1},
+        )
+        return commits[0]["sha"] if commits else "HEAD"
+
     def fetch(self, **kwargs):
         raise NotImplementedError
 

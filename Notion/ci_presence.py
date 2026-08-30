@@ -27,6 +27,11 @@ from base_metric import GitHubMetric
 # porque esa función hace sys.exit(1) ante cualquier respuesta no-200, y acá
 # un 404 es un resultado válido y esperado (el archivo/carpeta simplemente
 # no existe) — no un error de la API.
+#
+# fetch() resuelve el commit vigente a fecha_fin (self._resolve_ref) y lo
+# usa como `ref` en /contents, así que "¿hay CI configurada?" refleja el
+# estado del repo a esa fecha, no el HEAD actual. _fetch_last_author usa
+# `until=fecha_fin` por el mismo motivo.
 
 _CI_FILE_IDENTIFIERS = {
     "Travis CI": ".travis.yml",
@@ -56,7 +61,7 @@ class ContinuousIntegrationPresence(GitHubMetric):
         self.encontrados: list[str] = []
         self.encontrados_detalle: list[dict] = []  # [{sistema, path}]
 
-    def _get_status(self, path: str) -> int:
+    def _get_status(self, path: str, ref: str) -> int:
         headers = {
             "Authorization": f"Bearer {self.token}",
             "Accept": "application/vnd.github+json",
@@ -65,13 +70,14 @@ class ContinuousIntegrationPresence(GitHubMetric):
         resp = requests.get(
             f"https://api.github.com/repos/{self.org}/{self.repo}/contents/{path}",
             headers=headers,
+            params={"ref": ref},
         )
         return resp.status_code, resp
 
-    def _fetch_last_author(self, path: str) -> str:
+    def _fetch_last_author(self, path: str, fecha_fin: datetime) -> str:
         commits = self._rest(
             f"/repos/{self.org}/{self.repo}/commits",
-            {"path": path, "per_page": 1},
+            {"path": path, "per_page": 1, "until": fecha_fin.isoformat()},
         )
         if not commits:
             return "desconocido"
@@ -82,19 +88,20 @@ class ContinuousIntegrationPresence(GitHubMetric):
             or "desconocido"
         )
 
-    def fetch(self, **kwargs):
+    def fetch(self, fecha_fin: datetime, **kwargs):
+        ref = self._resolve_ref(fecha_fin)
         encontrados = []
         detalle = []
 
         for sistema, path in _CI_FILE_IDENTIFIERS.items():
-            status, _ = self._get_status(path)
+            status, _ = self._get_status(path, ref)
             if status == 200:
                 encontrados.append(sistema)
                 detalle.append({"sistema": sistema, "path": path})
             elif status not in (404,):
                 print(f"  Aviso: {path} devolvió {status}, se asume ausente", file=sys.stderr)
 
-        status, resp = self._get_status(_CI_WORKFLOWS_DIR)
+        status, resp = self._get_status(_CI_WORKFLOWS_DIR, ref)
         if status == 200:
             contenido = resp.json()
             if isinstance(contenido, list) and len(contenido) > 0:
@@ -114,13 +121,13 @@ class ContinuousIntegrationPresence(GitHubMetric):
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, list[str]]:
         resultado: dict[str, list[str]] = {}
         for item in self.encontrados_detalle:
-            login = self._fetch_last_author(item["path"])
+            login = self._fetch_last_author(item["path"], fecha_fin)
             resultado.setdefault(login, []).append(item["sistema"])
         return resultado
 
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto", **kwargs):
         print(f"Verificando configuración de CI en {self.org}/{self.repo}...")
-        self.fetch()
+        self.fetch(fecha_fin)
 
         if por == "persona":
             resultado = self.por_persona(fecha_inicio, fecha_fin)

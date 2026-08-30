@@ -58,10 +58,11 @@ class CommentDensity(GitHubMetric):
         self.files: list[dict] = []        # {path, cloc, lloc}
         self.author_lines: list[dict] = [] # {author, cloc, lloc}
 
-    def fetch(self, con_actor: bool = False, max_files: int = 500,
+    def fetch(self, fecha_fin: datetime, con_actor: bool = False, max_files: int = 500,
               skip_extensions: set = frozenset({".md"})):
         print("Obteniendo árbol del repositorio...")
-        tree = self._rest(f"/repos/{self.org}/{self.repo}/git/trees/HEAD", {"recursive": "1"})
+        ref = self._resolve_ref(fecha_fin)
+        tree = self._rest(f"/repos/{self.org}/{self.repo}/git/trees/{ref}", {"recursive": "1"})
 
         code_files = [
             e for e in tree.get("tree", [])
@@ -88,10 +89,10 @@ class CommentDensity(GitHubMetric):
         print()
         self.files = files
 
-    def _fetch_last_author(self, path: str) -> str:
+    def _fetch_last_author(self, path: str, fecha_fin: datetime) -> str:
         commits = self._rest(
             f"/repos/{self.org}/{self.repo}/commits",
-            {"path": path, "per_page": 1},
+            {"path": path, "per_page": 1, "until": fecha_fin.isoformat()},
         )
         if not commits:
             return "desconocido"
@@ -111,7 +112,7 @@ class CommentDensity(GitHubMetric):
         by_author: dict[str, list[int]] = {}
         total = len(self.files)
         for i, f in enumerate(self.files):
-            login = self._fetch_last_author(f["path"])
+            login = self._fetch_last_author(f["path"], fecha_fin)
             by_author.setdefault(login, [0, 0])
             by_author[login][0] += f["cloc"]
             by_author[login][1] += f["lloc"]
@@ -126,7 +127,7 @@ class CommentDensity(GitHubMetric):
 
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto",
             max_files: int = 500):
-        self.fetch(max_files=max_files)
+        self.fetch(fecha_fin, max_files=max_files)
         if por == "persona":
             resultado = self.por_persona(fecha_inicio, fecha_fin)
             print(f"{'Colaborador':<30} CD")

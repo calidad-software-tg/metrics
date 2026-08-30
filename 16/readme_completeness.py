@@ -34,10 +34,11 @@ class ReadmeCompleteness(GitHubMetric):
         super().__init__(token, org, repo)
         self.readmes: list[dict] = []  # [{path, score}]
 
-    def fetch(self, **kwargs):
+    def fetch(self, fecha_fin: datetime, **kwargs):
         print("Obteniendo árbol del repositorio...")
+        ref = self._resolve_ref(fecha_fin)
         tree = self._rest(
-            f"/repos/{self.org}/{self.repo}/git/trees/HEAD",
+            f"/repos/{self.org}/{self.repo}/git/trees/{ref}",
             {"recursive": "1"},
         )
         readme_files = [
@@ -59,10 +60,10 @@ class ReadmeCompleteness(GitHubMetric):
         print()
         self.readmes = readmes
 
-    def _fetch_last_author(self, path: str) -> str:
+    def _fetch_last_author(self, path: str, fecha_fin: datetime) -> str:
         commits = self._rest(
             f"/repos/{self.org}/{self.repo}/commits",
-            {"path": path, "per_page": 1},
+            {"path": path, "per_page": 1, "until": fecha_fin.isoformat()},
         )
         if not commits:
             return "desconocido"
@@ -82,7 +83,7 @@ class ReadmeCompleteness(GitHubMetric):
         by_author: dict[str, list[float]] = {}
         total = len(self.readmes)
         for i, r in enumerate(self.readmes):
-            login = self._fetch_last_author(r["path"])
+            login = self._fetch_last_author(r["path"], fecha_fin)
             by_author.setdefault(login, []).append(r["score"])
             print(f"  ...{i + 1}/{total} READMEs con autor resuelto", end="\r")
         print()
@@ -93,7 +94,7 @@ class ReadmeCompleteness(GitHubMetric):
         return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
 
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto", **kwargs):
-        self.fetch()
+        self.fetch(fecha_fin)
         if por == "persona":
             resultado = self.por_persona(fecha_inicio, fecha_fin)
             print(f"{'Colaborador':<30} RC")
