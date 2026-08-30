@@ -54,9 +54,9 @@ from noi import NumberOfOpenIssues
 from nci_reuse import NumberOfClosedIssues as NumberOfClosedIssuesProcess
 from tasa_exito import JarczykSuccessRate
 from nci_reuse_43 import NumberOfClosedIssues as NumberOfClosedIssuesResolutionTime
-from open_issues import NumberOfOpenIssues as NumberOfOpenIssuesRegistro28
+from noi import NumberOfOpenIssues as NumberOfOpenIssuesRegistro28
 from dev_experience import DevelopmentExperience
-from user_reported_bugs import NumberOfBugsDetectedByUsers
+from nub import NumberOfBugsDetectedByUsers
 from nob import NumberOfBranches
 from loc import LinesOfCode
 from collaborators import NumberOfCollaborators
@@ -80,7 +80,7 @@ now = datetime.now(timezone.utc)
 fecha_inicio = now - timedelta(days=365)
 fecha_fin    = now
 
-metrica   = "loc_notion"
+metrica   = "nub"
 por       = "producto"  # "producto" | "persona"
 max_files = 500        # solo aplica a "cd": máximo de archivos a analizar
 
