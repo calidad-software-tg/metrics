@@ -63,7 +63,7 @@ class SocialContribution(GitHubMetric):
                 if not (fecha_inicio <= created <= fecha_fin):
                     continue
                 login = (node.get("author") or {}).get("login", "desconocido")
-                results.append({"author": login, "state": node["state"]})
+                results.append({"author": login, "state": node["state"], "created": created})
             if not page_info["hasNextPage"]:
                 break
             cursor = page_info["endCursor"]

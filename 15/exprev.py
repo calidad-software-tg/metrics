@@ -161,25 +161,12 @@ class ReviewExperience(GitHubMetric):
         print()
 
     def _fetch_comments(self, path: str, tipo: str, fecha_inicio: datetime, fecha_fin: datetime):
-        page = 1
-        while True:
-            data = self._rest(
-                f"/repos/{self.org}/{self.repo}{path}",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
-            )
-            if not data:
-                break
-            for c in data:
-                created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
-                if created > fecha_fin:
-                    continue
-                login = (c.get("user") or {}).get("login", "desconocido")
-                self.eventos.append({"tipo": tipo, "login": login, "fecha": created})
-            print(f"  ...{tipo} página {page}", end="\r")
-            if len(data) < 100:
-                break
-            page += 1
-        print()
+        for c in self._rest_list_since(
+            f"/repos/{self.org}/{self.repo}{path}", fecha_inicio, fecha_fin, label=tipo,
+        ):
+            created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
+            login = (c.get("user") or {}).get("login", "desconocido")
+            self.eventos.append({"tipo": tipo, "login": login, "fecha": created})
 
     def fetch(self, fecha_inicio: datetime, fecha_fin: datetime):
         self.eventos = []
