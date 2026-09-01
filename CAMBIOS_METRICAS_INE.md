@@ -24,6 +24,7 @@ tag/release consecutivo del repo).
  .gitignore            |   4 +-
  15/exprev.py          |  25 ++-----
  15/rexprev.py         |  25 ++-----
+ 15/ss.py              | (reescrito casi entero: fetch por ventana + repo_languages por commit)
  18/disc_centrality.py |  88 +++++++---------------
  18/nc.py              |  25 ++-----
  20/dc.py              |   2 +-
@@ -32,6 +33,9 @@ tag/release consecutivo del repo).
  db/docker-compose.yml |   4 +-
 ```
 + untracked: `run_versiones.py`, `run_versiones_local.py`.
+
+> **Nota:** `15/ss.py` se modificó **después** del commit `a0c347d` (rama `ine/versionado`).
+> Ese commit **no lo incluye**; hay que agregarlo en el próximo push.
 
 ---
 
@@ -46,6 +50,7 @@ tag/release consecutivo del repo).
 | `18/nc.py` | `_fetch_paginated(path, tipo, fi, ff)` (usado para `/issues/comments`, `/comments`, `/pulls/comments`): mismo reemplazo que arriba — loop manual → `self._rest_list_since(...)`. Construcción del evento (`type`, `login`, `fecha`) idéntica. | Igual que `disc_centrality`. |
 | `15/exprev.py` | Solo el helper `_fetch_comments(path, tipo, fi, ff)` (parte de `fetch`, para `/issues/comments` y `/pulls/comments`): loop manual → `self._rest_list_since(...)`. **`_paginate_issues` / `_paginate_prs` (GraphQL) NO los toqué.** Construcción del evento idéntica. | Igual. |
 | `15/rexprev.py` | Idéntico a `exprev`: solo `_fetch_comments`. `_paginate_issues`/`_paginate_prs` sin tocar. | Igual. |
+| `15/ss.py` | **Reescritura del `fetch` y las entradas de la métrica.** **(a)** `fetch()` pasa de `(max_contributors, max_user_repos)` a `(fecha_inicio, fecha_fin, max_contributors, max_user_repos)` — con eso `run_versiones.py` la detecta como "por ventana" (antes no tomaba fechas → se corría **una vez** y el mismo valor se guardaba en las 11 ventanas). **(b)** `repo_languages` ya no sale de `GET /repos/.../languages` (siempre HEAD): se reconstruye en el commit vigente al cierre del bloque (`_resolve_ref(fecha_fin)`, mismo patrón que `dloc`/`loc_notion`), sumando bytes de blob (que la API de trees ya trae) agrupados por extensión→lenguaje con un mapa `_EXT_TO_LANG`. **(c)** Los colaboradores evaluados pasan de "top-N de `/contributors`" (ranking por commits de TODA la historia, igual en cada bloque) a "logins con ≥1 commit dentro de `[fecha_inicio, fecha_fin]`, hasta `max_contributors`". **(d)** `user_languages` **queda igual** (snapshot de los repos propios *actuales* de cada colaborador). **(e)** `calcular_skill_similarity` y `por_persona`/`por_producto`: **sin cambios**. | La métrica daba **el mismo número en las 11 ventanas** — no era "por versión" en absoluto. Dos de sus tres entradas (stack del repo, población evaluada) sí evolucionan entre versiones y no se estaban windowear. `user_languages` se deja como snapshot porque no hay forma razonable de historizarlo (habría que recorrer el árbol por fecha de cada repo de cada persona) y el spec ISL tampoco lo acota por fecha. |
 | `20/dc.py` | En `_paginate()` (fetch de issues y de PRs vía GraphQL), cada registro pasa de `{"author", "state"}` a `{"author", "state", "created"}` (se agrega el `datetime` de `createdAt` ya calculado). **`por_producto` / `por_persona` sin cambios.** | El campo `created` lo consume `run_versiones_local.py` para recortar `sc`/`sc_disc` por ventana desde un clon local sin re-bajar todo. **Dentro de `dc.py` el campo no se usa** (ver Parte 2 y "inconsistencias"). |
 | `db/docker-compose.yml` | **(a)** `ports: "5432:5432"` → `"${POSTGRES_PORT:-5432}:5432"`. **(b)** healthcheck `pg_isready -U $USER` → `pg_isready -U $USER -d ${POSTGRES_DB:-resultados_metricas}`. **Sin cambios a volúmenes, imagen ni `schema.sql` montado.** | En mi máquina el 5432 ya estaba ocupado por otro Postgres → necesitaba publicar en 5433 sin hardcodear. El healthcheck sin `-d` se conectaba a una base `metricas` inexistente y llenaba el log con `FATAL: database "metricas" does not exist` cada 5 s (el healthcheck igual pasaba). |
 | `db/README.md` | Solo documentación: renumeré secciones (3→"cargar catálogo", agregué "4. Correr métricas"), nota sobre `POSTGRES_PORT`, nota sobre re-aplicar `schema.sql` a mano si el volumen ya existía, y ejemplos de `run_versiones.py`. | Onboarding del equipo. Sin impacto en código. |
@@ -77,6 +82,10 @@ Migraciones / cambios de esquema: **ninguno.** `db/schema.sql`, `db/metrics_seed
 - **`run_versiones.py` — `_correr_sliceable` recorta atributos internos por nombre:** para `disc_centrality`→`metadata_comentarios`, `nc`/`exprev`/`rexprev`→`eventos`, `sc`/`sc_disc`→`_issues`+`_prs`, `dev_exp`→(sin recorte, solo cambia `fecha_fin`). **Depende de nombres de atributos privados de cada clase.** Si otra persona renombra `self.eventos` o `self._issues`, se rompe en silencio (recorte vacío).
 - **`run_versiones_local.py` — la atribución por persona pasa a ser el NOMBRE de git** del autor (`%an`) en vez del `login` de GitHub, porque el clon local no tiene el login. Distinto label para el mismo dev en `resultado.contribuyente_login`.
 - **`db/docker-compose.yml` — cambié el binding de puerto**, que es config compartida: si otra persona asume `localhost:5432` fijo, ahora depende de `POSTGRES_PORT` en `db/.env`.
+- **`15/ss.py` — `_EXT_TO_LANG` es una aproximación de GitHub Linguist**, no una implementación: mapea extensión→lenguaje por byte-size, sin shebangs ni `.gitattributes` ni detección de archivos generados fuera de las carpetas que ya filtra `_is_excluded`. **Excluye a propósito `.json`/`.yml`/`.yaml`** (Linguist los marca `type: data` y GitHub los deja fuera de `/repos/.../languages`; además `user_languages` nunca contiene "JSON"/"YAML", así que incluirlos solo inflaría el denominador `len(repo_languages)` y bajaría todos los SS). Validado contra tldr: de v1.4 en adelante da `{Markdown, Python, Shell}`, idéntico al endpoint real.
+- **`15/ss.py` — import nuevo `from loc import _is_excluded`** (`Notion/loc.py`), con `sys.path.insert` al dir `Notion/`. Sigue el precedente de `Notion/developer_ownership.py`, que ya importa `_CODE_EXTENSIONS`/`_is_excluded` de `loc.py`. Acopla `15/` con `Notion/`.
+- **`15/ss.py` — costo de requests sube.** `main`: ~1 + 1 + `max_contributors` requests, **una sola vez**. Ahora: por cada bloque, 1 (tree del ref) + N páginas de `/commits` para juntar committers + hasta `max_contributors` requests de `/users/{login}/repos`. Con 11 bloques y `max_contributors=100` son ~1100+ requests (antes ~102).
+- **`15/ss.py` — filas huérfanas al re-guardar.** Como `run_versiones.py` hace upsert por `(periodo, metrica, login)` y NO borra, al pasar de "top-N global" (mismos 100 en las 11 ventanas) a "committers de la ventana" (menos gente en ventanas cortas), las personas que estaban antes y ya no quedan con el valor viejo. Se limpian aparte con un `DELETE ... WHERE metrica_id='ss' AND calculado_en < <inicio de la corrida>`.
 
 ---
 
@@ -123,10 +132,22 @@ Migraciones / cambios de esquema: **ninguno.** `db/schema.sql`, `db/metrics_seed
 - **API/paginación:** no cambié la paginación (`_paginate` GraphQL sigue igual: `first:100`, cursor, filtro `fecha_inicio <= created <= fecha_fin` en memoria).
 - **FÓRMULA / forma de datos:** agregué `"created"` al dict de cada registro. **No cambia `por_producto` ni `por_persona`** (siguen usando `author` y `state`). Es un campo extra **inerte dentro de `dc.py`**; lo consume `run_versiones_local.py`. Riesgo de choque: bajo (campo aditivo), pero si otra persona también agregó un campo con otro nombre para lo mismo, hay que unificar el nombre.
 
+### `15/ss.py`
+
+- **API/paginación:** que `fetch` ahora tome fechas y pagine `/commits?since&until` para juntar committers es infra. La reconstrucción de `repo_languages` desde el árbol (en vez de `/languages`) también es "cómo se baja el dato".
+- **FÓRMULA/semántica — cambié *qué* se calcula, en dos de las tres entradas:**
+  1. **`repo_languages` de referencia**: antes = stack del repo **en HEAD actual**, igual para todos los bloques. Ahora = stack **en el commit de esa versión**. Distinto conjunto → distinto denominador `len(repo_languages)` → distinto SS por bloque.
+  2. **Población evaluada**: antes = **top-N colaboradores de toda la historia del repo**, los mismos 100 en cada bloque. Ahora = **quién commiteó dentro del bloque**. Cambia *a quién* se le calcula la métrica en cada período.
+  3. `user_languages` (perfil de la persona): **sin cambios** — snapshot de sus repos propios actuales.
+- `calcular_skill_similarity` (intersección / `len(repo_languages)`) y `por_persona`/`por_producto`: **sin tocar**. La fórmula matemática es la misma; lo que cambió son las dos entradas de arriba.
+- **Aproximación introducida:** `repo_languages` por bloque se calcula con `_EXT_TO_LANG` (extensión→lenguaje por bytes), que es una aproximación de Linguist. El endpoint real de GitHub usa Linguist completo. Para tldr coincide (`{Markdown, Python, Shell}` de v1.4 en adelante), pero en un repo con detección ambigua (shebangs, `.gitattributes`, extensiones compartidas) podría diferir.
+
 ### Resumen para el merge
 
 - **100% API (se toma la mejor versión, sin discutir contenido):** todo `base_metric.py` como *mecánica*; el reemplazo de loops por `_rest_list_since` en `disc_centrality`/`nc`/`exprev`/`rexprev`; los cambios de `db/docker-compose.yml`, `db/README.md`, `.gitignore`.
-- **Requiere decisión de contenido:** el **conjunto de comentarios** que alimenta `disc_centrality`, `nc`, `exprev`, `rexprev` (`updated_at ≥ inicio ∧ created ≤ fin`  vs  `inicio ≤ created ≤ fin`). Si otra de las tres tocó estos endpoints con otra semántica, **no se puede "tomar una" a ciegas**.
+- **Requiere decisión de contenido:**
+  - el **conjunto de comentarios** que alimenta `disc_centrality`, `nc`, `exprev`, `rexprev` (`updated_at ≥ inicio ∧ created ≤ fin`  vs  `inicio ≤ created ≤ fin`). Si otra de las tres tocó estos endpoints con otra semántica, **no se puede "tomar una" a ciegas**.
+  - **`15/ss.py`**: si otra persona lo dejó como snapshot global a propósito (el spec ISL lo llama "afinidad **inicial**"), mi versión "por bloque" choca de frente. Hay que acordar si SS es un valor único por dev o uno por período.
 - **Aditivo, bajo riesgo:** `created` en `dc.py`.
 
 ---
@@ -142,6 +163,7 @@ Migraciones / cambios de esquema: **ninguno.** `db/schema.sql`, `db/metrics_seed
 | `15/exprev.py` | `fetch(fecha_inicio, fecha_fin)`. | `dict[str, int]` (`login -> EXPRev`). Escalar. | No. |
 | `15/rexprev.py` | `fetch(fecha_inicio, fecha_fin)`. `por_persona` usa `fecha_fin` como "ahora" para el decaimiento → **el runner debe pasar el borde derecho real del bloque**. | `dict[str, float]` (`login -> REXPRev`). Escalar. | No. |
 | `20/dc.py` (`sc`, `sc_disc`) | `fetch(fecha_inicio, fecha_fin, **kwargs)`. | `dict[str, dict]` — cada valor es `{"issues_opened", "issues_opened_closed", "prs_opened", "prs_opened_closed", "prs_opened_merged", "sc"}`. **Compuesto.** | **Sí** — el runner necesita saber que la clave de resumen es `"sc"`. En `run_versiones.py` eso está en `_CLAVES_ESCALAR`. Si otro runner no lo sabe, guarda `value=NULL`. |
+| `15/ss.py` | `fetch(fecha_inicio, fecha_fin, max_contributors=15, max_user_repos=100)`. Se llama **una vez por bloque** (toma fechas → `run_versiones.py` la trata como "por ventana", NO es "sliceable"). `max_contributors` llega vía `--max-contributors` (`LIMITES`). | `dict[str, float]` (`login -> SS`). Escalar. | No. |
 
 Mi `run_versiones.py` además asume, para las "sliceable" (`disc_centrality`, `nc`, `exprev`, `rexprev`, `sc`, `sc_disc`, `dev_exp`): que puede hacer **un solo `fetch` del rango completo** y después recortar los atributos internos (`metadata_comentarios`, `eventos`, `_issues`, `_prs`) por bloque. Esto **solo es válido porque `por_*` de esas clases no re-filtra por fecha**. Si otra persona agrega un filtro por fecha dentro de `por_persona`, mi recorte y su filtro se pisan (doble filtrado → posible vacío).
 
@@ -152,6 +174,8 @@ Mi `run_versiones.py` además asume, para las "sliceable" (`disc_centrality`, `n
 - **🟡 `_LIST_SINCE_CACHE` con clave por rango de fechas.** Asume bloques **disjuntos** (dos bloques nunca comparten `(inicio, fin)` exactos). Cierto en VERSIONADO y en cualquier partición sensata, pero es un supuesto no chequeado. Sin límite de memoria: un runner con cientos de bloques distintos acumula todo en RAM.
 - **🟡 `run_versiones_local.py` usa `origin/HEAD` + `--since/--until` (fecha de *commit*) para elegir los commits del bloque**, replicando lo que hace `/repos/.../commits?since&until`. Asume que "los commits del bloque i" ≈ "los commits en `[fecha_tag_i, fecha_tag_{i+1})` sobre la rama default". Válido para VERSIONADO. Para otro criterio cuyos bordes no coincidan con tags, hay que revisar que el rango de fechas sea el correcto.
 - **🟢 No peligroso pero a notar:** `exprev`/`rexprev` quedan **mitad y mitad** — issues/PRs con la paginación GraphQL vieja de `main`, comentarios con mi `_rest_list_since`. Es consistente, pero cualquier merge tiene que mirar las dos mitades por separado.
+- **🔴 PELIGROSO — `15/ss.py`, "quién es relevante en un bloque" = "quién commiteó en el bloque".** Es una definición que elegí y que encaja con VERSIONADO (la gente que trabajó *entre esos dos tags*). Para otro criterio de partición puede no ser lo correcto: p. ej. si un bloque se define por volumen de issues cerradas, "los committers de ese rango de fechas" no necesariamente es la población que interesa. Además, en bloques cortos (v1.0 = 20 días → 15 committers) la muestra es chica y el promedio de SS es ruidoso; en bloques largos se topea en `max_contributors`. La versión `main` (top-N global fijo) no tiene este problema pero a cambio da el mismo número en todos los bloques.
+- **🟡 `15/ss.py` — `repo_languages` por `_resolve_ref(fecha_fin)`.** Igual que `dloc`/`loc_notion`: asume que "el estado del repo en el bloque" = "el árbol en el último commit ≤ `fecha_fin`". Válido para VERSIONADO (fin de bloque = tag). Para un criterio con bordes que no son releases, es el estado en una fecha arbitraria — defendible, pero conviene tenerlo presente.
 
 ---
 
@@ -166,6 +190,7 @@ Mi `run_versiones.py` además asume, para las "sliceable" (`disc_centrality`, `n
 | `18/nc.py` | Medio. Reescribí `_fetch_paginated`. |
 | `15/exprev.py` | Medio. Reescribí `_fetch_comments` (no `_paginate_issues/_prs`). |
 | `15/rexprev.py` | Medio. Ídem `exprev`. |
+| `15/ss.py` | **Alto.** Reescritura casi entera de `fetch` + método nuevo `_repo_languages_en_ref` + `_colaboradores_en_ventana` + constante `_EXT_TO_LANG` + import de `Notion/loc.py`. Es un **cambio de semántica** (SS por bloque vs snapshot global), no solo de código: si otra persona lo tocó, no es merge textual, es decisión de contenido. |
 | `20/dc.py` | Bajo. Una línea aditiva (`"created"` en el dict). |
 | `db/docker-compose.yml` | Medio. Config compartida de la DB (puerto + healthcheck). |
 | `db/README.md` | Bajo. Solo docs; conflicto textual probable por renumeración de secciones. |
@@ -197,13 +222,14 @@ Mi `run_versiones.py` además asume, para las "sliceable" (`disc_centrality`, `n
 2. **`base_metric.py` docstring de `_rest_list_since` (~línea 117)** dice que GitHub corta *"alrededor de la página ~150"*, pero el código usa `TOPE_PAGINA = 90` (`:134`). El 90 es un margen deliberado por debajo del 150; no es un bug, pero el número del docstring y el del código no son el mismo y puede confundir.
 3. **`20/dc.py`** — agregué `"created"` a cada registro de `_paginate`, pero ni el docstring de la clase ni los comentarios lo mencionan, y **`por_producto`/`por_persona` de `dc.py` no lo usan**. Es un campo "fantasma" desde el punto de vista de la clase (solo lo lee `run_versiones_local.py`).
 4. **`run_versiones.py`** — el comentario de `SLICEABLE` dice que para `dev_exp` "no hay nada que recortar, solo cambia la fecha_fin de referencia", lo cual es correcto, pero `dev_exp` igual está listado en `SLICEABLE` (con lista de atributos vacía) — un lector podría esperar que se recorte algo.
+5. **`15/ss.py` vs `15/15 - Skill Similarity.md`** — el spec ISL describe la métrica como *"afinidad técnica **previa** de un desarrollador... como predictor de la probabilidad de introducir defectos **durante el onboarding**"*, o sea un valor de un momento (cuando la persona llega). Mi implementación ahora la calcula **por bloque** (11 valores por persona). No es un bug, pero es una divergencia implementación↔spec: si el equipo la quiere fiel al spec, SS debería ser un único valor por dev, no una serie temporal. Además quité la palabra "inicial" del docstring de `calcular_skill_similarity` (`main` decía "afinidad técnica **inicial**") para que no contradiga el nuevo uso por ventana.
 
 ## Cómo reproducir este análisis
 
 ```bash
 git log --oneline -8
 git diff main --stat
-git diff main -- base_metric.py 18/disc_centrality.py 18/nc.py 15/exprev.py 15/rexprev.py 20/dc.py
+git diff main -- base_metric.py 18/disc_centrality.py 18/nc.py 15/exprev.py 15/rexprev.py 20/dc.py 15/ss.py
 git diff main -- db/docker-compose.yml db/README.md .gitignore
 git show c4a4963 --stat        # base actual (ClaraLopez1)
 git show 569b280 -- base_metric.py   # cambio previo de luzlaura a base_metric
