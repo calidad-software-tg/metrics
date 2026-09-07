@@ -51,11 +51,13 @@ class DocIssueSurvival(GitHubMetric):
 
     def __init__(self, token: str, org: str, repo: str):
         super().__init__(token, org, repo)
-        self.issues: list[dict] = []  # [{days, actor}]
+        # Guardamos closed_at para poder filtrar por ventana en por_producto/persona.
+        # Antes solo se guardaba `days` y `actor`, y por_producto promediaba TODOS
+        # los issues del repo → el mismo valor en los 45 bloques temporales.
+        self.issues: list[dict] = []  # [{days, actor, closed}]
 
     def fetch(self, con_actor: bool = False, **kwargs):
         query = _QUERY_CON_ACTOR if con_actor else _QUERY_SIN_ACTOR
-        page_size_label = "25" if con_actor else "100"
         cursor = None
         issues = []
         page = 0
@@ -79,7 +81,7 @@ class DocIssueSurvival(GitHubMetric):
                     tl = node.get("timelineItems", {}).get("nodes", [])
                     if tl:
                         actor = (tl[0].get("actor") or {}).get("login", "desconocido")
-                issues.append({"days": days, "actor": actor})
+                issues.append({"days": days, "actor": actor, "closed": closed})
 
             if not repo_data["pageInfo"]["hasNextPage"]:
                 break
@@ -87,16 +89,25 @@ class DocIssueSurvival(GitHubMetric):
 
         print()
         self.issues = issues
-        print(f"Issues de documentación cerrados: {len(issues)}")
+        print(f"Issues de documentación cerrados (total repo): {len(issues)}")
+
+    def _en_ventana(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
+        # Filtra por fecha de CIERRE: la métrica es "cuánto sobrevivió" y el
+        # evento medible en el bloque es el cierre. Un issue creado antes de la
+        # ventana y cerrado dentro cuenta acá (a diferencia de exprev, donde
+        # elegimos ignorarlos por costo de API).
+        return [i for i in self.issues if fecha_inicio <= i["closed"] <= fecha_fin]
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
-        if not self.issues:
+        ventana = self._en_ventana(fecha_inicio, fecha_fin)
+        if not ventana:
             return 0.0
-        return round(sum(i["days"] for i in self.issues) / len(self.issues), 2)
+        return round(sum(i["days"] for i in ventana) / len(ventana), 2)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:
+        ventana = self._en_ventana(fecha_inicio, fecha_fin)
         by_actor: dict[str, list[int]] = {}
-        for i in self.issues:
+        for i in ventana:
             by_actor.setdefault(i["actor"], []).append(i["days"])
         result = {
             login: round(sum(days) / len(days), 2)

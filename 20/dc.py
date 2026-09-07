@@ -5,16 +5,15 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
 
+# ASC: empieza desde los eventos más viejos y corta cuando supera fecha_fin.
+# Para períodos tempranos (ej. 2016) esto es muy rápido: 1-2 páginas.
+# DESC era peor: había que recorrer todo el historial antes de llegar al período.
 _QUERY_ISSUES = """
 query($owner: String!, $repo: String!, $cursor: String) {
   repository(owner: $owner, name: $repo) {
-    issues(first: 100, after: $cursor) {
+    issues(first: 100, after: $cursor, orderBy: {field: CREATED_AT, direction: ASC}) {
       pageInfo { hasNextPage endCursor }
-      nodes {
-        author { login }
-        state
-        createdAt
-      }
+      nodes { author { login } state createdAt }
     }
   }
 }
@@ -23,13 +22,9 @@ query($owner: String!, $repo: String!, $cursor: String) {
 _QUERY_PRS = """
 query($owner: String!, $repo: String!, $cursor: String) {
   repository(owner: $owner, name: $repo) {
-    pullRequests(first: 100, after: $cursor) {
+    pullRequests(first: 100, after: $cursor, orderBy: {field: CREATED_AT, direction: ASC}) {
       pageInfo { hasNextPage endCursor }
-      nodes {
-        author { login }
-        state
-        createdAt
-      }
+      nodes { author { login } state createdAt }
     }
   }
 }
@@ -58,13 +53,20 @@ class SocialContribution(GitHubMetric):
             nodes = data["data"]["repository"][key]["nodes"]
             page_info = data["data"]["repository"][key]["pageInfo"]
             print(f"  ...{label} página {page} ({len(results)} acumulados)", end="\r")
+
+            corta = False
             for node in nodes:
                 created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
-                if not (fecha_inicio <= created <= fecha_fin):
-                    continue
+                # ASC: si ya superamos fecha_fin, todo lo siguiente es más nuevo → cortar.
+                if created > fecha_fin:
+                    corta = True
+                    break
+                if created < fecha_inicio:
+                    continue  # todavía no entramos a la ventana
                 login = (node.get("author") or {}).get("login", "desconocido")
                 results.append({"author": login, "state": node["state"]})
-            if not page_info["hasNextPage"]:
+
+            if corta or not page_info["hasNextPage"]:
                 break
             cursor = page_info["endCursor"]
         print()

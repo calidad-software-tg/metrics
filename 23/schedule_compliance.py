@@ -76,6 +76,13 @@ class ScheduleCompliance(GitHubMetric):
         self.milestones = milestones
 
     def _milestones_en_periodo(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
+        # NOTA (partición temporal): si esta métrica devuelve el mismo valor en
+        # todos los bloques NO es un bug de ventana — el filtro está bien
+        # aplicado acá. Pasa cuando el repo tiene muy pocos milestones (tldr
+        # tiene ~3 en todo el historial), la mayoría de las ventanas cae en 0.0
+        # y solo una da la única muestra distinta. Antes de reportar como bug,
+        # verificar la cantidad de milestones del repo en el endpoint
+        # /repos/:org/:repo/milestones?state=all.
         en_periodo = []
         for m in self.milestones:
             fecha_raw = m.get("due_on") or m.get("created_at")

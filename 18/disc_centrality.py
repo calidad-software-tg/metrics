@@ -76,20 +76,24 @@ class DiscussionCentrality(GitHubMetric):
         while True:
             data = self._rest(
                 f"/repos/{self.org}/{self.repo}/issues/comments",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
+                {"per_page": 100, "page": page,
+                 "since": fecha_inicio.isoformat(),
+                 "sort": "created", "direction": "asc"},
             )
             if not data:
                 break
+            done = False
             for c in data:
                 created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
                 if created > fecha_fin:
-                    continue
+                    done = True
+                    break
                 match = _ISSUE_NUM_RE.search(c.get("issue_url", ""))
                 item_id = f"issue-{match.group(1)}" if match else c.get("issue_url")
                 login = (c.get("user") or {}).get("login", "desconocido")
                 self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
             print(f"  ...comentarios de issues/PRs página {page}", end="\r")
-            if len(data) < 100:
+            if done or len(data) < 100:
                 break
             page += 1
         print()
@@ -99,20 +103,24 @@ class DiscussionCentrality(GitHubMetric):
         while True:
             data = self._rest(
                 f"/repos/{self.org}/{self.repo}/pulls/comments",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
+                {"per_page": 100, "page": page,
+                 "since": fecha_inicio.isoformat(),
+                 "sort": "created", "direction": "asc"},
             )
             if not data:
                 break
+            done = False
             for c in data:
                 created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
                 if created > fecha_fin:
-                    continue
+                    done = True
+                    break
                 match = _ISSUE_NUM_RE.search(c.get("pull_request_url", ""))
                 item_id = f"pr-{match.group(1)}" if match else c.get("pull_request_url")
                 login = (c.get("user") or {}).get("login", "desconocido")
                 self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
             print(f"  ...comentarios de revisión de PRs página {page}", end="\r")
-            if len(data) < 100:
+            if done or len(data) < 100:
                 break
             page += 1
         print()

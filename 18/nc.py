@@ -48,22 +48,28 @@ class NumberOfComments(GitHubMetric):
         self.eventos: list[dict] = []  # {type, login, fecha}
 
     def _fetch_paginated(self, path: str, tipo: str, fecha_inicio: datetime, fecha_fin: datetime):
+        # sort=created+direction=asc permite cortar en cuanto superamos fecha_fin
+        # (evita el error 422 de paginación ilimitada en repos grandes).
         page = 1
         while True:
             data = self._rest(
                 f"/repos/{self.org}/{self.repo}{path}",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
+                {"per_page": 100, "page": page,
+                 "since": fecha_inicio.isoformat(),
+                 "sort": "created", "direction": "asc"},
             )
             if not data:
                 break
+            done = False
             for c in data:
                 created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
                 if created > fecha_fin:
-                    continue
+                    done = True
+                    break
                 login = (c.get("user") or {}).get("login", "desconocido")
                 self.eventos.append({"type": tipo, "login": login, "fecha": created})
             print(f"  ...{tipo} página {page}", end="\r")
-            if len(data) < 100:
+            if done or len(data) < 100:
                 break
             page += 1
         print()

@@ -83,7 +83,12 @@ class DeveloperOwnership(GitHubMetric):
         print(f"Archivos de código encontrados: {total} (analizando {len(archivos)})")
         return archivos
 
-    def fetch(self, fecha_fin: datetime, max_files: int = 300, **kwargs):
+    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime,
+              max_files: int = 300, **kwargs):
+        # fecha_inicio: ignorada. Developer Ownership es un SNAPSHOT del árbol
+        # de archivos al `ref` de fecha_fin (git blame). Se acepta igual como
+        # parámetro porque el runner (llamar_fetch) inspecciona la firma y
+        # solo pasa las fechas si están AMBAS declaradas.
         ref = self._resolve_ref(fecha_fin)
         archivos = self._listar_archivos(ref, max_files)
         propiedad: dict[str, int] = defaultdict(int)
@@ -142,7 +147,7 @@ class DeveloperOwnership(GitHubMetric):
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "persona",
             max_files: int = 300, **kwargs):
         print(f"Calculando Developer Ownership de {self.org}/{self.repo}...")
-        self.fetch(fecha_fin, max_files=max_files)
+        self.fetch(fecha_inicio, fecha_fin, max_files=max_files)
 
         if por == "producto":
             r = self.por_producto(fecha_inicio, fecha_fin)

@@ -8,12 +8,11 @@ from base_metric import GitHubMetric
 _QUERY_ISSUES = """
 query($owner: String!, $name: String!, $after: String) {
   repository(owner: $owner, name: $name) {
-    issues(first: 50, after: $after, orderBy: {field: UPDATED_AT, direction: DESC}) {
+    issues(first: 50, after: $after, orderBy: {field: CREATED_AT, direction: ASC}) {
       pageInfo { hasNextPage endCursor }
       nodes {
         author { login }
         createdAt
-        updatedAt
         closedAt
         timelineItems(last: 1, itemTypes: [CLOSED_EVENT]) {
           nodes { ... on ClosedEvent { actor { login } } }
@@ -27,12 +26,11 @@ query($owner: String!, $name: String!, $after: String) {
 _QUERY_PRS = """
 query($owner: String!, $name: String!, $after: String) {
   repository(owner: $owner, name: $name) {
-    pullRequests(first: 50, after: $after, orderBy: {field: UPDATED_AT, direction: DESC}) {
+    pullRequests(first: 50, after: $after, orderBy: {field: CREATED_AT, direction: ASC}) {
       pageInfo { hasNextPage endCursor }
       nodes {
         author { login }
         createdAt
-        updatedAt
         closedAt
         mergedAt
         mergedBy { login }
@@ -99,6 +97,11 @@ class RecentReviewExperience(GitHubMetric):
         return None
 
     def _paginate_issues(self, fecha_inicio: datetime, fecha_fin: datetime):
+        # CREATED_AT ASC + early-stop cuando created > fecha_fin. Mismo cambio
+        # que exprev: UPDATED_AT DESC obligaba a recorrer todo el historial
+        # antes de cortar en períodos tempranos. Trade-off: issues creados
+        # antes de la ventana pero cerrados dentro no se cuentan como
+        # issues_closed (aporte marginal en ventanas cortas).
         cursor, page = None, 0
         while True:
             page += 1
@@ -107,17 +110,12 @@ class RecentReviewExperience(GitHubMetric):
             print(f"  ...issues página {page}", end="\r")
             fuera_de_ventana = False
             for node in conexion["nodes"]:
-                # Orden UPDATED_AT DESC: en cuanto un nodo quede antes de
-                # fecha_inicio, todos los siguientes también (updatedAt nunca
-                # es anterior a createdAt ni a closedAt, así que no se pierde
-                # ningún evento de apertura ni de cierre dentro de la ventana).
-                updated = datetime.fromisoformat(node["updatedAt"].replace("Z", "+00:00"))
-                if updated < fecha_inicio:
+                created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
+                if created > fecha_fin:
                     fuera_de_ventana = True
                     break
 
-                created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
-                if fecha_inicio <= created <= fecha_fin:
+                if fecha_inicio <= created:
                     login = (node.get("author") or {}).get("login", "desconocido")
                     self.eventos.append({"tipo": "issues_opened", "login": login, "fecha": created})
 
@@ -140,13 +138,12 @@ class RecentReviewExperience(GitHubMetric):
             print(f"  ...PRs página {page}", end="\r")
             fuera_de_ventana = False
             for node in conexion["nodes"]:
-                updated = datetime.fromisoformat(node["updatedAt"].replace("Z", "+00:00"))
-                if updated < fecha_inicio:
+                created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
+                if created > fecha_fin:
                     fuera_de_ventana = True
                     break
 
-                created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
-                if fecha_inicio <= created <= fecha_fin:
+                if fecha_inicio <= created:
                     login = (node.get("author") or {}).get("login", "desconocido")
                     self.eventos.append({"tipo": "pull_requests_opened", "login": login, "fecha": created})
 
@@ -161,22 +158,28 @@ class RecentReviewExperience(GitHubMetric):
         print()
 
     def _fetch_comments(self, path: str, tipo: str, fecha_inicio: datetime, fecha_fin: datetime):
+        # sort=created + direction=asc + early-stop: mismo motivo que en exprev
+        # (evita el 422 de paginación ilimitada del endpoint /issues/comments).
         page = 1
         while True:
             data = self._rest(
                 f"/repos/{self.org}/{self.repo}{path}",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
+                {"per_page": 100, "page": page,
+                 "since": fecha_inicio.isoformat(),
+                 "sort": "created", "direction": "asc"},
             )
             if not data:
                 break
+            done = False
             for c in data:
                 created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
                 if created > fecha_fin:
-                    continue
+                    done = True
+                    break
                 login = (c.get("user") or {}).get("login", "desconocido")
                 self.eventos.append({"tipo": tipo, "login": login, "fecha": created})
             print(f"  ...{tipo} página {page}", end="\r")
-            if len(data) < 100:
+            if done or len(data) < 100:
                 break
             page += 1
         print()

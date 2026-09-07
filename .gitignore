@@ -1,1 +1,6 @@
 .env
+
+# Cache HTTP persistente de la API de GitHub (base_metric.py).
+# Se regenera solo, no tiene sentido versionarlo y puede pesar cientos de MB.
+gh_cache.sqlite
+gh_cache.sqlite3
