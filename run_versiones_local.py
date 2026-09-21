@@ -33,13 +33,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _root = Path(__file__).resolve().parent
-for _d in ["15", "16", "Notion"]:
+for _d in ["10", "15", "16", "Notion"]:
     sys.path.insert(0, str(_root / _d))
 
 # Helpers de conteo de las propias métricas de archivos.
 from loc import _CODE_EXTENSIONS as LOC_EXT, _is_excluded, _count_lines as loc_count
 from dloc import _DOC_EXTENSIONS, _count_lines as dloc_count
 from cd import _COMMENT_PATTERNS, _CODE_EXTENSIONS as CD_EXT, _count_lines as cd_count
+from readme_completeness import _score as rc_score
 
 # Clases originales: se instancian y se les carga el estado desde git, después
 # se llama a su propio por_producto()/por_persona() -> fórmula idéntica.
@@ -47,6 +48,7 @@ from cdiv import ContributionDiversity
 from fexp import FileExperience
 from le import LearningEase
 from rexp import RecentExperience
+from anmcc import AverageNumberOfModifiedComponentsPerCommit
 from developer_ownership import DeveloperOwnership, _CODE_EXTENSIONS as OWN_EXT, _is_excluded as own_excluded
 
 from run_versiones import (
@@ -57,8 +59,8 @@ from run_versiones import (
 CD_SKIP = frozenset({".md"})          # igual que el default de cd.fetch
 CLONES_DIR = _root / ".clones"        # donde viven los clones locales
 
-ARCHIVOS = {"loc_notion", "dloc", "cd"}
-COMMITS = {"cdiv", "fexp", "le", "rexp"}
+ARCHIVOS = {"loc_notion", "dloc", "cd", "rc"}
+COMMITS = {"cdiv", "fexp", "le", "rexp", "anmcc"}
 BLAME = {"developer_ownership_notion"}
 TODAS = ARCHIVOS | COMMITS | BLAME
 
@@ -233,8 +235,9 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
     quiere_loc = "loc_notion" in quiere
     quiere_dloc = "dloc" in quiere
     quiere_cd = "cd" in quiere
+    quiere_rc = "rc" in quiere
 
-    sel_loc, sel_dloc, sel_cd = [], [], []
+    sel_loc, sel_dloc, sel_cd, sel_rc = [], [], [], []
     for sha, path in blobs:
         ext = Path(path).suffix.lower()
         if quiere_loc and ext in LOC_EXT and not _is_excluded(path):
@@ -243,9 +246,11 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
             sel_dloc.append((sha, path))
         if quiere_cd and ext in CD_EXT and ext not in CD_SKIP:
             sel_cd.append((sha, path))
+        if quiere_rc and Path(path).name.lower() == "readme.md":
+            sel_rc.append((sha, path))
 
-    shas_unicos = {s for s, _ in (sel_loc + sel_dloc + sel_cd)}
-    print(f"    archivos: loc={len(sel_loc)} dloc={len(sel_dloc)} cd={len(sel_cd)} "
+    shas_unicos = {s for s, _ in (sel_loc + sel_dloc + sel_cd + sel_rc)}
+    print(f"    archivos: loc={len(sel_loc)} dloc={len(sel_dloc)} cd={len(sel_cd)} rc={len(sel_rc)} "
           f"(blobs a leer: {len(shas_unicos)})")
     cont = contenidos(dir_repo, list(shas_unicos)) if shas_unicos else {}
 
@@ -270,6 +275,11 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
         prod = round(tot_c / tot_l, 4) if tot_l else 0.0
         res["cd"] = {"producto": prod, "por_archivo": por_archivo}
 
+    if quiere_rc:
+        por_archivo = {p: rc_score(cont.get(s, "")) for s, p in sel_rc}
+        prod = round(sum(por_archivo.values()) / len(por_archivo), 4) if por_archivo else 0.0
+        res["rc"] = {"producto": prod, "por_archivo": por_archivo}
+
     return res
 
 
@@ -279,6 +289,19 @@ def persona_loc_dloc(por_archivo: dict[str, int], autores: dict[str, str]) -> di
         a = autores.get(path, "desconocido")
         acc[a] = acc.get(a, 0) + lineas
     return dict(sorted(acc.items(), key=lambda x: x[1], reverse=True))
+
+
+def persona_rc(por_archivo: dict[str, float], autores: dict[str, str]) -> dict[str, float]:
+    """Promedio simple de scores por autor (igual que ReadmeCompleteness.por_persona
+    vía API: no pondera por tamaño del README, cada archivo pesa igual)."""
+    acc: dict[str, list[float]] = {}
+    for path, score in por_archivo.items():
+        a = autores.get(path, "desconocido")
+        acc.setdefault(a, []).append(score)
+    return dict(sorted(
+        {a: round(sum(scores) / len(scores), 4) for a, scores in acc.items()}.items(),
+        key=lambda x: x[1], reverse=True,
+    ))
 
 
 def persona_cd(por_archivo: dict[str, tuple], autores: dict[str, str]) -> dict[str, float]:
@@ -325,6 +348,14 @@ def _eval_commit_metric(k: str, commits: list[dict], v: dict, token, org, repo):
                 regs.append({"author": c["author"], "component": comp,
                              "timestamp": c["timestamp"]})
         m.registros = regs
+        return m.por_producto(fi, ff), m.por_persona(fi, ff)
+
+    if k == "anmcc":
+        m = AverageNumberOfModifiedComponentsPerCommit(token, org, repo)
+        # mismos campos que fetch() arma vía GraphQL (oid no lo usa ninguno
+        # de los dos métodos, se omite); files_count = len(files) en vez de
+        # changedFilesIfAvailable, y acá viene completo, sin el tope de la API.
+        m.commits = [{"files_count": len(c["files"]), "author": c["author"]} for c in commits]
         return m.por_producto(fi, ff), m.por_persona(fi, ff)
 
     raise ValueError(k)
@@ -412,7 +443,13 @@ def main():
                 if not d:
                     continue
                 prod = d["producto"]
-                pers = (persona_cd if k == "cd" else persona_loc_dloc)(d["por_archivo"], autores)
+                if k == "cd":
+                    fn_persona = persona_cd
+                elif k == "rc":
+                    fn_persona = persona_rc
+                else:
+                    fn_persona = persona_loc_dloc
+                pers = fn_persona(d["por_archivo"], autores)
                 print(f"     {k:<12} producto={_fmt(prod)}  personas={len(pers)}")
                 guardar(k, v, "producto", prod)
                 guardar(k, v, "persona", pers)

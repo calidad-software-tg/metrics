@@ -192,30 +192,64 @@ def _gh(path: str, token: str, params: dict = None) -> requests.Response:
 
 
 def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
-    """Una ventana [inicio, fin) por cada tag consecutivo. El último va hasta ahora."""
-    tags = []
+    """Una ventana [inicio, fin) por cada versión estable consecutiva. El último va hasta ahora.
+
+    Usa /releases, no /tags: trae el flag `prerelease` para descartar versiones
+    de prueba (ej. canary de next.js, ~88% de sus tags) sin adivinar por el
+    nombre, y ya incluye `published_at`, así que no hace falta una llamada
+    extra a /commits/{sha} por versión como en la implementación anterior
+    basada en tags (para un repo con miles de tags, esa llamada extra por
+    cada uno se comía casi toda la cuota antes de calcular una sola métrica).
+
+    Fallback a /tags (comportamiento anterior, sin filtrar) para repos que no
+    usan GitHub Releases o donde ninguna release está marcada como estable
+    (ej. cpython). Si el repo sí usa Releases pero con nombres tipo canary,
+    usar siempre la rama de /releases de arriba, nunca este fallback.
+    """
+    releases = []
     page = 1
     while True:
-        batch = _gh(f"/repos/{org}/{repo}/tags", token, {"per_page": 100, "page": page}).json()
+        batch = _gh(f"/repos/{org}/{repo}/releases", token, {"per_page": 100, "page": page}).json()
         if not batch:
             break
-        tags.extend(batch)
+        releases.extend(batch)
         if len(batch) < 100:
             break
         page += 1
 
-    if not tags:
-        print(f"{org}/{repo} no tiene tags; no se puede cortar por versiones", file=sys.stderr)
-        sys.exit(1)
+    estables = [r for r in releases if not r["prerelease"] and not r["draft"]]
 
-    versiones = []
-    for t in tags:
-        sha = t["commit"]["sha"]
-        commit = _gh(f"/repos/{org}/{repo}/commits/{sha}", token).json()
-        fecha = datetime.fromisoformat(
-            commit["commit"]["committer"]["date"].replace("Z", "+00:00")
-        )
-        versiones.append({"version": t["name"], "fecha": fecha})
+    if estables:
+        versiones = [
+            {"version": r["tag_name"],
+             "fecha": datetime.fromisoformat(r["published_at"].replace("Z", "+00:00"))}
+            for r in estables
+        ]
+    else:
+        print(f"{org}/{repo}: sin releases estables, uso tags crudos (sin filtrar prerelease)", file=sys.stderr)
+        tags = []
+        page = 1
+        while True:
+            batch = _gh(f"/repos/{org}/{repo}/tags", token, {"per_page": 100, "page": page}).json()
+            if not batch:
+                break
+            tags.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+
+        if not tags:
+            print(f"{org}/{repo} no tiene tags ni releases; no se puede cortar por versiones", file=sys.stderr)
+            sys.exit(1)
+
+        versiones = []
+        for t in tags:
+            sha = t["commit"]["sha"]
+            commit = _gh(f"/repos/{org}/{repo}/commits/{sha}", token).json()
+            fecha = datetime.fromisoformat(
+                commit["commit"]["committer"]["date"].replace("Z", "+00:00")
+            )
+            versiones.append({"version": t["name"], "fecha": fecha})
 
     versiones.sort(key=lambda v: v["fecha"])
     ahora = datetime.now(timezone.utc)

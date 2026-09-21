@@ -79,7 +79,7 @@ class DocIssueSurvival(GitHubMetric):
                     tl = node.get("timelineItems", {}).get("nodes", [])
                     if tl:
                         actor = (tl[0].get("actor") or {}).get("login", "desconocido")
-                issues.append({"days": days, "actor": actor})
+                issues.append({"days": days, "actor": actor, "cierre": closed})
 
             if not repo_data["pageInfo"]["hasNextPage"]:
                 break
@@ -89,14 +89,20 @@ class DocIssueSurvival(GitHubMetric):
         self.issues = issues
         print(f"Issues de documentación cerrados: {len(issues)}")
 
+    def _issues_en_rango(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
+        return [i for i in self.issues if fecha_inicio <= i["cierre"] <= fecha_fin]
+
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
-        if not self.issues:
+        incidencias = self._issues_en_rango(fecha_inicio, fecha_fin)
+        if not incidencias:
             return 0.0
-        return round(sum(i["days"] for i in self.issues) / len(self.issues), 2)
+        return round(sum(i["days"] for i in incidencias) / len(incidencias), 2)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:
         by_actor: dict[str, list[int]] = {}
-        for i in self.issues:
+        for i in self._issues_en_rango(fecha_inicio, fecha_fin):
+            if self._es_bot(i["actor"]):
+                continue
             by_actor.setdefault(i["actor"], []).append(i["days"])
         result = {
             login: round(sum(days) / len(days), 2)

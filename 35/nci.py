@@ -78,6 +78,8 @@ class NumberOfClosedIssues(GitHubMetric):
         for issue in self.issues:
             if issue["closed_at"] and fecha_inicio <= issue["closed_at"] <= fecha_fin:
                 login = issue["closed_by"] or "desconocido"
+                if self._es_bot(login):
+                    continue
                 conteo[login] = conteo.get(login, 0) + 1
         return dict(sorted(conteo.items(), key=lambda x: x[1], reverse=True))
 

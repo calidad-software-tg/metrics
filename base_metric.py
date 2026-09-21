@@ -56,6 +56,36 @@ def _slim_comentario(item: dict) -> dict:
     return d
 
 
+# Cuentas de automatización detectadas al revisar cada repo candidato (ver
+# SELECCION_REPOSITORIO.md), no personas. Un commit/comentario de una de estas
+# cuentas contamina cualquier métrica de Persona (REXP, EXPRev, FEXP, REXPRev,
+# Contribution Diversity, Skill Similarity, Development Experience) si se
+# cuenta como si fuera un colaborador más. Se completa a mano a medida que se
+# detectan nuevas — no hay forma confiable de listarlas todas de antemano.
+BOTS_CONOCIDOS = {
+    "vercel-release-bot",       # next.js: bump automático de la versión interna de React
+    "skia-flutter-autoroll",    # flutter: autoroll de dependencias de Skia
+    "engine-flutter-autoroll",  # flutter: autoroll del motor de Flutter
+    "CLAassistant",             # tldr: bot de firma de CLA, comenta en casi todos los PRs
+    "tldr-bot",                 # tldr: bot de bienvenida/lint automático
+    # "github-actions" sin sufijo "[bot]": así lo devuelve GraphQL en
+    # ClosedEvent.actor.login (detectado en mttr sobre next.js — cierra
+    # issues automáticamente, con tiempos de cierre ~0 que no son reparación
+    # real). La REST API sí le pone el sufijo ("github-actions[bot]"), por
+    # eso hace falta la entrada explícita acá además del chequeo de sufijo.
+    "github-actions",
+}
+
+
+def es_bot(login: str | None) -> bool:
+    """True si `login` es una cuenta de automatización: está en BOTS_CONOCIDOS,
+    o sigue la convención de GitHub Apps (sufijo "[bot]", ej. "github-actions[bot]",
+    "next-js-bot[bot]")."""
+    if not login:
+        return False
+    return login in BOTS_CONOCIDOS or login.endswith("[bot]")
+
+
 class GitHubMetric:
 
     def __init__(self, token: str, org: str, repo: str):
@@ -219,6 +249,10 @@ class GitHubMetric:
             print(f"GraphQL error: {data['errors']}", file=sys.stderr)
             sys.exit(1)
         return data
+
+    def _es_bot(self, login: str | None) -> bool:
+        """Wrapper de conveniencia sobre `es_bot()` para llamar como self._es_bot(login)."""
+        return es_bot(login)
 
     def _resolve_ref(self, fecha_fin) -> str:
         """SHA del último commit de la rama default con fecha <= fecha_fin.
