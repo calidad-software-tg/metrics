@@ -267,6 +267,70 @@ def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
     return ventanas
 
 
+def ventanas_por_version_todas(token: str, org: str, repo: str) -> list[dict]:
+    """Igual que ventanas_por_version, pero SIN filtrar prerelease/canary --
+    una ventana por cada release publicada, estable o no. Para un repo con
+    cadencia canary diaria (ej. next.js) esto multiplica por ~10 la cantidad
+    de ventanas y las angosta a horas en vez de semanas/meses -- guardar bajo
+    tipo_analisis='versiones_canary', nunca pisa a 'versiones' (estables).
+    """
+    releases = []
+    page = 1
+    while True:
+        batch = _gh(f"/repos/{org}/{repo}/releases", token, {"per_page": 100, "page": page}).json()
+        if not batch:
+            break
+        releases.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+
+    if releases:
+        versiones = [
+            {"version": r["tag_name"],
+             "fecha": datetime.fromisoformat(r["published_at"].replace("Z", "+00:00"))}
+            for r in releases if not r["draft"]
+        ]
+    else:
+        print(f"{org}/{repo}: sin releases, uso tags crudos", file=sys.stderr)
+        tags = []
+        page = 1
+        while True:
+            batch = _gh(f"/repos/{org}/{repo}/tags", token, {"per_page": 100, "page": page}).json()
+            if not batch:
+                break
+            tags.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+        if not tags:
+            print(f"{org}/{repo} no tiene tags ni releases; no se puede cortar por versiones", file=sys.stderr)
+            sys.exit(1)
+        versiones = []
+        for t in tags:
+            sha = t["commit"]["sha"]
+            commit = _gh(f"/repos/{org}/{repo}/commits/{sha}", token).json()
+            fecha = datetime.fromisoformat(
+                commit["commit"]["committer"]["date"].replace("Z", "+00:00")
+            )
+            versiones.append({"version": t["name"], "fecha": fecha})
+
+    versiones.sort(key=lambda v: v["fecha"])
+    ahora = datetime.now(timezone.utc)
+
+    ventanas = []
+    for i, v in enumerate(versiones):
+        fin = versiones[i + 1]["fecha"] if i + 1 < len(versiones) else ahora
+        ventanas.append({
+            "n": i + 1,
+            "version": v["version"],
+            "inicio": v["fecha"],
+            "fin": fin,
+            "abierta": i + 1 == len(versiones),
+        })
+    return ventanas
+
+
 # --- persistencia ----------------------------------------------------------
 
 class Base:
@@ -586,7 +650,15 @@ def main():
     parser.add_argument("--max-files", type=int, help="tope de archivos para métricas de árbol (cd, dloc, loc_notion...)")
     parser.add_argument("--max-commits", type=int, help="tope de commits para métricas de historial (fexp, le, rexp...)")
     parser.add_argument("--max-contributors", type=int, help="tope de contribuidores (ss)")
+    parser.add_argument("--con-canary", action="store_true",
+                        help="no filtra prerelease/canary: una ventana por cada release publicada "
+                             "(muchas más, mucho más angostas). Guarda en tipo_analisis='versiones_canary', "
+                             "nunca pisa a 'versiones' (solo estables)")
     args = parser.parse_args()
+
+    global TIPO_ANALISIS
+    if args.con_canary:
+        TIPO_ANALISIS = "versiones_canary"
 
     LIMITES["max_files"] = args.max_files
     LIMITES["max_commits"] = args.max_commits
@@ -634,7 +706,7 @@ def main():
             print("Corré con --no-guardar, o levantá la base (db/README.md).", file=sys.stderr)
             sys.exit(1)
 
-    ventanas = ventanas_por_version(token, org, repo)
+    ventanas = (ventanas_por_version_todas if args.con_canary else ventanas_por_version)(token, org, repo)
 
     print(f"Repo     : {org}/{repo}")
     print(f"Métricas : {len(claves)} -> {', '.join(claves)}")

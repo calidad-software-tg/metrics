@@ -52,7 +52,7 @@ from anmcc import AverageNumberOfModifiedComponentsPerCommit
 from developer_ownership import DeveloperOwnership, _CODE_EXTENSIONS as OWN_EXT, _is_excluded as own_excluded
 
 from run_versiones import (
-    Base, ventanas_por_version, TIPO_ANALISIS, NOMBRES_METRICA,
+    Base, ventanas_por_version, ventanas_por_version_todas, TIPO_ANALISIS, NOMBRES_METRICA,
     _fmt, os,  # os ya trae el .env cargado por run_versiones
 )
 
@@ -370,7 +370,12 @@ def main():
     ap.add_argument("--solo", metavar="k1,k2",
                     help=f"subconjunto de {sorted(TODAS)}")
     ap.add_argument("--no-guardar", dest="guardar", action="store_false", default=True)
+    ap.add_argument("--con-canary", action="store_true",
+                    help="no filtra prerelease/canary: una ventana por cada release publicada. "
+                         "Guarda en tipo_analisis='versiones_canary', nunca pisa a 'versiones'")
     args = ap.parse_args()
+
+    tipo_analisis = "versiones_canary" if args.con_canary else TIPO_ANALISIS
 
     token = os.environ.get("GITHUB_TOKEN", "")
     if not token:
@@ -386,7 +391,7 @@ def main():
 
     dir_repo = clonar_o_actualizar(org, repo)
     rama = "origin/HEAD"  # branch por defecto, ya actualizado por el fetch
-    ventanas = ventanas_por_version(token, org, repo)  # mismas fechas/periodo_num que run_versiones.py
+    ventanas = (ventanas_por_version_todas if args.con_canary else ventanas_por_version)(token, org, repo)
     print(f"\nRepo    : {org}/{repo} (clon local)")
     print(f"Métricas: {', '.join(sorted(quiere))}")
     print(f"Ventanas: {len(ventanas)} (una por versión, SIN cap)")
@@ -408,7 +413,7 @@ def main():
                   AND periodo_id IN (SELECT periodo_id FROM periodo
                                      WHERE repo_id = %s AND tipo_analisis = %s)
                 """,
-                (k, repo_id, TIPO_ANALISIS),
+                (k, repo_id, tipo_analisis),
             )
         base.commit()
 
@@ -418,7 +423,7 @@ def main():
         if base is None:
             return
         try:
-            base.guardar_ventana(repo_id, k, TIPO_ANALISIS, v, por, valor)
+            base.guardar_ventana(repo_id, k, tipo_analisis, v, por, valor)
             base.commit()
         except Exception as exc:
             base.con.rollback()
