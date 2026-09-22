@@ -15,6 +15,7 @@ query($owner: String!, $repo: String!, $cursor: String) {
       pageInfo { hasNextPage endCursor }
       nodes {
         createdAt
+        authorAssociation
         author { login }
         labels(first: 20) {
           nodes { name }
@@ -24,6 +25,10 @@ query($owner: String!, $repo: String!, $cursor: String) {
   }
 }
 """
+
+# Asociaciones que indican pertenencia al core team en GitHub.
+# authorAssociation = afiliación al momento de reportar el issue (no la de hoy).
+_CORE_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 
 # Nombres de archivo candidatos para identificar al core team, en orden de preferencia.
 _MAINTAINERS_CANDIDATES = ["MAINTAINERS.md", ".github/MAINTAINERS.md", "CODEOWNERS", ".github/CODEOWNERS"]
@@ -122,7 +127,12 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 labels = [n["name"] for n in node.get("labels", {}).get("nodes", [])]
                 # 'created' se guarda para que SLICEABLE pueda recortar por ventana
                 # sin necesidad de repetir el fetch en cada una.
-                self._issues.append({"user_login": login, "labels": labels, "created": created})
+                self._issues.append({
+                    "user_login": login,
+                    "labels": labels,
+                    "created": created,
+                    "author_association": node.get("authorAssociation", ""),
+                })
             if not page_info["hasNextPage"]:
                 break
             cursor = page_info["endCursor"]
@@ -131,23 +141,29 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
 
     def _calcular_bugs_detectados_por_usuarios(self, metadata_issues: list[dict], lista_historica_core_team: set[str]) -> int:
         """
-        Fiel al algoritmo original de la consigna, con una corrección:
-        la comprensión original reutilizaba la variable `key` en los dos
-        `for` y referenciaba una `label` nunca definida (NameError). Se
-        corrige a `for label in etiquetas for keyword in keywords_bug`.
+        Fiel al algoritmo original de la consigna, con dos correcciones:
+        1. La comprensión original reutilizaba la variable `key` y referenciaba
+           una `label` nunca definida (NameError). Corregido a `for label in
+           etiquetas for keyword in keywords_bug`.
+        2. Criterio de afiliación: se usa `authorAssociation` (campo GraphQL,
+           afiliación al momento del reporte) como fuente principal. Solo si
+           el campo no está disponible se cae al fallback de la lista de core team.
         """
         conteo_user_bugs = 0
 
         for issue in metadata_issues:
-            reportero = issue.get("user_login")
             etiquetas = [et.lower() for et in issue.get("labels", [])]
-
-            # Criterio de tipo: ¿está etiquetado como bug?
             es_bug = any(keyword in label for label in etiquetas for keyword in self._KEYWORDS_BUG)
 
             if es_bug:
-                # Criterio de afiliación: ¿el reportero es externo al core team?
-                if reportero not in lista_historica_core_team:
+                association = issue.get("author_association", "")
+                if association:
+                    es_externo = association not in _CORE_ASSOCIATIONS
+                else:
+                    # Fallback cuando el campo no vino del API (ej. issues muy viejos).
+                    reportero = issue.get("user_login", "")
+                    es_externo = reportero not in lista_historica_core_team
+                if es_externo:
                     conteo_user_bugs += 1
 
         return conteo_user_bugs
@@ -157,11 +173,13 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, dict]:
         nub = self._calcular_bugs_detectados_por_usuarios(self._issues, self._core_team)
+        # core_team_size solo aplica al fallback (cuando authorAssociation no vino).
         return {
             self.repo: {
                 "issues_analizados": len(self._issues),
-                "core_team_size": len(self._core_team),
                 "nub": nub,
+                "criterio_afiliacion": "authorAssociation",
+                "core_team_fallback_size": len(self._core_team),
             }
         }
 
