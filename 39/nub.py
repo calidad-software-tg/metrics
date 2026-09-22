@@ -45,8 +45,10 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
     """
 
     _KEYWORDS_BUG = {
-        "defect", "error", "bug", "issue", "mistake",
+        "defect", "error", "bug", "mistake",
         "incorrect", "fault", "flaw",
+        # "issue" eliminado: como substring matchea "good first issue",
+        # "open issue", etc. — demasiados falsos positivos.
     }
 
     def __init__(self, token: str, org: str, repo: str):
@@ -71,7 +73,34 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 if handles:
                     print(f"Core team detectado en '{path}': {len(handles)} usuarios")
                     return handles
-        print("No se encontró MAINTAINERS.md/CODEOWNERS legible; core team queda vacío (revisar manualmente).")
+        # Fallback: miembros de la organización (funciona para orgs públicas
+        # como vercel cuando no hay MAINTAINERS.md/CODEOWNERS).
+        headers_json = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        handles: set[str] = set()
+        page = 1
+        while True:
+            resp = requests.get(
+                f"https://api.github.com/orgs/{self.org}/members",
+                headers=headers_json,
+                params={"per_page": 100, "page": page},
+            )
+            if not resp.ok:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            handles |= {m["login"] for m in batch if "login" in m}
+            if len(batch) < 100:
+                break
+            page += 1
+        if handles:
+            print(f"Core team vía org members ({self.org}): {len(handles)} usuarios")
+            return handles
+        print("No se encontró MAINTAINERS.md/CODEOWNERS ni org members; core team queda vacío.")
         return set()
 
     def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, **kwargs):

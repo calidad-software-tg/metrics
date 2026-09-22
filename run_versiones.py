@@ -440,7 +440,18 @@ class Base:
                 else:
                     self.upsert_resultado(periodo_id, metrica_id, login, float(val), None)
         elif isinstance(valor, (dict, list)):
-            self.upsert_resultado(periodo_id, metrica_id, None, None, valor)
+            # Para métricas de producto que devuelven {repo: {key: escalar, ...}},
+            # extraer el número principal a value y guardar el dict completo en
+            # value_extra para no perder el desglose (ej. nub, nob_42).
+            escalar = None
+            if isinstance(valor, dict):
+                if len(valor) == 1:
+                    inner = next(iter(valor.values()))
+                    if isinstance(inner, dict):
+                        escalar = _escalar_de(inner)
+                else:
+                    escalar = _escalar_de(valor)
+            self.upsert_resultado(periodo_id, metrica_id, None, escalar, valor)
         elif isinstance(valor, bool):
             self.upsert_resultado(periodo_id, metrica_id, None, float(valor), None)
         elif valor is not None:
@@ -495,7 +506,7 @@ def _fmt(valor) -> str:
 
 # Claves de resumen conocidas en salidas compuestas por persona.
 _CLAVES_ESCALAR = ("sc", "experiencia_meses", "porcentaje", "value", "valor",
-                   "total", "score", "count")
+                   "total", "score", "count", "nub", "nob")
 
 
 def _escalar_de(d: dict):

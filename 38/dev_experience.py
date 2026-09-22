@@ -119,12 +119,16 @@ class DevelopmentExperience(GitHubMetric):
         commits_resueltos = self._resolver_identidades()
         por_autor: dict[str, list] = {}
         for c in commits_resueltos:
+            if self._es_bot(c["author"]):
+                continue
             por_autor.setdefault(c["author"], []).append(c)
 
         result = {}
         for login, commits in por_autor.items():
-            experiencia = self._calcular_development_experience(commits, fecha_fin)
             primer_commit = min(c["timestamp"] for c in commits)
+            if primer_commit > fecha_fin:
+                continue  # autor aún no existía en esta ventana
+            experiencia = self._calcular_development_experience(commits, fecha_fin)
             result[login] = {
                 "primer_commit": primer_commit.isoformat(),
                 "experiencia_meses": experiencia,
