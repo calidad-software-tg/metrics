@@ -543,6 +543,13 @@ SLICEABLE = {
     "sc":              [("_issues", "created"), ("_prs", "created")],
     "sc_disc":         [("_issues", "created"), ("_prs", "created")],
     "dev_exp":         [],
+    # nob_42: devuelve conteo actual de branches (no histórico); un fetch global
+    # evita repetirlo una vez por ventana sin cambiar el resultado.
+    "nob_42":          [],
+    # nub: un fetch global descarga todos los issues del rango completo; SLICEABLE
+    # los filtra por ventana usando 'created'. Evita ~373 fetches completos del
+    # issue tracker de next.js (que tiene >40k issues).
+    "nub":             [("_issues", "created")],
 }
 
 

@@ -91,7 +91,9 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                     continue
                 login = (node.get("author") or {}).get("login", "desconocido")
                 labels = [n["name"] for n in node.get("labels", {}).get("nodes", [])]
-                self._issues.append({"user_login": login, "labels": labels})
+                # 'created' se guarda para que SLICEABLE pueda recortar por ventana
+                # sin necesidad de repetir el fetch en cada una.
+                self._issues.append({"user_login": login, "labels": labels, "created": created})
             if not page_info["hasNextPage"]:
                 break
             cursor = page_info["endCursor"]
