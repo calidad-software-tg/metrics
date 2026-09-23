@@ -64,6 +64,10 @@ def _slim_comentario(item: dict) -> dict:
 # detectan nuevas — no hay forma confiable de listarlas todas de antemano.
 BOTS_CONOCIDOS = {
     "vercel-release-bot",       # next.js: bump automático de la versión interna de React
+    # Nombres de git (no logins) de los mismos bots de next.js: las métricas
+    # locales (run_versiones_local.py) atribuyen por nombre de autor de git.
+    "Vercel Release Bot",       # next.js: 643 commits, email ...+vercel-release-bot@users.noreply
+    "nextjs-bot",               # next.js: ~600 commits de release, email it+nextjs-bot@vercel.com
     "skia-flutter-autoroll",    # flutter: autoroll de dependencias de Skia
     "engine-flutter-autoroll",  # flutter: autoroll del motor de Flutter
     "CLAassistant",             # tldr: bot de firma de CLA, comenta en casi todos los PRs

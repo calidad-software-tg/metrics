@@ -70,13 +70,15 @@ class LearningEase(GitHubMetric):
         print()
         self.registros = registros
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         por_componente: dict[str, list[dict]] = {}
         for r in self.registros:
+            if self._es_bot(r["author"]):
+                continue
             por_componente.setdefault(r["component"], []).append(r)
 
         if not por_componente:
-            return 0.0
+            return None  # ventana sin commits: no observable (NULL, no 0.0)
 
         valores = [calcular_learning_easy(commits) for commits in por_componente.values()]
         return round(sum(valores) / len(valores), 2)

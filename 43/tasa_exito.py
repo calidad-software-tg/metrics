@@ -105,11 +105,21 @@ class JarczykSuccessRate(GitHubMetric):
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         # Población total: issues creados dentro del período observado
         # (mismo universo usado en Development Process Performance, consigna 40).
-        total_issues = sum(1 for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin)
+        total_issues, nci_total = self._n_y_n1(fecha_inicio, fecha_fin)
         if total_issues == 0:
             return None  # ventana sin issues creados: no observable (NULL, no 0.0)
-        nci_total = calcular_nci(self.issues, fecha_inicio, fecha_fin)
         return calcular_tasa_exito_jarczyk(nci_total, total_issues)
+
+    def _n_y_n1(self, fecha_inicio: datetime, fecha_fin: datetime) -> tuple[int, int]:
+        """n = issues creados en la ventana; n1 = de ESOS, los cerrados antes de fecha_fin.
+
+        n1 tiene que ser un subconjunto de n (éxitos de n ensayos binomiales). Antes
+        n1 era calcular_nci() sobre todo el repo (cierres en la ventana de issues
+        creados en cualquier fecha): en ventanas cortas (next.js, releases del mismo
+        día) cerraban más issues viejos de los que se creaban y la tasa daba > 1.
+        """
+        creados = [i for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin]
+        return len(creados), calcular_nci(creados, fecha_inicio, fecha_fin)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):
         raise NotImplementedError(
@@ -127,10 +137,9 @@ class JarczykSuccessRate(GitHubMetric):
             print("No se encontraron issues.")
             return
 
-        total_issues = sum(1 for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin)
-        nci_total = calcular_nci(self.issues, fecha_inicio, fecha_fin)
+        total_issues, nci_total = self._n_y_n1(fecha_inicio, fecha_fin)
         tasa = calcular_tasa_exito_jarczyk(nci_total, total_issues)
 
         print(f"\nIssues creados en el período (n, población total): {total_issues}")
-        print(f"Issues cerrados en el período (n1, éxitos - NCI):    {nci_total}")
+        print(f"De esos, cerrados en el período (n1, éxitos):      {nci_total}")
         print(f"Tasa de éxito (pt = n1 / n): {tasa}")
