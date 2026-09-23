@@ -84,6 +84,8 @@ class LearningEase(GitHubMetric):
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:
         por_autor_componente: dict[tuple, list[dict]] = {}
         for r in self.registros:
+            if self._es_bot(r["author"]):
+                continue
             key = (r["author"], r["component"])
             por_autor_componente.setdefault(key, []).append(r)
 

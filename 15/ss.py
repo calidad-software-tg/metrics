@@ -183,6 +183,7 @@ class SkillSimilarity(GitHubMetric):
         resultado = {
             login: round(calcular_skill_similarity(langs, self.repo_languages), 4)
             for login, langs in self.user_languages.items()
+            if not self._es_bot(login)
         }
         return dict(sorted(resultado.items(), key=lambda x: x[1], reverse=True))
 

@@ -71,6 +71,8 @@ class NumberOfComments(GitHubMetric):
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, int]:
         por_autor: dict[str, list[dict]] = {}
         for e in self.eventos:
+            if self._es_bot(e["login"]):
+                continue
             por_autor.setdefault(e["login"], []).append(e)
 
         resultado = {
