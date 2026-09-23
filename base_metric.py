@@ -82,6 +82,22 @@ BOTS_CONOCIDOS = {
     # real). La REST API sí le pone el sufijo ("github-actions[bot]"), por
     # eso hace falta la entrada explícita acá además del chequeo de sufijo.
     "github-actions",
+    # GraphQL devuelve estos logins de GitHub Apps SIN el sufijo "[bot]" (mismo
+    # caso que github-actions): detectados en exprev/nc sobre next.js.
+    "next-js-bot",
+    "dependabot",
+    "greenkeeperio-bot",
+    "codetriage-readme-bot",
+    "diffray-bot",
+    "askdevai-bot",
+    # Agentes de IA que abren PRs / comentan: no son desarrolladores.
+    "Copilot",
+    "copilot-swe-agent",
+    "devin-ai-integration",
+    # No es una persona: el placeholder que usan las métricas cuando la cuenta
+    # autora fue borrada (GitHub la muestra como "ghost"); agrupa a muchos.
+    "desconocido",
+    "ghost",
 }
 
 
