@@ -48,6 +48,13 @@ class DevelopmentExperience(GitHubMetric):
         self._commits: list[dict] = []
 
     def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, **kwargs):
+        # CACHÉ: fetch() no usa fecha_inicio/fecha_fin para nada (trae SIEMPRE
+        # el historial completo de commits, por_persona ya filtra por fecha_fin
+        # en memoria) -- sin esto, un runner que llama fetch() una vez por
+        # período (66 veces) re-descargaría los ~23.500 commits del repo cada
+        # vez. Mismo bug que ya se corrigió en core_devs_prs.py/dc.py.
+        if self._commits:
+            return
         cursor, page = None, 0
         print("Obteniendo commits...")
         while True:

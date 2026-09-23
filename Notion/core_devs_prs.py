@@ -29,6 +29,15 @@ from commits_per_author import CommitsPerAuthor
 # no CLOSED — a diferencia de la REST API, donde hay que chequear
 # `merged_at is None` sobre PRs con state='closed'. Acá alcanza con filtrar
 # state == "CLOSED" directamente, sin ese chequeo adicional.
+#
+# CACHE — BUG DE PERFORMANCE CORREGIDO: antes, fetch() bajaba TODAS las PRs
+# del repo (sin filtro de fecha en la query) cada vez que se lo llamaba. Para
+# un análisis que corre fetch() una vez por período (ej. 66 bloques
+# adaptativos), eso significaba re-descargar ~21.000 PRs (~214 páginas) por
+# cada período -- del orden de 14.000 requests para una sola métrica. Ahora
+# el listado completo de PRs se baja UNA sola vez por instancia (cacheado en
+# self._all_prs) y fetch() solo filtra por fecha de creación + core devs del
+# período sobre ese caché, sin volver a pegarle a la API.
 
 _QUERY_PRS = """
 query($owner: String!, $name: String!, $after: String) {
@@ -38,6 +47,7 @@ query($owner: String!, $name: String!, $after: String) {
       nodes {
         author { login }
         state
+        createdAt
       }
     }
   }
@@ -60,7 +70,8 @@ class CoreDevsPullRequests(GitHubMetric):
         self.core_devs_input = core_devs
         self.top_n = top_n
         self.core_devs: list[str] = []
-        self.prs: list[dict] = []  # [{author, state}]
+        self.prs: list[dict] = []  # [{author, state}], ya filtradas al período vigente
+        self._all_prs: list[dict] | None = None  # caché: [{author, state, created_at}], todo el repo
 
     def _auto_seleccionar_core_devs(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[str]:
         print(f"  core_devs no especificado: auto-seleccionando top-{self.top_n} por commits...")
@@ -71,10 +82,7 @@ class CoreDevsPullRequests(GitHubMetric):
         print(f"  Core devs seleccionados: {', '.join(seleccionados)}")
         return seleccionados
 
-    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, **kwargs):
-        self.core_devs = self.core_devs_input or self._auto_seleccionar_core_devs(fecha_inicio, fecha_fin)
-        core_devs_set = set(self.core_devs)
-
+    def _fetch_all_prs(self) -> list[dict]:
         prs = []
         cursor, page = None, 0
         while True:
@@ -83,15 +91,30 @@ class CoreDevsPullRequests(GitHubMetric):
             conexion = data["data"]["repository"]["pullRequests"]
             for node in conexion["nodes"]:
                 author_node = node.get("author") or {}
-                login = author_node.get("login")
-                if login in core_devs_set:
-                    prs.append({"author": login, "state": node["state"]})
-            print(f"  ...PRs página {page} ({len(prs)} de core devs acumuladas)", end="\r")
+                prs.append({
+                    "author": author_node.get("login"),
+                    "state": node["state"],
+                    "created_at": datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00")),
+                })
+            print(f"  ...PRs página {page} ({len(prs)} acumuladas)", end="\r")
             if not conexion["pageInfo"]["hasNextPage"]:
                 break
             cursor = conexion["pageInfo"]["endCursor"]
         print()
-        self.prs = prs
+        return prs
+
+    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, **kwargs):
+        self.core_devs = self.core_devs_input or self._auto_seleccionar_core_devs(fecha_inicio, fecha_fin)
+        core_devs_set = set(self.core_devs)
+
+        if self._all_prs is None:
+            print("  Descargando PRs del repo (una sola vez, se cachea)...")
+            self._all_prs = self._fetch_all_prs()
+
+        self.prs = [
+            pr for pr in self._all_prs
+            if pr["author"] in core_devs_set and fecha_inicio <= pr["created_at"] <= fecha_fin
+        ]
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, dict]:
         resultado = {login: {"prs_generadas": 0, "prs_rechazadas": 0} for login in self.core_devs}

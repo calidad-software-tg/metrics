@@ -71,6 +71,7 @@ class ContinuousIntegrationPresence(GitHubMetric):
             f"https://api.github.com/repos/{self.org}/{self.repo}/contents/{path}",
             headers=headers,
             params={"ref": ref},
+            timeout=30,
         )
         return resp.status_code, resp
 

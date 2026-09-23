@@ -72,72 +72,36 @@ class DiscussionCentrality(GitHubMetric):
         self.metadata_comentarios: list[dict] = []  # {item_id, user_login, fecha}
 
     def _fetch_issue_comments(self, fecha_inicio: datetime, fecha_fin: datetime):
-        page = 1
-        while True:
-            data = self._rest(
-                f"/repos/{self.org}/{self.repo}/issues/comments",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
-            )
-            if not data:
-                break
-            for c in data:
-                created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
-                if created > fecha_fin:
-                    continue
-                match = _ISSUE_NUM_RE.search(c.get("issue_url", ""))
-                item_id = f"issue-{match.group(1)}" if match else c.get("issue_url")
-                login = (c.get("user") or {}).get("login", "desconocido")
-                self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
-            print(f"  ...comentarios de issues/PRs página {page}", end="\r")
-            if len(data) < 100:
-                break
-            page += 1
-        print()
+        for c in self._rest_list_since(
+            f"/repos/{self.org}/{self.repo}/issues/comments",
+            fecha_inicio, fecha_fin, label="comentarios de issues/PRs",
+        ):
+            created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
+            match = _ISSUE_NUM_RE.search(c.get("issue_url", ""))
+            item_id = f"issue-{match.group(1)}" if match else c.get("issue_url")
+            login = (c.get("user") or {}).get("login", "desconocido")
+            self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
 
     def _fetch_pr_review_comments(self, fecha_inicio: datetime, fecha_fin: datetime):
-        page = 1
-        while True:
-            data = self._rest(
-                f"/repos/{self.org}/{self.repo}/pulls/comments",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
-            )
-            if not data:
-                break
-            for c in data:
-                created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
-                if created > fecha_fin:
-                    continue
-                match = _ISSUE_NUM_RE.search(c.get("pull_request_url", ""))
-                item_id = f"pr-{match.group(1)}" if match else c.get("pull_request_url")
-                login = (c.get("user") or {}).get("login", "desconocido")
-                self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
-            print(f"  ...comentarios de revisión de PRs página {page}", end="\r")
-            if len(data) < 100:
-                break
-            page += 1
-        print()
+        for c in self._rest_list_since(
+            f"/repos/{self.org}/{self.repo}/pulls/comments",
+            fecha_inicio, fecha_fin, label="comentarios de revisión de PRs",
+        ):
+            created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
+            match = _ISSUE_NUM_RE.search(c.get("pull_request_url", ""))
+            item_id = f"pr-{match.group(1)}" if match else c.get("pull_request_url")
+            login = (c.get("user") or {}).get("login", "desconocido")
+            self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
 
     def _fetch_commit_comments(self, fecha_inicio: datetime, fecha_fin: datetime):
-        page = 1
-        while True:
-            data = self._rest(
-                f"/repos/{self.org}/{self.repo}/comments",
-                {"per_page": 100, "page": page, "since": fecha_inicio.isoformat()},
-            )
-            if not data:
-                break
-            for c in data:
-                created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
-                if created > fecha_fin:
-                    continue
-                item_id = f"commit-{c.get('commit_id')}"
-                login = (c.get("user") or {}).get("login", "desconocido")
-                self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
-            print(f"  ...comentarios de commits página {page}", end="\r")
-            if len(data) < 100:
-                break
-            page += 1
-        print()
+        for c in self._rest_list_since(
+            f"/repos/{self.org}/{self.repo}/comments",
+            fecha_inicio, fecha_fin, label="comentarios de commits",
+        ):
+            created = datetime.fromisoformat(c["created_at"].replace("Z", "+00:00"))
+            item_id = f"commit-{c.get('commit_id')}"
+            login = (c.get("user") or {}).get("login", "desconocido")
+            self.metadata_comentarios.append({"item_id": item_id, "user_login": login, "fecha": created})
 
     def fetch(self, fecha_inicio: datetime, fecha_fin: datetime):
         self.metadata_comentarios = []
