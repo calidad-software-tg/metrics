@@ -102,10 +102,12 @@ class JarczykSuccessRate(GitHubMetric):
         print()
         self.issues = issues
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         # Población total: issues creados dentro del período observado
         # (mismo universo usado en Development Process Performance, consigna 40).
         total_issues = sum(1 for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin)
+        if total_issues == 0:
+            return None  # ventana sin issues creados: no observable (NULL, no 0.0)
         nci_total = calcular_nci(self.issues, fecha_inicio, fecha_fin)
         return calcular_tasa_exito_jarczyk(nci_total, total_issues)
 
