@@ -139,7 +139,9 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         print()
         print(f"Issues en período: {len(self._issues)}")
 
-    def _calcular_bugs_detectados_por_usuarios(self, metadata_issues: list[dict], lista_historica_core_team: set[str]) -> int:
+    def _calcular_bugs_detectados_por_usuarios(
+        self, metadata_issues: list[dict], lista_historica_core_team: set[str]
+    ) -> dict:
         """
         Fiel al algoritmo original de la consigna, con dos correcciones:
         1. La comprensión original reutilizaba la variable `key` y referenciaba
@@ -148,36 +150,62 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         2. Criterio de afiliación: se usa `authorAssociation` (campo GraphQL,
            afiliación al momento del reporte) como fuente principal. Solo si
            el campo no está disponible se cae al fallback de la lista de core team.
+
+        Devuelve un dict con el desglose completo. `nub=None` cuando ningún issue
+        tiene label de bug en la ventana (métrica no observable, ≠ "cero bugs").
         """
         conteo_user_bugs = 0
+        con_label_bug = 0
+        por_asociacion: dict[str, int] = {}
+        labels_bug_vistos: set[str] = set()
 
         for issue in metadata_issues:
-            etiquetas = [et.lower() for et in issue.get("labels", [])]
-            es_bug = any(keyword in label for label in etiquetas for keyword in self._KEYWORDS_BUG)
+            labels_orig = issue.get("labels", [])
+            etiquetas = [l.lower() for l in labels_orig]
+
+            bug_labels_orig = [
+                orig for orig, low in zip(labels_orig, etiquetas)
+                if any(kw in low for kw in self._KEYWORDS_BUG)
+            ]
+            es_bug = bool(bug_labels_orig)
 
             if es_bug:
+                con_label_bug += 1
+                labels_bug_vistos.update(bug_labels_orig)
+
                 association = issue.get("author_association", "")
+                por_asociacion[association] = por_asociacion.get(association, 0) + 1
+
                 if association:
                     es_externo = association not in _CORE_ASSOCIATIONS
                 else:
-                    # Fallback cuando el campo no vino del API (ej. issues muy viejos).
                     reportero = issue.get("user_login", "")
                     es_externo = reportero not in lista_historica_core_team
                 if es_externo:
                     conteo_user_bugs += 1
 
-        return conteo_user_bugs
+        return {
+            # None = no observable (sin labels de bug en la ventana).
+            # 0 = observable pero todos los bugs los reportó el core team.
+            "nub": conteo_user_bugs if con_label_bug > 0 else None,
+            "con_label_bug": con_label_bug,
+            "por_asociacion": por_asociacion,
+            # Lista vacía es el detector de ventana no observable.
+            "labels_bug_vistos": sorted(labels_bug_vistos),
+        }
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):
         raise NotImplementedError("NUB es una métrica por producto, no aplica por persona.")
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, dict]:
-        nub = self._calcular_bugs_detectados_por_usuarios(self._issues, self._core_team)
-        # core_team_size solo aplica al fallback (cuando authorAssociation no vino).
+        breakdown = self._calcular_bugs_detectados_por_usuarios(self._issues, self._core_team)
         return {
             self.repo: {
+                "nub": breakdown["nub"],
                 "issues_analizados": len(self._issues),
-                "nub": nub,
+                "con_label_bug": breakdown["con_label_bug"],
+                "por_asociacion": breakdown["por_asociacion"],
+                "labels_bug_vistos": breakdown["labels_bug_vistos"],
                 "criterio_afiliacion": "authorAssociation",
                 "core_team_fallback_size": len(self._core_team),
             }
@@ -192,5 +220,7 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         for repo, d in resultado.items():
             print(f"\nRepositorio: {repo}")
             print(f"Issues analizados     : {d['issues_analizados']}")
-            print(f"Core team detectado   : {d['core_team_size']}")
+            print(f"Con label bug         : {d['con_label_bug']}")
+            print(f"Distribución afiliación: {d['por_asociacion']}")
+            print(f"Labels bug vistos     : {d['labels_bug_vistos']}")
             print(f"Bugs detectados por usuarios (NUB): {d['nub']}")
