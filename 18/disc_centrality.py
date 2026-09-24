@@ -117,9 +117,12 @@ class DiscussionCentrality(GitHubMetric):
         raise NotImplementedError("Discussion Centrality es una métrica por persona, no aplica por producto.")
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, int]:
-        usuarios = {c["user_login"] for c in self.metadata_comentarios}
+        # Los bots se sacan antes de armar el grafo: un bot que comenta en casi
+        # todos los hilos inflaría la centralidad de cualquiera que co-participe.
+        comentarios = [c for c in self.metadata_comentarios if not self._es_bot(c["user_login"])]
+        usuarios = {c["user_login"] for c in comentarios}
         resultado = {
-            login: calcular_discussion_centrality(self.metadata_comentarios, login)
+            login: calcular_discussion_centrality(comentarios, login)
             for login in usuarios
         }
         return dict(sorted(resultado.items(), key=lambda x: x[1], reverse=True))

@@ -46,7 +46,7 @@ from readme_completeness import _score as rc_score
 # se llama a su propio por_producto()/por_persona() -> fórmula idéntica.
 from cdiv import ContributionDiversity
 from fexp import FileExperience
-from le import LearningEase
+from le import LearningEase, componente_de
 from rexp import RecentExperience
 from anmcc import AverageNumberOfModifiedComponentsPerCommit
 from developer_ownership import DeveloperOwnership, _CODE_EXTENSIONS as OWN_EXT, _is_excluded as own_excluded
@@ -317,6 +317,23 @@ def persona_cd(por_archivo: dict[str, tuple], autores: dict[str, str]) -> dict[s
     ))
 
 
+# {(autor, componente): primera fecha} sobre TODA la historia de la rama, para le.
+# Se llena una vez en main(): la primera contribución no depende de la ventana.
+_PRIMERA_LE: dict[tuple, datetime] = {}
+
+
+def primera_contribucion_le(dir_repo: Path, ref: str) -> dict[tuple, datetime]:
+    todos = commits_en_ventana(dir_repo, ref, datetime(1970, 1, 1, tzinfo=timezone.utc),
+                               datetime.now(timezone.utc))
+    primera: dict[tuple, datetime] = {}
+    for c in todos:
+        for f in c["files"]:
+            par = (c["author"], componente_de(f))
+            if par not in primera or c["timestamp"] < primera[par]:
+                primera[par] = c["timestamp"]
+    return primera
+
+
 def _eval_commit_metric(k: str, commits: list[dict], v: dict, token, org, repo):
     """Instancia la clase original, le carga el estado desde git y llama a su
     propio por_producto()/por_persona(). Devuelve (producto|None, persona)."""
@@ -344,10 +361,10 @@ def _eval_commit_metric(k: str, commits: list[dict], v: dict, token, org, repo):
         regs = []
         for c in commits:
             for f in c["files"]:
-                comp = f.split("/")[0] if "/" in f else f
-                regs.append({"author": c["author"], "component": comp,
+                regs.append({"author": c["author"], "component": componente_de(f),
                              "timestamp": c["timestamp"]})
         m.registros = regs
+        m.primera_contribucion = _PRIMERA_LE
         return m.por_producto(fi, ff), m.por_persona(fi, ff)
 
     if k == "anmcc":
@@ -429,6 +446,11 @@ def main():
             base.con.rollback()
             resumen[k]["err"] += 1
             print(f"     ERROR guardando {k}/{por}: {exc}", file=sys.stderr)
+
+    if "le" in quiere:
+        print("le: calculando primera contribución por (autor, componente) sobre toda la historia...")
+        _PRIMERA_LE.update(primera_contribucion_le(dir_repo, rama))
+        print(f"le: {len(_PRIMERA_LE)} pares (autor, componente)\n")
 
     q_arch = quiere & ARCHIVOS
     q_com = quiere & COMMITS

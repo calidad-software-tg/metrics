@@ -65,6 +65,8 @@ class RecentExperience(GitHubMetric):
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:
         por_autor: dict[str, list[dict]] = {}
         for c in self.commits:
+            if self._es_bot(c["author"]):
+                continue
             por_autor.setdefault(c["author"], []).append(c)
 
         resultado = {
