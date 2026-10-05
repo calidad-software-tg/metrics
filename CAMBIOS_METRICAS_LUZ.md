@@ -63,6 +63,22 @@ NCI (43) = `35/nci.py` (`nci`, Ines); Social Contributions (18) = `20/dc.py` (`s
    `None` en métricas escalares (Clara guarda fila con `value = NULL` porque `nub`
    devuelve un dict) — conviene unificar.
 
+4. **Tipo de issue en CFDR (27/cfdr.py), NUB (39/nub.py) y DIS (16/doc_issue_survival.py)**
+   - *Problema:* las tres reconocen bugs y documentación solo por **etiqueta**. En 2025
+     next.js dejó las etiquetas `bug` y `Documentation` y pasó al **tipo de issue** de
+     GitHub (`Bug`, `Documentation`). Issues con etiqueta `bug`: 2.390 en 2024 y 37 en
+     2025; con tipo `Bug`: 135 en 2024 y 1.647 en 2025. Desde 2025 las tres daban casi 0.
+   - *Ahora:* un issue es bug (o de documentación) si lo dice la etiqueta, como antes,
+     **o** el tipo de issue. En repos sin tipos de issue el resultado no cambia.
+   - *No observable:* CFDR y DIS devuelven `None` cuando ningún issue de la ventana
+     está clasificado (antes 0 y 0.0 días; 0.0 días se leía como "se cierran en el
+     día"). Mismo criterio que `nub` y que el punto 3. next.js no marcaba bugs antes
+     de mediados de 2020 (sin etiqueta ni tipo): esas ventanas quedan `None`.
+   - *Algoritmo original:* `run_versiones.py --solo-etiquetas` (o `solo_etiquetas=True`
+     en `fetch`/`run`) reproduce el cálculo anterior exacto: solo etiquetas, 0 y 0.0.
+   - `nub` agrega en `value_extra`: `bug_solo_por_tipo` (cuántos se reconocieron solo
+     por el tipo) y `criterio_bug` (`etiquetas+tipo` o `etiquetas`).
+
 ## Cambios de código compartido
 
 - **`base_metric.py` — `BOTS_CONOCIDOS`:** agregados los nombres de git de los bots de

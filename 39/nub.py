@@ -20,6 +20,7 @@ query($owner: String!, $repo: String!, $cursor: String) {
         labels(first: 20) {
           nodes { name }
         }
+        issueType { name }
       }
     }
   }
@@ -60,6 +61,8 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         super().__init__(token, org, repo)
         self._issues: list[dict] = []
         self._core_team: set[str] = set()
+        # True reproduce el algoritmo original: solo etiquetas, sin el tipo de issue.
+        self._solo_etiquetas = False
 
     def _fetch_core_team(self) -> set[str]:
         headers = {
@@ -108,7 +111,8 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         print("No se encontró MAINTAINERS.md/CODEOWNERS ni org members; core team queda vacío.")
         return set()
 
-    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, **kwargs):
+    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, solo_etiquetas: bool = False, **kwargs):
+        self._solo_etiquetas = solo_etiquetas
         self._core_team = self._fetch_core_team()
 
         cursor, page = None, 0
@@ -130,6 +134,7 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 self._issues.append({
                     "user_login": login,
                     "labels": labels,
+                    "tipo": (node.get("issueType") or {}).get("name"),
                     "created": created,
                     "author_association": node.get("authorAssociation", ""),
                 })
@@ -143,19 +148,24 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         self, metadata_issues: list[dict], lista_historica_core_team: set[str]
     ) -> dict:
         """
-        Fiel al algoritmo original de la consigna, con dos correcciones:
+        Fiel al algoritmo original de la consigna, con tres correcciones:
         1. La comprensión original reutilizaba la variable `key` y referenciaba
            una `label` nunca definida (NameError). Corregido a `for label in
            etiquetas for keyword in keywords_bug`.
         2. Criterio de afiliación: se usa `authorAssociation` (campo GraphQL,
            afiliación al momento del reporte) como fuente principal. Solo si
            el campo no está disponible se cae al fallback de la lista de core team.
+        3. Tipo de issue: además de las etiquetas, cuenta como bug el tipo de issue
+           de GitHub ('Bug'), que algunos proyectos usan en lugar de la etiqueta
+           (next.js pasó de la etiqueta 'bug' al tipo 'Bug' en 2025). En repos sin
+           tipos de issue el resultado no cambia. Se desactiva con solo_etiquetas.
 
         Devuelve un dict con el desglose completo. `nub=None` cuando ningún issue
-        tiene label de bug en la ventana (métrica no observable, ≠ "cero bugs").
+        está marcado como bug en la ventana (métrica no observable, ≠ "cero bugs").
         """
         conteo_user_bugs = 0
-        con_label_bug = 0
+        con_label_bug = 0  # issues marcados como bug, por etiqueta o por tipo
+        por_tipo = 0       # de esos, cuántos solo por el tipo de issue
         por_asociacion: dict[str, int] = {}
         labels_bug_vistos: set[str] = set()
 
@@ -167,10 +177,14 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 orig for orig, low in zip(labels_orig, etiquetas)
                 if any(kw in low for kw in self._KEYWORDS_BUG)
             ]
-            es_bug = bool(bug_labels_orig)
+            tipo = (issue.get("tipo") or "").lower()
+            bug_por_tipo = (not self._solo_etiquetas and not bug_labels_orig
+                            and any(kw in tipo for kw in self._KEYWORDS_BUG))
+            es_bug = bool(bug_labels_orig) or bug_por_tipo
 
             if es_bug:
                 con_label_bug += 1
+                por_tipo += bug_por_tipo
                 labels_bug_vistos.update(bug_labels_orig)
 
                 association = issue.get("author_association", "")
@@ -189,6 +203,7 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
             # 0 = observable pero todos los bugs los reportó el core team.
             "nub": conteo_user_bugs if con_label_bug > 0 else None,
             "con_label_bug": con_label_bug,
+            "bug_solo_por_tipo": por_tipo,
             "por_asociacion": por_asociacion,
             # Lista vacía es el detector de ventana no observable.
             "labels_bug_vistos": sorted(labels_bug_vistos),
@@ -204,23 +219,26 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 "nub": breakdown["nub"],
                 "issues_analizados": len(self._issues),
                 "con_label_bug": breakdown["con_label_bug"],
+                "bug_solo_por_tipo": breakdown["bug_solo_por_tipo"],
                 "por_asociacion": breakdown["por_asociacion"],
                 "labels_bug_vistos": breakdown["labels_bug_vistos"],
+                "criterio_bug": "etiquetas" if self._solo_etiquetas else "etiquetas+tipo",
                 "criterio_afiliacion": "authorAssociation",
                 "core_team_fallback_size": len(self._core_team),
             }
         }
 
-    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto", **kwargs):
+    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto",
+            solo_etiquetas: bool = False, **kwargs):
         if por == "persona":
             print("Number of Bugs Detected by Users no aplica por persona: es una métrica por producto.")
             return
-        self.fetch(fecha_inicio, fecha_fin)
+        self.fetch(fecha_inicio, fecha_fin, solo_etiquetas=solo_etiquetas)
         resultado = self.por_producto(fecha_inicio, fecha_fin)
         for repo, d in resultado.items():
             print(f"\nRepositorio: {repo}")
             print(f"Issues analizados     : {d['issues_analizados']}")
-            print(f"Con label bug         : {d['con_label_bug']}")
+            print(f"Marcados como bug     : {d['con_label_bug']} ({d['bug_solo_por_tipo']} solo por tipo de issue)")
             print(f"Distribución afiliación: {d['por_asociacion']}")
             print(f"Labels bug vistos     : {d['labels_bug_vistos']}")
             print(f"Bugs detectados por usuarios (NUB): {d['nub']}")

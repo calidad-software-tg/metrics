@@ -468,6 +468,11 @@ class Base:
 # Topes opcionales para métricas caras (se setean desde --max-files / --max-commits).
 LIMITES = {"max_files": None, "max_commits": None, "max_contributors": None}
 
+# Opciones de criterio que se pasan a fetch si la métrica las acepta (se setean desde la línea de comandos).
+# solo_etiquetas: cfdr, nub y dis reconocen bugs/documentación solo por etiqueta, sin el tipo de
+# issue de GitHub (algoritmo original de la consigna).
+OPCIONES = {"solo_etiquetas": False}
+
 
 def _fetch(metric, fecha_inicio, fecha_fin, por: str):
     """Llama fetch adaptándose a su firma (fecha_inicio/fecha_fin y/o con_actor)."""
@@ -477,6 +482,9 @@ def _fetch(metric, fecha_inicio, fecha_fin, por: str):
         kwargs["con_actor"] = True
     for nombre, valor in LIMITES.items():
         if valor is not None and nombre in params:
+            kwargs[nombre] = valor
+    for nombre, valor in OPCIONES.items():
+        if nombre in params:
             kwargs[nombre] = valor
     if "fecha_inicio" in params and "fecha_fin" in params:
         metric.fetch(fecha_inicio, fecha_fin, **kwargs)
@@ -668,6 +676,9 @@ def main():
     parser.add_argument("--max-files", type=int, help="tope de archivos para métricas de árbol (cd, dloc, loc_notion...)")
     parser.add_argument("--max-commits", type=int, help="tope de commits para métricas de historial (fexp, le, rexp...)")
     parser.add_argument("--max-contributors", type=int, help="tope de contribuidores (ss)")
+    parser.add_argument("--solo-etiquetas", action="store_true",
+                        help="cfdr, nub y dis: reconocer bugs/documentación solo por etiqueta, sin el tipo "
+                             "de issue de GitHub (algoritmo original de la consigna)")
     parser.add_argument("--con-canary", action="store_true",
                         help="no filtra prerelease/canary: una ventana por cada release publicada "
                              "(muchas más, mucho más angostas). Guarda en tipo_analisis='versiones_canary', "
@@ -681,6 +692,7 @@ def main():
     LIMITES["max_files"] = args.max_files
     LIMITES["max_commits"] = args.max_commits
     LIMITES["max_contributors"] = args.max_contributors
+    OPCIONES["solo_etiquetas"] = args.solo_etiquetas
 
     token = os.environ.get("GITHUB_TOKEN", "")
     if not token:

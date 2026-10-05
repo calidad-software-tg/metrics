@@ -14,6 +14,7 @@ query($owner: String!, $repo: String!, $cursor: String) {
       pageInfo { hasNextPage endCursor }
       nodes {
         labels(first: 10) { nodes { name } }
+        issueType { name }
         createdAt
         closedAt
       }
@@ -29,6 +30,7 @@ query($owner: String!, $repo: String!, $cursor: String) {
       pageInfo { hasNextPage endCursor }
       nodes {
         labels(first: 10) { nodes { name } }
+        issueType { name }
         createdAt
         closedAt
         timelineItems(last: 1, itemTypes: [CLOSED_EVENT]) {
@@ -43,8 +45,20 @@ query($owner: String!, $repo: String!, $cursor: String) {
 """
 
 
-def _is_doc(labels: list[str]) -> bool:
-    return any(any(kw in label.lower() for kw in _DOC_KEYWORDS) for label in labels)
+def _is_doc(labels: list[str], tipo: str | None = None, solo_etiquetas: bool = False) -> bool:
+    """¿Es un issue de documentación?
+
+    Algoritmo original: alguna etiqueta contiene una de _DOC_KEYWORDS.
+    Además (salvo solo_etiquetas): el tipo de issue de GitHub ('Documentation'),
+    que algunos proyectos usan en lugar de la etiqueta. next.js pasó de la etiqueta
+    'Documentation' al tipo 'Documentation' en 2025; en repos sin tipos de issue
+    el resultado no cambia.
+    """
+    if any(any(kw in label.lower() for kw in _DOC_KEYWORDS) for label in labels):
+        return True
+    if solo_etiquetas or not tipo:
+        return False
+    return any(kw in tipo.lower() for kw in _DOC_KEYWORDS)
 
 
 class DocIssueSurvival(GitHubMetric):
@@ -52,8 +66,11 @@ class DocIssueSurvival(GitHubMetric):
     def __init__(self, token: str, org: str, repo: str):
         super().__init__(token, org, repo)
         self.issues: list[dict] = []  # [{days, actor}]
+        # True reproduce el algoritmo original: solo etiquetas, y 0.0 cuando no hay issues.
+        self.solo_etiquetas = False
 
-    def fetch(self, con_actor: bool = False, **kwargs):
+    def fetch(self, con_actor: bool = False, solo_etiquetas: bool = False, **kwargs):
+        self.solo_etiquetas = solo_etiquetas
         query = _QUERY_CON_ACTOR if con_actor else _QUERY_SIN_ACTOR
         page_size_label = "25" if con_actor else "100"
         cursor = None
@@ -69,7 +86,8 @@ class DocIssueSurvival(GitHubMetric):
 
             for node in nodes:
                 labels = [l["name"] for l in node["labels"]["nodes"]]
-                if not _is_doc(labels):
+                tipo = (node.get("issueType") or {}).get("name")
+                if not _is_doc(labels, tipo, solo_etiquetas):
                     continue
                 created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
                 closed  = datetime.fromisoformat(node["closedAt"].replace("Z", "+00:00"))
@@ -92,10 +110,12 @@ class DocIssueSurvival(GitHubMetric):
     def _issues_en_rango(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
         return [i for i in self.issues if fecha_inicio <= i["cierre"] <= fecha_fin]
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         incidencias = self._issues_en_rango(fecha_inicio, fecha_fin)
         if not incidencias:
-            return 0.0
+            # Sin issues de documentación cerrados no hay supervivencia que medir:
+            # None (no observable). 0.0 se leería como "se cierran en el día".
+            return 0.0 if self.solo_etiquetas else None
         return round(sum(i["days"] for i in incidencias) / len(incidencias), 2)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:
@@ -110,9 +130,10 @@ class DocIssueSurvival(GitHubMetric):
         }
         return dict(sorted(result.items(), key=lambda x: x[1]))
 
-    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto", **kwargs):
+    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto",
+            solo_etiquetas: bool = False, **kwargs):
         if por == "persona":
-            self.fetch(con_actor=True)
+            self.fetch(con_actor=True, solo_etiquetas=solo_etiquetas)
             resultado = self.por_persona(fecha_inicio, fecha_fin)
             if not resultado:
                 print("No se encontraron issues de documentación cerrados.")
@@ -122,9 +143,9 @@ class DocIssueSurvival(GitHubMetric):
             for login, days in resultado.items():
                 print(f"{login:<30} {days}")
         else:
-            self.fetch(con_actor=False)
+            self.fetch(con_actor=False, solo_etiquetas=solo_etiquetas)
             avg = self.por_producto(fecha_inicio, fecha_fin)
-            if avg == 0.0:
+            if not self._issues_en_rango(fecha_inicio, fecha_fin):
                 print("No se encontraron issues de documentación cerrados.")
                 return
             print(f"DIS (Doc Issue Survival): {avg} días promedio")
