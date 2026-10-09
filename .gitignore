@@ -1,3 +1,10 @@
 .env
 .clones/
 __pycache__/
+
+# análisis - archivos grandes / locales
+backups/
+*.log
+analisis/salidas/pares_valores*.csv
+persona_detalle_estable.csv
+persona_agregado_estable_canary.csv
