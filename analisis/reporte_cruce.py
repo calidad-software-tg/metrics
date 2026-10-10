@@ -16,6 +16,7 @@ El reporte (analisis/salidas/reportes/reporte_<cruce>.html) tiene:
   - cantidad de pares, pares evaluados (sin los de control), con relación,
     robustos, robustos que pasan el control por tamaño, sin solapamiento de
     definición y hallazgos candidatos;
+  - un mapa de calor con la correlación (corregida o cruda) de todos los pares;
   - un gráfico con la cantidad de pares por categoría;
   - un explorador de pares: dos selectores con todas las combinaciones de
     variables del cruce y, para el par elegido, sus resultados y dos gráficos
@@ -120,6 +121,8 @@ def datos_reporte(p: pd.DataFrame, nombres: dict) -> dict:
     v = v[v.par_id.isin(set(p.par_id))]
     releases = (v.drop_duplicates("periodo_num").set_index("periodo_num")[["version", "anio", "etapa", "duracion_dias", "fecha_hora"]]
                 .sort_index())
+    mayor = releases.version.str.extract(r"^v?(\d+)\.")[0].astype(float)
+    releases["backport"] = mayor < mayor.cummax()   # parche de una versión mayor anterior
 
     serie = {}  # variable -> {periodo_num: valor}
     pares = {}
@@ -145,6 +148,10 @@ def datos_reporte(p: pd.DataFrame, nombres: dict) -> dict:
             "alcance": r.alcance_temporal if isinstance(r.alcance_temporal, str) else "",
             "escala": r.escala_relacion if isinstance(r.escala_relacion, str) else "",
             "hallazgo": es_verdadero(r.hallazgo_candidato),
+            "estable": es_verdadero(r.estable), "cortas": es_verdadero(r.depende_ventanas_cortas),
+            "fam": es_verdadero(r.misma_familia),
+            "lineal": _num(r.rho_corregida_lineal, 2), "local": _num(r.rho_corregida_local, 2),
+            "rtam": _num(r.rho_corregida_tamano, 2),
             "motivo": r.motivo_descarte if isinstance(r.motivo_descarte, str) else "",
         }
     variables = sorted(set(p.x_id) | set(p.y_id), key=lambda k: nombres.get(k, k).lower())
@@ -152,7 +159,8 @@ def datos_reporte(p: pd.DataFrame, nombres: dict) -> dict:
         "con_valores": con_valores,
         "variables": [{"id": k, "nombre": nombres.get(k, k)} for k in variables],
         "releases": {int(n): [r.version, int(r.anio), r.etapa, _num(r.duracion_dias, 2),
-                              f"{str(r.fecha_hora)[:4]}-{str(r.fecha_hora)[4:6]}-{str(r.fecha_hora)[6:8]}"]
+                              f"{str(r.fecha_hora)[:4]}-{str(r.fecha_hora)[4:6]}-{str(r.fecha_hora)[6:8]}",
+                              bool(r.backport)]
                      for n, r in releases.iterrows()},
         "serie": {k: {int(n): _num(val, 6) for n, val in s.items() if not pd.isna(val)} for k, s in serie.items()},
         "pares": pares,
@@ -203,13 +211,13 @@ def grafico(conteos: list[tuple[str, int]], total: int) -> str:
 ESTILO = """
 :root { color-scheme: light;
   --fondo:#fcfcfb; --superficie:#ffffff; --texto:#0b0b0b; --texto2:#52514e; --tenue:#8a8984;
-  --borde:#e6e5e0; --serie:#2a78d6; --serie2:#eb6834; --tendencia:#52514e; --banda:rgba(0,0,0,.035); --hover:rgba(42,120,214,.08); }
+  --borde:#e6e5e0; --div-neg:#2a78d6; --div-mid:#f1f0ec; --div-pos:#eb6834; --serie:#2a78d6; --serie2:#eb6834; --tendencia:#52514e; --banda:rgba(0,0,0,.035); --hover:rgba(42,120,214,.08); }
 @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) { color-scheme: dark;
   --fondo:#141413; --superficie:#1a1a19; --texto:#ffffff; --texto2:#c3c2b7; --tenue:#8f8e86;
-  --borde:#33322f; --serie:#3987e5; --serie2:#d95926; --tendencia:#c3c2b7; --banda:rgba(255,255,255,.045); --hover:rgba(57,135,229,.14); } }
+  --borde:#33322f; --div-neg:#3987e5; --div-mid:#2c2b29; --div-pos:#d95926; --serie:#3987e5; --serie2:#d95926; --tendencia:#c3c2b7; --banda:rgba(255,255,255,.045); --hover:rgba(57,135,229,.14); } }
 :root[data-theme="dark"] { color-scheme: dark;
   --fondo:#141413; --superficie:#1a1a19; --texto:#ffffff; --texto2:#c3c2b7; --tenue:#8f8e86;
-  --borde:#33322f; --serie:#3987e5; --serie2:#d95926; --tendencia:#c3c2b7; --banda:rgba(255,255,255,.045); --hover:rgba(57,135,229,.14); }
+  --borde:#33322f; --div-neg:#3987e5; --div-mid:#2c2b29; --div-pos:#d95926; --serie:#3987e5; --serie2:#d95926; --tendencia:#c3c2b7; --banda:rgba(255,255,255,.045); --hover:rgba(57,135,229,.14); }
 * { box-sizing: border-box; }
 body { margin:0; background:var(--fondo); color:var(--texto);
   font: 15px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -285,6 +293,22 @@ svg .per-grupo.atenuado { opacity:.3; }
 svg .per-grupo.activo .hit { fill:var(--hover); }
 svg .banda-clic { fill:transparent; cursor:pointer; }
 svg .banda-sel { fill:var(--hover); }
+svg .pt-sig { fill:var(--serie); fill-opacity:.85; cursor:pointer; }
+svg .pt-ns { fill:var(--tenue); fill-opacity:.45; cursor:pointer; }
+svg .pt-rob { stroke:var(--texto); stroke-width:1.5; }
+svg .pt-at { opacity:.12; }
+svg .arista { cursor:pointer; stroke-linecap:round; stroke-opacity:.85; }
+svg .arista:hover { stroke-opacity:1; }
+svg .nodo { fill:var(--serie); } svg .nodo.solo { fill:var(--tenue); }
+svg .lbl-nodo { fill:var(--texto); font-size:11px; dominant-baseline:middle; } svg .lbl-nodo.solo { fill:var(--tenue); }
+svg .fila-hit { fill:transparent; cursor:pointer; } svg g:hover > .fila-hit { fill:var(--hover); }
+svg .ic-linea { stroke:var(--serie); stroke-width:2; }
+svg .pt-forest { fill:var(--serie); } svg .pt-forest.hueca { fill:var(--superficie); stroke:var(--serie); stroke-width:2; }
+svg .pt-sens { fill:var(--texto2); }
+svg .txt-celda { fill:var(--texto); font-size:11.5px; text-anchor:middle; dominant-baseline:middle; font-variant-numeric:tabular-nums; }
+svg .umbral { stroke:var(--tenue); stroke-width:1; stroke-dasharray:3 3; }
+svg .punto.bp { fill:var(--serie2); fill-opacity:.85; }
+svg .rug { stroke:var(--serie2); stroke-width:1.5; }
 svg .guia { stroke:var(--tenue); stroke-width:1; stroke-dasharray:3 3; }
 .filtro-banner { display:none; align-items:center; flex-wrap:wrap; gap:8px 12px; margin-top:12px; padding:10px 14px;
   border:1px solid var(--borde); border-radius:10px; background:var(--hover); font-size:13.5px; }
@@ -292,6 +316,14 @@ svg .guia { stroke:var(--tenue); stroke-width:1; stroke-dasharray:3 3; }
 .filtro-banner button { font:inherit; font-size:13px; border:1px solid var(--borde); border-radius:8px; padding:4px 10px;
   background:var(--superficie); color:var(--texto); cursor:pointer; }
 .filtro-banner .aclaracion { color:var(--texto2); font-size:12.5px; flex-basis:100%; }
+svg .celda { stroke:var(--superficie); stroke-width:1; }
+svg .celda.par { cursor:pointer; }
+svg .celda.par:hover { stroke:var(--texto); stroke-width:1.5; }
+svg .celda.atenuada { opacity:.18; }
+svg .celda.vacia { fill:transparent; }
+svg .lbl-fila { fill:var(--texto2); font-size:11px; text-anchor:end; dominant-baseline:middle; }
+svg .lbl-col { fill:var(--texto2); font-size:11px; text-anchor:start; dominant-baseline:middle; }
+.mapa-cont { overflow-x:auto; }
 .filtros { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin-bottom:10px; }
 .chip { font:inherit; font-size:13px; border:1px solid var(--borde); border-radius:99px; padding:5px 12px;
   background:var(--superficie); color:var(--texto2); cursor:pointer; }
@@ -302,6 +334,12 @@ svg .guia { stroke:var(--tenue); stroke-width:1; stroke-dasharray:3 3; }
 .modo button { font:inherit; font-size:13px; border:0; padding:6px 12px; background:var(--superficie); color:var(--texto2); cursor:pointer; }
 .modo button.activo { background:var(--hover); color:var(--texto); font-weight:600; }
 .leyenda i.y { background:var(--serie2); }
+.leyenda i.gris { background:var(--tenue); opacity:.5; }
+.leyenda i.anillo { background:var(--serie); box-shadow:0 0 0 1.5px var(--texto); }
+.leyenda i.hueco { background:var(--superficie); box-shadow:inset 0 0 0 2px var(--serie); opacity:1; }
+.leyenda i.rug { width:2px; height:10px; border-radius:0; background:var(--serie2); opacity:1; }
+.leyenda i.linea-neg, .leyenda i.linea-pos { width:16px; height:3px; border-radius:2px; opacity:1; vertical-align:3px; }
+.leyenda i.linea-neg { background:var(--div-neg); } .leyenda i.linea-pos { background:var(--div-pos); }
 .leyenda i.cuad { border-radius:2px; opacity:1; } .leyenda i.cuad.debil { opacity:.35; }
 .leyenda i.punteada { width:16px; height:0; border-top:2px dashed var(--texto2); background:none; border-radius:0; vertical-align:3px; }
 .leyenda i.linea { width:14px; height:2px; border-radius:0; background:var(--tendencia); opacity:1; vertical-align:3px; }
@@ -366,7 +404,238 @@ document.getElementById('limpiarFiltros').addEventListener('click', () => {
   document.querySelectorAll('.chip[data-filtro]').forEach(o => o.setAttribute('aria-pressed', 'false'));
   renderTabla();
 });
-renderTabla();
+
+// ── Mapa de calor ──
+let modoMapa = 'corr';
+const idsMapa = D.variables.map(v => v.id);
+const parMapa = {};
+for (const [id, p] of Object.entries(D.pares)) { parMapa[p.x + '|' + p.y] = id; parMapa[p.y + '|' + p.x] = id; }
+const hexRgb = h => { h = h.trim().replace('#', ''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+function colorDiv(v) {
+  const css = getComputedStyle(document.documentElement);
+  const [neg, mid, pos] = ['--div-neg', '--div-mid', '--div-pos'].map(k => hexRgb(css.getPropertyValue(k)));
+  const t = Math.max(-1, Math.min(1, v)), fin = t < 0 ? neg : pos, a = Math.abs(t);
+  return `rgb(${mid.map((c, i) => Math.round(c + (fin[i] - c) * a)).join(',')})`;
+}
+function renderMapa() {
+  const cont = document.getElementById('mapaCalor'), n = idsMapa.length;
+  const maxCar = Math.max(...idsMapa.map(id => nombre[id].length));
+  const LW = Math.min(240, maxCar * 6.2 + 12);
+  const celda = Math.max(13, Math.min(34, (940 - LW) / n));
+  const LH = Math.min(200, maxCar * 5.2 + 12);
+  const extra = Math.min(170, maxCar * 6.2 * 0.6);   // las etiquetas inclinadas se extienden a la derecha
+  const W = LW + celda * n + extra, H = LH + celda * n + 8;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" style="min-width:${Math.min(W, 520)}px" role="img" aria-label="Mapa de calor de correlaciones">`;
+  idsMapa.forEach((id, i) => {
+    svg += `<text x="${LW - 6}" y="${LH + celda * (i + 0.5)}" class="lbl-fila">${nombre[id]}</text>`;
+    const cx = LW + celda * (i + 0.5);
+    svg += `<text transform="translate(${cx} ${LH - 6}) rotate(-55)" class="lbl-col">${nombre[id]}</text>`;
+  });
+  idsMapa.forEach((a, i) => idsMapa.forEach((b, j) => {
+    const x = LW + celda * j, y = LH + celda * i, id = i !== j ? parMapa[a + '|' + b] : null;
+    if (!id) { svg += `<rect x="${x}" y="${y}" width="${celda}" height="${celda}" class="celda vacia"/>`; return; }
+    const p = D.pares[id], v = modoMapa === 'corr' ? p.corr : p.cruda;
+    const fill = v === null ? 'transparent' : colorDiv(v);
+    const at = hayFiltros() && !paresVisibles.has(id) ? ' atenuada' : '';
+    svg += `<rect x="${x}" y="${y}" width="${celda}" height="${celda}" class="celda par${at}" data-id="${id}" data-a="${a}" data-b="${b}" style="fill:${fill}"/>`;
+  }));
+  cont.innerHTML = svg + '</svg><div class="tooltip"></div>';
+  const el = cont.querySelector('svg'), tip = cont.querySelector('.tooltip');
+  el.addEventListener('pointermove', ev => {
+    const r = ev.target.closest('.celda.par');
+    if (!r) { tip.style.display = 'none'; return; }
+    const p = D.pares[r.dataset.id];
+    tip.innerHTML = `<b>${nombre[r.dataset.a]} ↔ ${nombre[r.dataset.b]}</b><br>ρ corregida ${fmt(p.corr)} · ρ cruda ${fmt(p.cruda)}<br>`
+      + `${p.control ? 'Control (misma métrica)' : p.cat + (p.fuerza ? ' · ' + p.fuerza : '')}${p.robusta ? ' · robusta' : ''}`;
+    tip.style.display = 'block';
+    const caja = cont.getBoundingClientRect(), rr = r.getBoundingClientRect();
+    let left = rr.left - caja.left + cont.scrollLeft + rr.width + 8;
+    if (left + tip.offsetWidth > cont.scrollLeft + caja.width) left = rr.left - caja.left + cont.scrollLeft - tip.offsetWidth - 8;
+    tip.style.left = Math.max(0, left) + 'px';
+    tip.style.top = (rr.top - caja.top) + 'px';
+  });
+  el.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+  el.addEventListener('click', ev => {
+    const r = ev.target.closest('.celda.par');
+    if (r && abrirPar) abrirPar(r.dataset.id);
+  });
+  // leyenda: gradiente de −1 a 1
+  const ley = [-1, -0.5, 0, 0.5, 1];
+  document.getElementById('leyendaMapa').innerHTML = `<svg viewBox="0 0 320 34" style="max-width:320px">
+    <defs><linearGradient id="gradMapa">${ley.map(v => `<stop offset="${(v + 1) / 2}" stop-color="${colorDiv(v)}"/>`).join('')}</linearGradient></defs>
+    <rect x="10" y="4" width="300" height="10" rx="2" fill="url(#gradMapa)"/>
+    ${ley.map(v => `<text x="${10 + (v + 1) / 2 * 300}" y="18" class="tick">${fmt(v, 1)}</text>`).join('')}</svg>`;
+}
+document.querySelectorAll('#modoMapa button').forEach(b => b.addEventListener('click', () => {
+  modoMapa = b.dataset.modo;
+  document.querySelectorAll('#modoMapa button').forEach(o => o.classList.toggle('activo', o === b));
+  renderMapa();
+}));
+const _renderTablaBase = renderTabla;
+renderTabla = function () { _renderTablaBase(); renderMapa(); };
+renderMapa();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderMapa);
+
+// ── Vista general del cruce ──
+const signif = p => p.cat === 'Positiva' || p.cat === 'Negativa';
+const nPar = p => `${nombre[p.x]} ↔ ${nombre[p.y]}`;
+const replica = p => p.canary === null || p.corr === null || (p.canary >= 0) === (p.corr >= 0);
+const visible = id => !hayFiltros() || paresVisibles.has(id);
+const tipPar = p => `<b>${nPar(p)}</b><br>ρ corregida ${fmt(p.corr)} [${fmt(p.ic[0])}; ${fmt(p.ic[1])}] · ρ cruda ${fmt(p.cruda)}<br>`
+  + `${p.cat}${p.fuerza ? ' · ' + p.fuerza : ''}${p.robusta ? ' · robusta' : ''}${p.hallazgo ? ' · hallazgo' : ''}`;
+
+function interactivo(cont) {   // tooltip con data-tip y clic con data-par, una sola vez por contenedor
+  const tip = () => {
+    let t = cont.querySelector(':scope > .tooltip');
+    if (!t) { t = document.createElement('div'); t.className = 'tooltip'; cont.appendChild(t); }
+    return t;
+  };
+  cont.addEventListener('pointermove', ev => {
+    const el = ev.target.closest('[data-tip]'), t = tip();
+    if (!el) { t.style.display = 'none'; return; }
+    t.innerHTML = el.dataset.tip; t.style.display = 'block';
+    const caja = cont.getBoundingClientRect();
+    let left = ev.clientX - caja.left + 14;
+    if (left + t.offsetWidth > caja.width) left = ev.clientX - caja.left - t.offsetWidth - 14;
+    t.style.left = Math.max(0, left) + 'px';
+    t.style.top = (ev.clientY - caja.top + 14) + 'px';
+  });
+  cont.addEventListener('pointerleave', () => { tip().style.display = 'none'; });
+  cont.addEventListener('click', ev => {
+    const el = ev.target.closest('[data-par]');
+    if (el && abrirPar) abrirPar(el.dataset.par);
+  });
+}
+
+function renderEmbudo() {
+  const ev = evaluados.map(([, p]) => p), total = ev.length;
+  const pasos = [
+    ['Pares evaluados', p => true],
+    ['Significativos', p => signif(p)],
+    ['+ mismo signo en todos los períodos', p => signif(p) && p.estable],
+    ['+ se repiten en canary', p => signif(p) && p.estable && replica(p)],
+    ['+ no dependen de ventanas cortas (robustos)', p => p.robusta],
+    ['+ resisten el control por tamaño (o no aplica)', p => p.robusta && p.tamano !== 'no pasa'],
+    ['+ sin solapamiento de definición', p => p.robusta && p.tamano !== 'no pasa' && !p.solap],
+    ['+ de familias distintas (hallazgos)', p => p.hallazgo],
+  ];
+  const LW = 300, W = 980, fila = 30, H = pasos.length * fila + 6;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Embudo de filtrado de pares">`;
+  pasos.forEach(([txt, f], i) => {
+    const n = ev.filter(f).length, w = total ? (W - LW - 120) * n / total : 0, y = i * fila;
+    s += `<text x="${LW - 10}" y="${y + fila / 2}" class="cat">${txt}</text>`
+      + (n ? `<rect x="${LW}" y="${y + 5}" width="${Math.max(w, 2)}" height="${fila - 10}" rx="3" class="marca"/>` : '')
+      + `<text x="${LW + w + 8}" y="${y + fila / 2}" class="val">${n} (${total ? Math.round(100 * n / total) : 0}%)</text>`;
+  });
+  document.getElementById('vEmbudo').innerHTML = s + '</svg>';
+}
+
+function renderCrudaCorr() {
+  const W = 520, H = 440, m = { l: 50, r: 14, t: 12, b: 44 };
+  const sx = v => m.l + (v + 1) / 2 * (W - m.l - m.r), sy = v => m.t + (1 - v) / 2 * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Correlación cruda contra corregida">`
+    + `<rect x="${sx(-1)}" y="${sy(0.2)}" width="${sx(1) - sx(-1)}" height="${sy(-0.2) - sy(0.2)}" class="banda"/>`;
+  for (const v of [-1, -0.5, 0, 0.5, 1]) {
+    s += `<line x1="${sx(v)}" x2="${sx(v)}" y1="${sy(1)}" y2="${sy(-1)}" class="${v ? 'grid' : 'cero'}"/>`
+      + `<line x1="${sx(-1)}" x2="${sx(1)}" y1="${sy(v)}" y2="${sy(v)}" class="${v ? 'grid' : 'cero'}"/>`
+      + `<text x="${sx(v)}" y="${sy(-1) + 6}" class="tick">${fmt(v, 1)}</text>`
+      + `<text x="${m.l - 6}" y="${sy(v)}" class="ticky">${fmt(v, 1)}</text>`;
+  }
+  s += `<line x1="${sx(-1)}" y1="${sy(-1)}" x2="${sx(1)}" y2="${sy(1)}" class="ref"/>`;
+  const orden = [...evaluados].sort((a, b) => signif(a[1]) - signif(b[1]));   // significativos arriba
+  for (const [id, p] of orden) {
+    if (p.corr === null || p.cruda === null) continue;
+    const cls = (signif(p) ? 'pt-sig' : 'pt-ns') + (p.robusta ? ' pt-rob' : '') + (visible(id) ? '' : ' pt-at');
+    s += `<circle cx="${sx(p.cruda)}" cy="${sy(p.corr)}" r="${signif(p) ? 4.5 : 3.5}" class="${cls}" data-par="${id}" data-tip="${tipPar(p)}"/>`;
+  }
+  s += `<text x="${m.l + (W - m.l - m.r) / 2}" y="${H - 8}" class="eje">ρ cruda</text>`
+    + `<text transform="translate(14 ${m.t + (H - m.t - m.b) / 2}) rotate(-90)" class="eje">ρ corregida</text></svg>`;
+  document.getElementById('vCrudaCorr').innerHTML = s;
+}
+
+function renderRed() {
+  const W = 520, H = 460, cx = W / 2, cy = H / 2, n = idsMapa.length;
+  const R = Math.min(150, 60 + n * 3);
+  const pos = Object.fromEntries(idsMapa.map((id, i) => {
+    const a = -Math.PI / 2 + 2 * Math.PI * i / n;
+    return [id, [cx + R * Math.cos(a), cy + R * Math.sin(a), a]];
+  }));
+  const aristas = evaluados.filter(([id, p]) => signif(p) && visible(id)).sort((a, b) => Math.abs(a[1].corr) - Math.abs(b[1].corr));
+  const grado = {};
+  aristas.forEach(([, p]) => { grado[p.x] = (grado[p.x] || 0) + 1; grado[p.y] = (grado[p.y] || 0) + 1; });
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Red de relaciones significativas">`;
+  for (const [id, p] of aristas) {
+    const [x1, y1] = pos[p.x], [x2, y2] = pos[p.y];
+    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="arista" style="stroke:${colorDiv(p.corr)};stroke-width:${1.5 + 5 * Math.abs(p.corr)}" data-par="${id}" data-tip="${tipPar(p)}"/>`;
+  }
+  for (const id of idsMapa) {
+    const [x, y, a] = pos[id], der = Math.cos(a) >= 0;
+    const lx = x + 9 * Math.cos(a), ly = y + 9 * Math.sin(a);
+    s += `<circle cx="${x}" cy="${y}" r="${grado[id] ? 5 : 3.5}" class="nodo${grado[id] ? '' : ' solo'}"><title>${nombre[id]}: ${grado[id] || 0} relaciones</title></circle>`
+      + `<text x="${lx}" y="${ly}" class="lbl-nodo${grado[id] ? '' : ' solo'}" style="text-anchor:${der ? 'start' : 'end'}">${nombre[id]}</text>`;
+  }
+  s += aristas.length ? '' : `<text x="${cx}" y="${cy}" class="eje">Ningún par significativo con estos filtros</text>`;
+  document.getElementById('vRed').innerHTML = s + '</svg>';
+}
+
+const anchoEtiquetas = filas => Math.min(420, Math.max(200, ...filas.map(([, p]) => nPar(p).length * 6.6 + 24)));
+function filasSignif() {
+  return evaluados.filter(([id, p]) => signif(p) && visible(id));
+}
+
+function renderForest() {
+  const filas = filasSignif().sort((a, b) => b[1].corr - a[1].corr);
+  const cont = document.getElementById('vForest');
+  if (!filas.length) { cont.innerHTML = '<p class="vacio">Ningún par significativo con estos filtros.</p>'; return; }
+  const LW = anchoEtiquetas(filas), W = 980, fila = 24, top = 26, H = top + filas.length * fila + 30;
+  const sx = v => LW + (v + 1) / 2 * (W - LW - 60);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Intervalos de confianza de las relaciones significativas">`
+    + `<rect x="${sx(-0.2)}" y="${top - 6}" width="${sx(0.2) - sx(-0.2)}" height="${filas.length * fila + 6}" class="banda"/>`;
+  for (const v of [-1, -0.5, 0, 0.5, 1]) s += `<line x1="${sx(v)}" x2="${sx(v)}" y1="${top - 6}" y2="${top + filas.length * fila}" class="${v ? 'grid' : 'cero'}"/>`
+    + `<text x="${sx(v)}" y="${top + filas.length * fila + 6}" class="tick">${fmt(v, 1)}</text>`;
+  s += `<text x="${sx(0)}" y="${top - 12}" class="ref-txt" style="text-anchor:middle">zona despreciable (−0,2 a 0,2)</text>`;
+  filas.forEach(([id, p], i) => {
+    const y = top + i * fila + fila / 2;
+    s += `<g data-par="${id}" data-tip="${tipPar(p)}"><rect x="0" y="${y - fila / 2}" width="${W}" height="${fila}" class="fila-hit"/>`
+      + `<text x="${LW - 10}" y="${y}" class="cat">${nPar(p)}</text>`
+      + `<line x1="${sx(p.ic[0])}" x2="${sx(p.ic[1])}" y1="${y}" y2="${y}" class="ic-linea"/>`
+      + `<circle cx="${sx(p.corr)}" cy="${y}" r="5" class="pt-forest${p.robusta ? '' : ' hueca'}"/>`
+      + `<text x="${sx(p.ic[1]) + 8}" y="${y}" class="val">${fmt(p.corr)}</text></g>`;
+  });
+  cont.innerHTML = s + '</svg>';
+}
+
+function renderEstab() {
+  const filas = filasSignif().sort((a, b) => Math.abs(b[1].corr) - Math.abs(a[1].corr));
+  const cont = document.getElementById('vEstab');
+  if (!filas.length) { cont.innerHTML = '<p class="vacio">Ningún par significativo con estos filtros.</p>'; return; }
+  const cols = ['Toda la historia', '2016–19', '2020–22', '2023–24', '2025–26'];
+  const LW = anchoEtiquetas(filas), cw = 120, fila = 26, top = 30, W = LW + cw * cols.length + 10, H = top + filas.length * fila + 4;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Estabilidad por período de las relaciones significativas">`;
+  cols.forEach((c, j) => { s += `<text x="${LW + cw * j + cw / 2}" y="${top - 12}" class="tick" style="font-weight:600">${c}</text>`; });
+  filas.forEach(([id, p], i) => {
+    const y = top + i * fila;
+    s += `<g data-par="${id}" data-tip="${tipPar(p)}"><rect x="0" y="${y}" width="${W}" height="${fila}" class="fila-hit"/>`
+      + `<text x="${LW - 10}" y="${y + fila / 2}" class="cat">${nPar(p)}</text>`;
+    const celdas = [[p.corr, p.corr >= 0 ? '+' : '-'], ...p.per.map((v, k) => [v, p.est[k]])];
+    celdas.forEach(([v, e], j) => {
+      const fill = e === '+' ? colorDiv(0.75) : e === '-' ? colorDiv(-0.75) : e === '0' ? colorDiv(0) : 'transparent';
+      s += `<rect x="${LW + cw * j + 2}" y="${y + 2}" width="${cw - 4}" height="${fila - 4}" rx="3" style="fill:${fill}" class="celda-est"/>`
+        + `<text x="${LW + cw * j + cw / 2}" y="${y + fila / 2}" class="txt-celda">${v === null ? '—' : fmt(v)}</text>`;
+    });
+    s += '</g>';
+  });
+  cont.innerHTML = s + '</svg>';
+}
+
+function renderVista() {
+  renderEmbudo(); renderCrudaCorr(); renderRed(); renderForest(); renderEstab();
+}
+['vCrudaCorr', 'vRed', 'vForest', 'vEstab'].forEach(id => interactivo(document.getElementById(id)));
+const _renderTablaMapa = renderTabla;
+renderTabla = function () { _renderTablaMapa(); renderVista(); };
+renderTabla();   // dibuja la tabla, el mapa de calor y la vista general
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderVista);
 """
 
 SCRIPT = r"""
@@ -411,7 +680,7 @@ function dispersion(contenedor, pts, etiqX, etiqY, centrado) {
     if (x0 < 0 && x1 > 0) s += `<line x1="${sx(0)}" x2="${sx(0)}" y1="${m.t}" y2="${H - m.b}" class="cero"/>`;
     if (y0 < 0 && y1 > 0) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(0)}" y2="${sy(0)}" class="cero"/>`;
   }
-  pts.forEach((p, i) => { s += `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="3.5" class="punto" data-i="${i}"/>`; });
+  pts.forEach((p, i) => { s += `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="3.5" class="punto${p.rel && p.rel[5] ? ' bp' : ''}" data-i="${i}"/>`; });
   // línea de tendencia (mínimos cuadrados sobre lo que se grafica)
   const n = pts.length, mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n;
   let sxy = 0, sxx = 0; for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; }
@@ -555,6 +824,7 @@ function temporal(cont, x, y, p, inv) {
     if (modoTiempo === 'ajustado' && y0 < 0 && y1 > 0) svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(0)}" y2="${sy(0)}" class="cero"/>`;
     svg += `<text x="${m.l}" y="${top - 4}" class="titulo-panel">${titulo}</text>`;
     svg += `<path d="${serie.map((o, i) => (i ? 'L' : 'M') + sx(o.t).toFixed(1) + ',' + sy(o.v).toFixed(1)).join('')}" class="linea-${cual}"/>`;
+    for (const o of serie) if (D.releases[o.n][5]) svg += `<line x1="${sx(o.t)}" x2="${sx(o.t)}" y1="${top + PH + 2}" y2="${top + PH + 9}" class="rug"/>`;
   });
   const yb = m.t + PH * 2 + GAP;
   const trimestral = (t1 - t0) < 3.5 * 365.25 * 864e5, MESES = ['ene', 'abr', 'jul', 'oct'];
@@ -569,7 +839,7 @@ function temporal(cont, x, y, p, inv) {
     + `<circle class="marca-x" r="4.5" cx="-10" cy="-10"/><circle class="marca-y" r="4.5" cx="-10" cy="-10"/></svg>`;
   cont.innerHTML = svg + '<div class="tooltip"></div>';
   document.getElementById('leyendaTiempo').innerHTML =
-    `<span><i></i>${nombre[x]}</span><span><i class="y"></i>${nombre[y]}</span>`;
+    `<span><i></i>${nombre[x]}</span><span><i class="y"></i>${nombre[y]}</span><span><i class="rug"></i>backport (parche de una versión mayor anterior)</span>`;
 
   const el = cont.querySelector('svg'), tip = cont.querySelector('.tooltip');
   const guia = el.querySelector('.guia'), mx = el.querySelector('.marca-x'), my = el.querySelector('.marca-y');
@@ -617,6 +887,89 @@ document.querySelectorAll('#modoTiempo button').forEach(b => b.addEventListener(
   mostrar();
 }));
 
+
+// ── Sensibilidad del par: la ρ con cada control ──
+function sensibilidad(cont, p) {
+  const items = [
+    ['ρ cruda', p.cruda, null, ''],
+    ['Corregida (tiempo lineal)', p.lineal, null, ''],
+    ['ρ corregida', p.corr, p.ic, 'principal'],
+    ['Sin ventanas de < 1 día', p.sincortas, null, ''],
+    ['Con tendencia local', p.local, null, ''],
+    ['Con control por tamaño', p.rtam, null, ''],
+    ['Canary', p.canary, null, ''],
+  ];
+  const W = 480, LW = 170, fila = 30, top = 10, H = top + items.length * fila + 30;
+  const sx = v => LW + (v + 1) / 2 * (W - LW - 44);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Correlación del par según cada control">`;
+  for (const v of [-1, -0.5, 0, 0.5, 1]) s += `<line x1="${sx(v)}" x2="${sx(v)}" y1="${top}" y2="${top + items.length * fila}" class="${v ? 'grid' : 'cero'}"/>`
+    + `<text x="${sx(v)}" y="${top + items.length * fila + 6}" class="tick">${fmt(v, 1)}</text>`;
+  for (const v of [-0.1, 0.1]) s += `<line x1="${sx(v)}" x2="${sx(v)}" y1="${top}" y2="${top + items.length * fila}" class="umbral"/>`;
+  items.forEach(([txt, v, ic, cls], i) => {
+    const y = top + i * fila + fila / 2;
+    s += `<text x="${LW - 10}" y="${y}" class="cat"${cls ? ' style="font-weight:600"' : ''}>${txt}</text>`;
+    if (v === null || v === undefined) { s += `<text x="${sx(0) + 8}" y="${y}" class="val" style="fill:var(--tenue)">no aplica</text>`; return; }
+    if (ic) s += `<line x1="${sx(ic[0])}" x2="${sx(ic[1])}" y1="${y}" y2="${y}" class="ic-linea"/>`;
+    s += `<circle cx="${sx(v)}" cy="${y}" r="${cls ? 6 : 4.5}" class="${cls ? 'pt-forest' : 'pt-sens'}"/>`
+      + `<text x="${sx(v) + (v >= 0 ? 10 : -10)}" y="${y}" class="val" style="text-anchor:${v >= 0 ? 'start' : 'end'}">${fmt(v)}</text>`;
+  });
+  cont.innerHTML = s + '</svg>';
+}
+
+// ── Correlación móvil de los valores ajustados ──
+const VENTANA_MOVIL = 41;
+function movil(cont, p, inv) {
+  const xa = inv ? p.ya : p.xa, ya = inv ? p.xa : p.ya;
+  const pts = p.p.map((n, i) => ({ n, t: fechaMs(n), x: xa[i], y: ya[i] }))
+    .filter(o => o.x !== null && o.y !== null).sort((a, b) => a.t - b.t);
+  const mitad = Math.floor(VENTANA_MOVIL / 2), serie = [];
+  for (let i = 0; i < pts.length; i++) {
+    const v = pts.slice(Math.max(0, i - mitad), i + mitad + 1);
+    if (v.length < 21) continue;
+    const mx = v.reduce((a, o) => a + o.x, 0) / v.length, my = v.reduce((a, o) => a + o.y, 0) / v.length;
+    let sxy = 0, sxx = 0, syy = 0;
+    for (const o of v) { sxy += (o.x - mx) * (o.y - my); sxx += (o.x - mx) ** 2; syy += (o.y - my) ** 2; }
+    if (sxx > 0 && syy > 0) serie.push({ t: pts[i].t, n: pts[i].n, r: sxy / Math.sqrt(sxx * syy) });
+  }
+  if (serie.length < 2) { cont.innerHTML = '<p class="vacio">No hay releases suficientes para la correlación móvil.</p>'; return; }
+  const W = 480, H = 270, m = { l: 44, r: 12, t: 22, b: 30 };
+  const t0 = serie[0].t, t1 = serie[serie.length - 1].t;
+  const sx = t => m.l + (t - t0) / ((t1 - t0) || 1) * (W - m.l - m.r), sy = v => m.t + (1 - v) / 2 * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Correlación móvil del par">`;
+  ETAPAS_T.forEach(([a, b, et], i) => {
+    const xa2 = Math.max(m.l, sx(Date.UTC(a, 0, 1))), xb = Math.min(W - m.r, sx(Date.UTC(b, 0, 1)));
+    if (xb <= xa2) return;
+    const clase = periodoSel === i ? 'banda-sel' : (i % 2 === 0 ? 'banda' : '');
+    if (clase) s += `<rect x="${xa2}" y="${m.t}" width="${xb - xa2}" height="${H - m.t - m.b}" class="${clase}"/>`;
+    s += `<text x="${(xa2 + xb) / 2}" y="${m.t - 8}" class="etapa">${et}</text>`;
+  });
+  for (const v of [-1, -0.5, 0, 0.5, 1]) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(v)}" y2="${sy(v)}" class="${v ? 'grid' : 'cero'}"/>`
+    + `<text x="${m.l - 6}" y="${sy(v)}" class="ticky">${fmt(v, 1)}</text>`;
+  if (p.corr !== null) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(p.corr)}" y2="${sy(p.corr)}" class="ref"/>`;
+  for (let a = new Date(t0).getUTCFullYear() + 1; a <= new Date(t1).getUTCFullYear(); a++) {
+    const t = Date.UTC(a, 0, 1); if (t > t1) break;
+    s += `<text x="${sx(t)}" y="${H - m.b + 6}" class="tick">${String(a).slice(2)}</text>`;
+  }
+  s += `<path d="${serie.map((o, i) => (i ? 'L' : 'M') + sx(o.t).toFixed(1) + ',' + sy(o.r).toFixed(1)).join('')}" class="linea-x"/>`;
+  s += `<line class="guia" y1="${m.t}" y2="${H - m.b}" x1="-10" x2="-10"/><circle class="marca-x" r="4" cx="-10" cy="-10"/>`;
+  cont.innerHTML = s + '</svg><div class="tooltip"></div>';
+  const el = cont.querySelector('svg'), tip = cont.querySelector('.tooltip'), guia = el.querySelector('.guia'), mk = el.querySelector('.marca-x');
+  el.addEventListener('pointermove', ev => {
+    const r = el.getBoundingClientRect(), k = W / r.width, px = (ev.clientX - r.left) * k;
+    let mejor = serie[0], d = Infinity;
+    for (const o of serie) { const dd = Math.abs(sx(o.t) - px); if (dd < d) { d = dd; mejor = o; } }
+    guia.setAttribute('x1', sx(mejor.t)); guia.setAttribute('x2', sx(mejor.t));
+    mk.setAttribute('cx', sx(mejor.t)); mk.setAttribute('cy', sy(mejor.r));
+    const rel = D.releases[mejor.n];
+    tip.innerHTML = `<b>${rel[0]}</b> · ${rel[4]}<br>ρ en ${VENTANA_MOVIL} releases alrededor: ${fmt(mejor.r)}`;
+    tip.style.display = 'block';
+    const cx = sx(mejor.t) / k, ancho = tip.offsetWidth;
+    tip.style.left = (cx + 12 + ancho > r.width ? cx - ancho - 12 : cx + 12) + 'px';
+    tip.style.top = '0px';
+  });
+  el.addEventListener('pointerleave', () => { tip.style.display = 'none'; guia.setAttribute('x1', -10); guia.setAttribute('x2', -10); mk.setAttribute('cx', -10); });
+}
+
 function mostrar() {
   const x = selX.value, y = selY.value, id = parDe[x + '|' + y];
   if (!id) return;
@@ -658,6 +1011,8 @@ function mostrar() {
       <div><b>Escala</b><span>${p.escala || '—'}</span></div>
     </div>
     ${p.motivo ? `<div class="motivo">Por qué no es hallazgo: ${p.motivo}</div>` : ''}`;
+  sensibilidad(document.getElementById('dispSens'), p);
+  movil(document.getElementById('dispMovil'), p, inv);
   barrasPeriodo(document.getElementById('dispPeriodos'), p);
   dispersion(document.getElementById('dispAjustada'), ajustF, nx + ' (ajustado)', ny + ' (ajustado)', true);
   dispersion(document.getElementById('dispOriginal'), origF, nx, ny, false);
@@ -753,6 +1108,16 @@ También podés hacer clic en una fila de la tabla de pares.</p>
   </div>
   <div id="ficha"></div>
 </div>
+<div class="graficos">
+  <div class="panel"><h3>Sensibilidad: la ρ del par con cada control</h3>
+    <div class="grafico-disp" id="dispSens"></div>
+    <p class="nota">Si los puntos quedan del mismo lado del 0 y fuera de las líneas punteadas (±0,1), la relación no depende de
+    esa decisión del método. Línea: intervalo de confianza de la ρ corregida.</p></div>
+  <div class="panel"><h3>Correlación móvil</h3>
+    <div class="grafico-disp" id="dispMovil"></div>
+    <p class="nota">Correlación de los valores ajustados en una ventana de 41 releases alrededor de cada punto. Muestra cuándo
+    aparece o desaparece la relación sin depender de los cortes de período. Punteada: ρ corregida de toda la historia.</p></div>
+</div>
 <div class="panel" style="margin-top:16px"><h3>Correlación corregida por período y en canary</h3>
   <div class="grafico-disp" id="dispPeriodos"></div>
   <div class="leyenda"><span><i class="cuad"></i>período con relación (|ρ| ≥ 0,1 e IC sin el 0)</span>
@@ -764,11 +1129,11 @@ También podés hacer clic en una fila de la tabla de pares.</p>
 <div class="graficos">
   <div class="panel"><h3>Relación ajustada (sin tiempo ni duración)</h3>
     <div class="grafico-disp" id="dispAjustada"></div>
-    <div class="leyenda"><span><i></i>release</span><span><i class="linea"></i>tendencia</span></div>
+    <div class="leyenda"><span><i></i>release</span><span><i class="y"></i>backport</span><span><i class="linea"></i>tendencia</span></div>
     <p class="nota">Cada eje: posición del release menos la esperable para su momento y su duración. La correlación de esta nube es la ρ corregida.</p></div>
   <div class="panel"><h3>Valores originales</h3>
     <div class="grafico-disp" id="dispOriginal"></div>
-    <div class="leyenda"><span><i></i>release</span><span><i class="linea"></i>tendencia</span></div>
+    <div class="leyenda"><span><i></i>release</span><span><i class="y"></i>backport</span><span><i class="linea"></i>tendencia</span></div>
     <p class="nota">Valores de cada métrica tal como se calcularon, con la tendencia del proyecto incluida.</p></div>
 </div>
 <div class="panel" style="margin-top:16px"><h3>Evolución en el tiempo</h3>
@@ -808,7 +1173,48 @@ También podés hacer clic en una fila de la tabla de pares.</p>
     <span class="conteo" id="conteoTabla"></span>
   </div>
   <div class="tabla" id="tablaPares"></div>
-</div>"""
+</div>
+
+<h2>Mapa de calor</h2>
+<p class="sub">Correlación de cada par del cruce · usa los filtros de la tabla · clic en una celda para verla en el explorador</p>
+<div class="panel">
+  <div class="modo" id="modoMapa" role="group" aria-label="Correlación del mapa" style="margin-top:0">
+    <button type="button" data-modo="corr" class="activo">ρ corregida</button>
+    <button type="button" data-modo="cruda">ρ cruda</button>
+  </div>
+  <div class="grafico-disp mapa-cont" id="mapaCalor"></div>
+  <div id="leyendaMapa"></div>
+  <p class="nota">Azul: correlación negativa; naranja: positiva; gris: cerca de 0. Las celdas vacías son la diagonal o pares
+  que no pertenecen al cruce. Con filtros activos, los pares que no los cumplen se muestran atenuados.
+  Comparar "corregida" y "cruda" muestra cuánto de cada relación venía del crecimiento del proyecto.</p>
+</div>
+
+<h2>Vista general del cruce</h2>
+<p class="sub">Salvo el embudo, usan los filtros de la tabla · clic en un par para verlo en el explorador</p>
+<div class="panel"><h3>Embudo: de los pares evaluados a los hallazgos</h3>
+  <div id="vEmbudo"></div>
+  <p class="nota">Cada paso agrega una condición a la anterior; muestra en qué paso se descarta la mayoría de las relaciones.
+  No usa los filtros de la tabla.</p></div>
+<div class="graficos">
+  <div class="panel"><h3>ρ cruda vs. ρ corregida</h3>
+    <div class="grafico-disp" id="vCrudaCorr"></div>
+    <div class="leyenda"><span><i></i>significativo</span><span><i class="gris"></i>no significativo</span><span><i class="anillo"></i>robusto</span></div>
+    <p class="nota">Cada punto es un par. Sobre la diagonal, la relación no cambia al corregir; los que caen a la franja
+    (−0,2 a 0,2) eran crecimiento del proyecto o efecto de la duración de las ventanas.</p></div>
+  <div class="panel"><h3>Red de relaciones significativas</h3>
+    <div class="grafico-disp" id="vRed"></div>
+    <div class="leyenda"><span><i class="linea-neg"></i>negativa</span><span><i class="linea-pos"></i>positiva</span></div>
+    <p class="nota">Cada línea une dos variables con una relación significativa; el grosor es la fuerza.
+    Las variables sin relaciones quedan en gris.</p></div>
+</div>
+<div class="panel" style="margin-top:16px"><h3>Intervalos de las relaciones significativas</h3>
+  <div class="grafico-disp" id="vForest"></div>
+  <div class="leyenda"><span><i></i>robusta</span><span><i class="hueco"></i>no robusta</span></div>
+  <p class="nota">Punto: ρ corregida; línea: intervalo de confianza del 95%. La franja marca la zona despreciable.</p></div>
+<div class="panel" style="margin-top:16px"><h3>Estabilidad por período de las relaciones significativas</h3>
+  <div class="grafico-disp" id="vEstab"></div>
+  <p class="nota">Naranja / azul: relación positiva / negativa en ese período (|ρ| ≥ 0,1 e intervalo sin el 0);
+  gris: sin relación en ese período; vacío: menos de 15 ventanas.</p></div>"""
 
     titulo = f"Correlaciones {cruce}"
     doc = f"""<!doctype html>
