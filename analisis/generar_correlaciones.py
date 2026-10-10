@@ -7,9 +7,15 @@ Genera:
   analisis/salidas/pares_valores.csv          (o _persona / _resto si > 90 MB)
   analisis/salidas/metodo_correlaciones.md
   analisis/salidas/revision_persona.csv
+
+Además de la correlación corregida, cada par incluye chequeos de sensibilidad:
+sin ventanas de menos de 1 día, con tendencia local (escala de la relación),
+fuerza por período (alcance temporal) y control por tamaño; y un resumen
+(hallazgo_candidato, nivel_evidencia, motivo_descarte). Ver metodo_correlaciones.md.
 """
 import csv
 import math
+import os
 from collections import defaultdict
 from itertools import combinations
 from pathlib import Path
@@ -28,8 +34,18 @@ OUT_VALS_R = ROOT / "analisis" / "salidas" / "pares_valores_resto.csv"
 OUT_MD    = ROOT / "analisis" / "salidas" / "metodo_correlaciones.md"
 OUT_REV   = ROOT / "analisis" / "salidas" / "revision_persona.csv"
 
-DB = dict(host="localhost", port=5432, dbname="resultados_metricas",
-          user="metricas", password="metricas")
+# Credenciales: variables POSTGRES_* del .env de la raíz si existen.
+_env = ROOT / ".env"
+if _env.exists():
+    for _line in _env.read_text().splitlines():
+        if "=" in _line and not _line.startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+DB = dict(host=os.environ.get("POSTGRES_HOST", "localhost"),
+          port=int(os.environ.get("POSTGRES_PORT", 5432)),
+          dbname=os.environ.get("POSTGRES_DB", "resultados_metricas"),
+          user=os.environ.get("POSTGRES_USER", "metricas"),
+          password=os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
 EXCLUIR_ESTABLE = frozenset({
     "4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"
@@ -67,6 +83,19 @@ RATIO_POR_CONSTRUCCION = frozenset(
 
 K_CONTROLS_LIN = 2   # periodo_num + log(dur)
 K_CONTROLS_SPL = 5   # 4 spline df + log(dur)
+
+# Chequeos de sensibilidad
+UMBRAL_FUERZA        = 0.1   # |rho| mínimo para que una relación "exista"
+MIN_VENTANAS_PERIODO = 15    # ventanas mínimas para evaluar un período
+DIAS_MINIMOS         = 1.0   # ventanas más cortas se excluyen en rho_corregida_sin_cortas
+VENTANA_LOCAL        = 21    # releases por grado de libertad del spline de tendencia local
+
+# Pares de métricas cuya definición se solapa, además de las reglas de
+# es_solapamiento_definicion: DLOC cuenta las líneas de los README.md que evalúa
+# README Completeness; cada bug abierto (CFDR/NUB) es una issue abierta (NOI).
+SOLAPAMIENTO_METRICAS = {frozenset({"dloc", "rc"}), frozenset({"noi", "cfdr"}), frozenset({"noi", "nub"})}
+ADVERTENCIA_DLOC = ("DLOC no cuenta archivos .mdx: la documentación oficial (docs/) pasó de .md a .mdx "
+                    "en 2023 (v13.4 → v14.0) y desde entonces no se cuenta")
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -193,6 +222,121 @@ def partial_spearman(x_vals, y_vals, pnums, durs, extra_controls=None):
                 r1x=r1x, r1y=r1y, n_efectiva=n_ef)
 
 
+# ── Chequeos de sensibilidad ─────────────────────────────────────────────────
+
+def parcial_df(x_vals, y_vals, pnums, durs, df_spline):
+    """Spearman parcial como partial_spearman (versión spline), con el df del
+    spline de tendencia configurable. Devuelve rho e IC95 con n efectiva."""
+    nan = dict(rho=np.nan, ic_inf=np.nan, ic_sup=np.nan)
+    n = len(x_vals)
+    if n < 5:
+        return nan
+    rx = rankdata(x_vals, method="average")
+    ry = rankdata(y_vals, method="average")
+    rp = rankdata(pnums, method="average")
+    rd = rankdata([safe_log(d) for d in durs], method="average")
+    X = np.column_stack([np.ones(n), natural_spline_basis(rp, df=df_spline), rd])
+
+    def resid(v):
+        coef, *_ = np.linalg.lstsq(X, v, rcond=None)
+        return v - X @ coef
+
+    ex, ey = resid(rx), resid(ry)
+    if ex.std() == 0 or ey.std() == 0:
+        return nan
+    rho = float(np.corrcoef(ex, ey)[0, 1])
+    orden = np.argsort(pnums)
+    r1x, r1y = ar1_coef(ex[orden]), ar1_coef(ey[orden])
+    den = 1.0 + r1x * r1y
+    n_ef = n if den <= 0 else int(min(float(n), max(10.0, n * (1.0 - r1x * r1y) / den)))
+    if n_ef <= 3:
+        return dict(rho=rho, ic_inf=np.nan, ic_sup=np.nan)
+    z = math.atanh(float(np.clip(rho, -1 + 1e-10, 1 - 1e-10)))
+    se = 1.0 / math.sqrt(max(1e-10, n_ef - 3))
+    return dict(rho=rho, ic_inf=math.tanh(z - 1.96 * se), ic_sup=math.tanh(z + 1.96 * se))
+
+
+def excluye_cero(ic_inf, ic_sup):
+    return (ic_inf > 0 or ic_sup < 0) if not (np.isnan(ic_inf) or np.isnan(ic_sup)) else False
+
+
+def mismo_signo(a, b):
+    return (a >= 0) == (b >= 0)
+
+
+def alcance_temporal(estados):
+    """Patrón a partir del estado de cada período ('+', '-', '0' o None)."""
+    ev = [(nombre, e) for nombre, e in estados if e is not None]
+    signos = {e for _, e in ev if e in "+-"}
+    if not signos:
+        return "sin relación en ningún período"
+    if len(signos) == 2:
+        return "cambia de signo"
+    con = [i for i, (_, e) in enumerate(ev) if e in "+-"]
+    contiguos = con == list(range(con[0], con[-1] + 1))
+    if len(con) == len(ev):
+        patron = "toda la historia"
+    elif contiguos and con[-1] == len(ev) - 1:
+        patron = f"desde {ev[con[0]][0][:4]}"
+    elif contiguos:
+        patron = f"solo {ev[con[0]][0][:4]}-{ev[con[-1]][0][-4:]}"
+    else:
+        patron = "intermitente"
+    if len(ev) < 3:
+        patron += f" ({len(ev)} períodos evaluables)"
+    return patron
+
+
+def chequeos_par(rows_e):
+    """Sobre las ventanas del par (rows_e de compute_pair):
+    - sin ventanas de menos de DIAS_MINIMOS días;
+    - con tendencia local (un df del spline cada VENTANA_LOCAL releases);
+    - por período, con IC95: '+'/'-' si |rho| >= UMBRAL_FUERZA y el IC95 no incluye el 0."""
+    out = {}
+    if len(rows_e) < 5:
+        return out
+    pn = [r[0] for r in rows_e]
+    du = [r[1] if r[1] else 1.0 for r in rows_e]
+    xv = [r[2] for r in rows_e]
+    yv = [r[3] for r in rows_e]
+    an = [r[4] for r in rows_e]
+    anios = [a for a in an if a is not None]
+    out["anio_desde"] = min(anios) if anios else ""
+    out["anio_hasta"] = max(anios) if anios else ""
+
+    idx = [i for i, d in enumerate(du) if d >= DIAS_MINIMOS]
+    r = parcial_df([xv[i] for i in idx], [yv[i] for i in idx],
+                   [pn[i] for i in idx], [du[i] for i in idx], df_spline=4)
+    out.update(n_sin_cortas=len(idx), rho_corregida_sin_cortas=r["rho"],
+               ic_sin_cortas_inf=r["ic_inf"], ic_sin_cortas_sup=r["ic_sup"])
+
+    df_local = max(4, round(len(rows_e) / VENTANA_LOCAL))
+    r = parcial_df(xv, yv, pn, du, df_spline=df_local)
+    out.update(df_tendencia_local=df_local, rho_corregida_local=r["rho"],
+               ic_local_inf=r["ic_inf"], ic_local_sup=r["ic_sup"])
+
+    estados = []
+    for label, y0, y1 in ETAPAS:
+        ii = [i for i, a in enumerate(an) if a is not None and y0 <= a <= y1]
+        r = dict(rho=np.nan, ic_inf=np.nan, ic_sup=np.nan)
+        if len(ii) >= MIN_VENTANAS_PERIODO:
+            r = parcial_df([xv[i] for i in ii], [yv[i] for i in ii],
+                           [pn[i] for i in ii], [du[i] for i in ii], df_spline=4)
+        clave = label.replace("-", "_")
+        out[f"ic_{clave}"] = (f"[{r['ic_inf']:.2f}; {r['ic_sup']:.2f}]"
+                              if not np.isnan(r["ic_inf"]) else "")
+        if np.isnan(r["rho"]):
+            estado = None
+        elif abs(r["rho"]) >= UMBRAL_FUERZA and excluye_cero(r["ic_inf"], r["ic_sup"]):
+            estado = "+" if r["rho"] > 0 else "-"
+        else:
+            estado = "0"
+        out[f"estado_{clave}"] = estado or ""
+        estados.append((label, estado))
+    out["alcance_temporal"] = alcance_temporal(estados)
+    return out
+
+
 def benjamini_hochberg(pairs_pvals):
     valid = [(k, p) for k, p in pairs_pvals if isinstance(p, float) and not math.isnan(p)]
     valid.sort(key=lambda x: x[1])
@@ -257,7 +401,11 @@ def es_por_construccion(x_id, y_id, misma_metrica):
     return False
 
 
-def es_solapamiento_definicion(x_id, y_id):
+def es_solapamiento_definicion(x_id, y_id, metricas=None):
+    """metricas: (metrica_id de x, metrica_id de y), para las reglas de SOLAPAMIENTO_METRICAS."""
+    if metricas and frozenset(metricas) in SOLAPAMIENTO_METRICAS:
+        return True
+
     def _starts(vid, prefix):
         return vid.startswith(prefix + "_")
     if (_starts(x_id, "anmcc") and _starts(y_id, "cdiv")) or \
@@ -275,29 +423,47 @@ def es_solapamiento_definicion(x_id, y_id):
     return False
 
 
-def es_robusta(cat, estable, rho_corr, rho_canary):
-    if cat not in ("positiva", "negativa"):
-        return False
-    if not estable:
-        return False
-    if not isinstance(rho_corr, float) or math.isnan(rho_corr):
-        return False
+def replica_en_canary(rho_corr, rho_canary):
+    """Mismo signo en canary, o sin dato en canary."""
     if isinstance(rho_canary, float) and not math.isnan(rho_canary):
         return (rho_corr >= 0) == (rho_canary >= 0)
     return True
 
 
-def es_robusta_tamano(robusta, rho_corr, rho_tamano):
-    """robusta AND |rho_tamano| >= 0.1 AND mismo signo que rho_corr."""
-    if not robusta:
+def depende_de_ventanas_cortas(rho_corr, rho_sin_cortas):
+    """La relación (|rho| >= UMBRAL_FUERZA) cambia de signo o baja del umbral
+    sin las ventanas de menos de DIAS_MINIMOS días."""
+    if not isinstance(rho_corr, float) or math.isnan(rho_corr) or abs(rho_corr) < UMBRAL_FUERZA:
         return False
-    if not isinstance(rho_tamano, float) or math.isnan(rho_tamano):
+    if not isinstance(rho_sin_cortas, float) or math.isnan(rho_sin_cortas):
+        return True
+    return not mismo_signo(rho_sin_cortas, rho_corr) or abs(rho_sin_cortas) < UMBRAL_FUERZA
+
+
+def es_robusta(cat, estable, rho_corr, rho_canary, depende_cortas=False):
+    if cat not in ("positiva", "negativa"):
+        return False
+    if not estable or depende_cortas:
         return False
     if not isinstance(rho_corr, float) or math.isnan(rho_corr):
         return False
-    if abs(rho_tamano) < 0.1:
+    return replica_en_canary(rho_corr, rho_canary)
+
+
+def resiste_tamano(rho_corr, rho_tamano):
+    """None si el control por tamaño no se calculó; si no, |rho_tamano| >= 0.1 y
+    mismo signo que rho_corr."""
+    if not isinstance(rho_tamano, float) or math.isnan(rho_tamano):
+        return None
+    if not isinstance(rho_corr, float) or math.isnan(rho_corr):
         return False
-    return (rho_corr >= 0) == (rho_tamano >= 0)
+    return bool(abs(rho_tamano) >= UMBRAL_FUERZA and mismo_signo(rho_tamano, rho_corr))
+
+
+def es_robusta_tamano(robusta, rho_corr, rho_tamano):
+    """robusta AND resiste el control por tamaño. Vacío si el control no aplica."""
+    ok = resiste_tamano(rho_corr, rho_tamano)
+    return "" if ok is None else bool(robusta and ok)
 
 
 # ── Cargar diccionario ────────────────────────────────────────────────────────
@@ -554,11 +720,15 @@ Spline natural de 4 df sobre `rank(periodo_num)` + `rank(log(duracion_días))`.
 Pyper-Peterman 1998: `n_ef = n × (1−r1x×r1y) / (1+r1x×r1y)`, acotado [10, n].
 p_corregida: t con `n_ef − 7` gl. IC95: Fisher z con `se = 1/√(n_ef−3)`.
 
+No hace falta logaritmo ni dividir por días: la correlación trabaja con rangos y
+descuenta la duración de la ventana en todos los pares.
+
 ### Corrección por tamaño (rho_corregida_tamano)
 
-Para pares con al menos una variable de Persona (excluye familia tamano):
-misma correlación parcial controlando además por `rank(log(activos_interaccion+1))`.
-K_controles = 6; gl = `n_ef − 8`.
+Para todos los pares salvo los de control y los que incluyen una variable de la
+familia tamano (`tamano_aplica`): misma correlación parcial controlando además por
+`rank(log(activos_interaccion+1))`. K_controles = 6; gl = `n_ef − 8`.
+Si no aplica queda vacía.
 
 ## Benjamini-Hochberg (p_fdr)
 
@@ -566,9 +736,20 @@ Dentro de cada cruce, solo pares con `por_construccion = false`.
 
 ## Pares por_construccion
 
-misma_metrica; activos ↔ nuevos del mismo canal; activos_comentarios/cierre ↔
-activos_interaccion; proporciones ↔ sus dos componentes (numerador y denominador);
-nc/sc/nci ↔ exprev.
+misma_metrica; activos ↔ nuevos del mismo canal; activos_comentarios/cierre ↔ activos_interaccion;
+proporciones ↔ sus dos componentes (numerador y denominador); nc/sc/nci ↔ exprev.
+
+## solapamiento_definicion
+
+Métricas distintas cuya definición comparte ingredientes: ANMCC ↔ Contribution
+Diversity; Learning Easy ↔ Development Experience; Learning Easy ↔ nuevos en commits;
+REXP ↔ REXPRev; DLOC ↔ README Completeness (DLOC cuenta las líneas de los README.md);
+NOI ↔ CFDR / NUB (cada bug abierto es una issue abierta).
+
+## misma_familia
+
+Las dos variables tienen la misma familia, salvo "otra" (que agrupa variables sin
+familia propia y no es un aspecto común).
 
 ## Categorías y fuerza
 
@@ -582,10 +763,36 @@ nc/sc/nci ↔ exprev.
 
 Fuerza: débil [0.1,0.3), moderada [0.3,0.5), fuerte ≥ 0.5.
 
-## robusta y robusta_tamano
+## Chequeos de sensibilidad
 
-`robusta` = positiva|negativa AND estable AND rho_canary mismo signo (o vacío).
-`robusta_tamano` = robusta AND |rho_corregida_tamano| ≥ 0,1 AND mismo signo.
+| Columna | Qué calcula |
+|---|---|
+| `rho_corregida_sin_cortas` | La correlación corregida sin las ventanas de menos de 1 día |
+| `depende_ventanas_cortas` | \\|rho_corregida\\| ≥ 0,1 y, sin las ventanas cortas, cambia de signo o baja de 0,1 |
+| `rho_corregida_local` | La correlación corregida con una tendencia local: spline con un grado de libertad cada ~21 releases (`df_tendencia_local`) |
+| `escala_relacion` | Solo pares significativos. "release a release" si con la tendencia local mantiene el signo, \\|rho\\| ≥ 0,1 y su IC95 no incluye el 0; si no, "cambio de etapa" |
+| `ic_AAAA_AAAA`, `estado_AAAA_AAAA` | Por período, IC95 de la correlación corregida y estado: `+` / `-` si \\|rho\\| ≥ 0,1 y el IC95 no incluye el 0, `0` si no, vacío si no es evaluable |
+| `alcance_temporal` | Toda la historia, desde AAAA, solo AAAA-AAAA, intermitente, cambia de signo o sin relación en ningún período |
+| `anio_desde`, `anio_hasta` | Años que cubren las ventanas del par (los pares con CFDR / NUB empiezan en 2019–2020) |
+
+## estable, robusta y robusta_tamano
+
+`estable` = al menos 3 períodos evaluables y el mismo signo que rho_corregida en todos.
+`robusta` = positiva|negativa AND estable AND rho_canary mismo signo (o vacío)
+AND NOT depende_ventanas_cortas.
+`robusta_tamano` = robusta AND |rho_corregida_tamano| ≥ 0,1 AND mismo signo
+(vacío si el control por tamaño no aplica).
+
+## hallazgo_candidato y nivel_evidencia
+
+`hallazgo_candidato` = robusta AND NOT solapamiento_definicion AND NOT misma_familia
+AND (resiste el control por tamaño, o el control no aplica).
+
+`nivel_evidencia` (solo hallazgos): **alta** si `alcance_temporal` = toda la historia y
+`escala_relacion` = release a release; **baja** si no tiene fuerza en ningún período o
+es un cambio de etapa; **media** en el resto.
+
+`motivo_descarte` lista por qué un par no es hallazgo.
 
 ## Unión en Looker
 
@@ -646,9 +853,10 @@ def main():
          r1x, r1y, n_ef, rho_per, rxr, ryr, rows_e, rho_canary) = compute_pair(
             x_data_e, y_data_e, x_data_c, y_data_c)
 
-        misma_meta   = (rx["metrica_id"] == ry["metrica_id"])
+        metricas     = (rx["metrica_id"], ry["metrica_id"])
+        misma_meta   = (metricas[0] == metricas[1])
         por_constr   = es_por_construccion(x_id, y_id, misma_meta)
-        solapamiento = es_solapamiento_definicion(x_id, y_id)
+        solapamiento = es_solapamiento_definicion(x_id, y_id, metricas)
 
         dims_x = set(rx["dims_texto"].split("+")) if rx["dims_texto"] != "Sin dimensión" else set()
         dims_y = set(ry["dims_texto"].split("+")) if ry["dims_texto"] != "Sin dimensión" else set()
@@ -656,7 +864,8 @@ def main():
 
         familia_x = rx.get("familia", "")
         familia_y = ry.get("familia", "")
-        misma_fam = (familia_x != "" and familia_x == familia_y)
+        # "otra" agrupa variables sin familia propia: no cuenta como familia compartida
+        misma_fam = (familia_x not in ("", "otra") and familia_x == familia_y)
 
         # Estabilidad temporal
         n_eval = len(rho_per)
@@ -666,12 +875,10 @@ def main():
                       and (r >= 0) == (rho_global >= 0))
         estable = (n_eval >= 3 and n_mismo == n_eval)
 
-        # Corrección por tamaño
+        # Corrección por tamaño: en todos los pares salvo control y familia tamaño
         rho_tamano = np.nan
-        has_persona = "Persona" in dims_x or "Persona" in dims_y
-        if (has_persona and not por_constr
-                and familia_x != "tamano" and familia_y != "tamano"
-                and n >= 5):
+        tamano_aplica = (not por_constr and familia_x != "tamano" and familia_y != "tamano")
+        if tamano_aplica and n >= 5:
             size_rows = [
                 (vx, vy, pnum, dur if dur else 1.0, size_data_e[pnum][1])
                 for pnum, dur, vx, vy, anio, ver, fh in rows_e
@@ -686,7 +893,13 @@ def main():
                 ps_sz = partial_spearman(xv, yv, pp, dd, extra_controls=[sv])
                 rho_tamano = ps_sz["rho_corr"]
 
+        advertencias = [rx.get("advertencia", ""), ry.get("advertencia", "")]
+        if "dloc" in metricas:
+            advertencias.append(ADVERTENCIA_DLOC)
+
         pair_results[par_id] = dict(
+            chequeos_par(rows_e),
+            tamano_aplica=tamano_aplica,
             x_id=x_id, y_id=y_id,
             x_nombre=rx["nombre_legible"], y_nombre=ry["nombre_legible"],
             x_dims=rx["dims_texto"], y_dims=ry["dims_texto"],
@@ -711,8 +924,7 @@ def main():
             cruces=cruces,
             rx_r=rxr, ry_r=ryr,
             rows_e=rows_e,
-            adv_x=rx.get("advertencia", ""),
-            adv_y=ry.get("advertencia", ""),
+            advertencia=" | ".join(dict.fromkeys(a for a in advertencias if a)),
         )
 
     print(f"  {len(pair_results)} pares calculados")
@@ -748,7 +960,23 @@ def main():
         "n_periodos_evaluables", "n_periodos_mismo_signo", "estable",
         "rho_canary", "rho_corregida_tamano",
         "categoria", "fuerza", "robusta", "robusta_tamano", "advertencia",
+        # chequeos de sensibilidad
+        "anio_desde", "anio_hasta",
+        "n_sin_cortas", "rho_corregida_sin_cortas", "ic_sin_cortas_inf", "ic_sin_cortas_sup",
+        "depende_ventanas_cortas",
+        "df_tendencia_local", "rho_corregida_local", "ic_local_inf", "ic_local_sup",
+        "escala_relacion",
+        "ic_2016_2019", "ic_2020_2022", "ic_2023_2024", "ic_2025_2026",
+        "estado_2016_2019", "estado_2020_2022", "estado_2023_2024", "estado_2025_2026",
+        "alcance_temporal", "tamano_aplica",
+        "hallazgo_candidato", "nivel_evidencia", "motivo_descarte",
     ]
+    COLS_CHEQUEOS = ["anio_desde", "anio_hasta", "n_sin_cortas", "df_tendencia_local",
+                     "ic_2016_2019", "ic_2020_2022", "ic_2023_2024", "ic_2025_2026",
+                     "estado_2016_2019", "estado_2020_2022", "estado_2023_2024", "estado_2025_2026",
+                     "alcance_temporal"]
+    COLS_CHEQUEOS_NUM = ["rho_corregida_sin_cortas", "ic_sin_cortas_inf", "ic_sin_cortas_sup",
+                         "rho_corregida_local", "ic_local_inf", "ic_local_sup"]
     n_pares_rows = 0
     with open(OUT_PARES, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLS_PARES)
@@ -762,11 +990,62 @@ def main():
                     pr["por_construccion"], pr["n"],
                     p_fdr if isinstance(p_fdr, float) else np.nan,
                     rho_corr_v, pr["ic_inf"], pr["ic_sup"])
-                robusta      = es_robusta(cat, pr["estable"], rho_corr_v, pr["rho_canary"])
+                significativa = cat in ("positiva", "negativa")
+                depende_cortas = depende_de_ventanas_cortas(rho_corr_v, pr.get("rho_corregida_sin_cortas", np.nan))
+                robusta      = es_robusta(cat, pr["estable"], rho_corr_v, pr["rho_canary"], depende_cortas)
                 robusta_tam  = es_robusta_tamano(robusta, rho_corr_v, rho_tamano)
+                tamano_ok    = resiste_tamano(rho_corr_v, rho_tamano)
                 rho_per      = pr["rho_per"]
-                adv = " | ".join(dict.fromkeys(a for a in [pr["adv_x"], pr["adv_y"]] if a))
+
+                # Escala: ¿la relación se mantiene con una tendencia local?
+                rho_loc = pr.get("rho_corregida_local", np.nan)
+                local_ok = (isinstance(rho_loc, float) and not math.isnan(rho_loc)
+                            and isinstance(rho_corr_v, float) and not math.isnan(rho_corr_v)
+                            and mismo_signo(rho_loc, rho_corr_v) and abs(rho_loc) >= UMBRAL_FUERZA
+                            and excluye_cero(pr.get("ic_local_inf", np.nan), pr.get("ic_local_sup", np.nan)))
+                escala = "" if not significativa else ("release a release" if local_ok else "cambio de etapa")
+
+                # Hallazgo candidato y motivo de descarte
+                hallazgo = bool(robusta and not pr["solapamiento_definicion"]
+                                and not pr["misma_familia"] and tamano_ok is not False)
+                alcance = pr.get("alcance_temporal", "")
+                nivel = ""
+                if hallazgo:
+                    if alcance == "toda la historia" and escala == "release a release":
+                        nivel = "alta"
+                    elif alcance.startswith("sin relación") or escala == "cambio de etapa":
+                        nivel = "baja"
+                    else:
+                        nivel = "media"
+                motivos = []
+                if pr["por_construccion"]:
+                    motivos.append("control (por construcción)")
+                elif not significativa:
+                    motivos.append(f"categoría: {cat}")
+                else:
+                    if not pr["estable"]:
+                        motivos.append("cambia de signo entre períodos")
+                    if not replica_en_canary(rho_corr_v, pr["rho_canary"]):
+                        motivos.append("no se repite en canary")
+                    if depende_cortas:
+                        motivos.append("depende de las ventanas de menos de 1 día")
+                    if pr["solapamiento_definicion"]:
+                        motivos.append("solapamiento de definición")
+                    if pr["misma_familia"]:
+                        motivos.append("misma familia")
+                    if tamano_ok is False:
+                        motivos.append("no resiste el control por tamaño")
+
+                chequeos = {c: pr.get(c, "") for c in COLS_CHEQUEOS}
+                chequeos.update({c: fmt(pr.get(c, np.nan)) for c in COLS_CHEQUEOS_NUM})
                 w.writerow({
+                    **chequeos,
+                    "depende_ventanas_cortas": depende_cortas,
+                    "escala_relacion":  escala,
+                    "tamano_aplica":    pr["tamano_aplica"],
+                    "hallazgo_candidato": hallazgo,
+                    "nivel_evidencia":  nivel,
+                    "motivo_descarte":  "" if hallazgo else "; ".join(motivos),
                     "par_id":   par_id, "cruce":   cruce,
                     "x_id":     pr["x_id"], "y_id": pr["y_id"],
                     "x_nombre": pr["x_nombre"], "y_nombre": pr["y_nombre"],
@@ -804,7 +1083,7 @@ def main():
                     "fuerza":           fuerza,
                     "robusta":          robusta,
                     "robusta_tamano":   robusta_tam,
-                    "advertencia":      adv,
+                    "advertencia":      pr["advertencia"],
                 })
                 n_pares_rows += 1
 
@@ -884,6 +1163,8 @@ def main():
         "ic_inf", "ic_sup",
         "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026",
         "rho_canary", "categoria", "robusta", "robusta_tamano",
+        "alcance_temporal", "escala_relacion", "hallazgo_candidato", "nivel_evidencia",
+        "motivo_descarte",
     ]
     all_par_rows = []
     with open(OUT_PARES, newline="", encoding="utf-8") as f:

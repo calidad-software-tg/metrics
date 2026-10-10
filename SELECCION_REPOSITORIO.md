@@ -4,11 +4,13 @@
 
 ## 1. Ranking final
 
+> **Nota:** el ranking de abajo es el resultado del análisis comparativo (mejor puntuado según los criterios evaluados). La decisión práctica de sobre qué repositorio trabajar terminó siendo **Next.js** — no el mejor puntuado del ranking, sino el elegido por manejabilidad (tamaño y volumen de datos más manejable que VS Code para correr las 27 métricas de punta a punta), confirmado con el director. Ver la columna "Estado" para la distinción entre "mejor rankeado" y "repositorio de trabajo elegido".
+
 | # | Repo | Estado                      | Motivo resumido                                                                                                            |
 |---|---|-----------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| 1 | **VS Code / Code-OSS** | **Elegido**                 | Único candidato sin problema de delimitación de Producto, homogéneo en lenguaje y con adopción tecnológica real y fechable |
+| 1 | **VS Code / Code-OSS** | **Mejor rankeado (no fue el repo de trabajo)** | Único candidato sin problema de delimitación de Producto, homogéneo en lenguaje y con adopción tecnológica real y fechable |
 | 2 | CPython | Finalista del director      | Exige normalizar C/Python a un lenguaje para algunas metricas                                                              |
-| 3 | Next.js | Elegible                    | Mejor historia de adopción tecnológica de los 10                                                                           |
+| 3 | **Next.js** | **Elegido como repositorio de trabajo** | Mejor historia de adopción tecnológica de los 10; elegido en la práctica por ser más manejable en tamaño/volumen que VS Code |
 | 4 | Home Assistant Core | Finalista del director      | Problema serio de delimitación de Producto (~1000 integraciones con dueños que no colaboran)                               |
 | 5 | TensorFlow | Elegible                    | El más heterogéneo en lenguajes de los 10                                                                                  |
 | 6 | Flutter | Elegible   | Releases mal etiquetadas + colaboradores top son bots                                                                      |
@@ -97,7 +99,7 @@ Development Experience, usada como proxy operacional de la Consigna 29 ("adopci�
 
 ## 4. Análisis por candidato
 
-### 1. VS Code / Code-OSS — ELEGIDO
+### 1. VS Code / Code-OSS — mejor rankeado del análisis (no fue el repositorio de trabajo final; ver nota en la sección 1)
 
 **Pros:** un solo lenguaje dominante (TypeScript 96%), sin fragmentación de dueños (a diferencia de Home Assistant, las 97 extensiones incluidas las gobierna el mismo equipo — `CODEOWNERS` no tiene entradas individuales para `extensions/*`), caso real y fechable de adopción de tecnología nueva (CLI en Rust, 64 commits de historia), comunidad sana (nadie pasa el 9% de los commits), releases regulares y bien etiquetadas.
 
@@ -208,9 +210,11 @@ Development Experience, usada como proxy operacional de la Consigna 29 ("adopci�
 
 ---
 
-## 5. Diseño de bloques temporales para el candidato elegido (VS Code / Code-OSS)
+## 5. Diseño de bloques temporales para VS Code / Code-OSS (análisis exploratorio, no aplicado)
 
 *(Análisis complementario, datos consultados el 2026-09-18 vía search API de GitHub, verificados independientemente — ver detalle de verificación en el historial de la conversación.)*
+
+> **Nota:** este diseño de bloques (trimestral, con variable de régimen) se pensó específicamente para VS Code, que finalmente no fue el repositorio de trabajo. El diseño de ventanas que sí se implementó para Next.js es distinto y más simple: dos series paralelas, `versiones` (373 ventanas, una por release estable) y `versiones_canary` (~4.228 ventanas, una por cada release publicada incluyendo canary) — ver `INSTRUCTIVO.md` para el detalle real aplicado.
 
 ### 5.1 Actividad por año
 

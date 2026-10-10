@@ -29,11 +29,15 @@ Spline natural de 4 df sobre `rank(periodo_num)` + `rank(log(duracion_días))`.
 Pyper-Peterman 1998: `n_ef = n × (1−r1x×r1y) / (1+r1x×r1y)`, acotado [10, n].
 p_corregida: t con `n_ef − 7` gl. IC95: Fisher z con `se = 1/√(n_ef−3)`.
 
+No hace falta logaritmo ni dividir por días: la correlación trabaja con rangos y
+descuenta la duración de la ventana en todos los pares.
+
 ### Corrección por tamaño (rho_corregida_tamano)
 
-Para pares con al menos una variable de Persona (excluye familia tamano):
-misma correlación parcial controlando además por `rank(log(activos_interaccion+1))`.
-K_controles = 6; gl = `n_ef − 8`.
+Para todos los pares salvo los de control y los que incluyen una variable de la
+familia tamano (`tamano_aplica`): misma correlación parcial controlando además por
+`rank(log(activos_interaccion+1))`. K_controles = 6; gl = `n_ef − 8`.
+Si no aplica queda vacía.
 
 ## Benjamini-Hochberg (p_fdr)
 
@@ -41,9 +45,20 @@ Dentro de cada cruce, solo pares con `por_construccion = false`.
 
 ## Pares por_construccion
 
-misma_metrica; activos ↔ nuevos del mismo canal; activos_comentarios/cierre ↔
-activos_interaccion; proporciones ↔ sus dos componentes (numerador y denominador);
-nc/sc/nci ↔ exprev.
+misma_metrica; activos ↔ nuevos del mismo canal; activos_comentarios/cierre ↔ activos_interaccion;
+proporciones ↔ sus dos componentes (numerador y denominador); nc/sc/nci ↔ exprev.
+
+## solapamiento_definicion
+
+Métricas distintas cuya definición comparte ingredientes: ANMCC ↔ Contribution
+Diversity; Learning Easy ↔ Development Experience; Learning Easy ↔ nuevos en commits;
+REXP ↔ REXPRev; DLOC ↔ README Completeness (DLOC cuenta las líneas de los README.md);
+NOI ↔ CFDR / NUB (cada bug abierto es una issue abierta).
+
+## misma_familia
+
+Las dos variables tienen la misma familia, salvo "otra" (que agrupa variables sin
+familia propia y no es un aspecto común).
 
 ## Categorías y fuerza
 
@@ -57,35 +72,37 @@ nc/sc/nci ↔ exprev.
 
 Fuerza: débil [0.1,0.3), moderada [0.3,0.5), fuerte ≥ 0.5.
 
-## robusta y robusta_tamano
+## Chequeos de sensibilidad
 
-`robusta` = positiva|negativa AND estable AND rho_canary mismo signo (o vacío).
-`robusta_tamano` = robusta AND |rho_corregida_tamano| ≥ 0,1 AND mismo signo.
+| Columna | Qué calcula |
+|---|---|
+| `rho_corregida_sin_cortas` | La correlación corregida sin las ventanas de menos de 1 día |
+| `depende_ventanas_cortas` | \|rho_corregida\| ≥ 0,1 y, sin las ventanas cortas, cambia de signo o baja de 0,1 |
+| `rho_corregida_local` | La correlación corregida con una tendencia local: spline con un grado de libertad cada ~21 releases (`df_tendencia_local`) |
+| `escala_relacion` | Solo pares significativos. "release a release" si con la tendencia local mantiene el signo, \|rho\| ≥ 0,1 y su IC95 no incluye el 0; si no, "cambio de etapa" |
+| `ic_AAAA_AAAA`, `estado_AAAA_AAAA` | Por período, IC95 de la correlación corregida y estado: `+` / `-` si \|rho\| ≥ 0,1 y el IC95 no incluye el 0, `0` si no, vacío si no es evaluable |
+| `alcance_temporal` | Toda la historia, desde AAAA, solo AAAA-AAAA, intermitente, cambia de signo o sin relación en ningún período |
+| `anio_desde`, `anio_hasta` | Años que cubren las ventanas del par (los pares con CFDR / NUB empiezan en 2019–2020) |
+
+## estable, robusta y robusta_tamano
+
+`estable` = al menos 3 períodos evaluables y el mismo signo que rho_corregida en todos.
+`robusta` = positiva|negativa AND estable AND rho_canary mismo signo (o vacío)
+AND NOT depende_ventanas_cortas.
+`robusta_tamano` = robusta AND |rho_corregida_tamano| ≥ 0,1 AND mismo signo
+(vacío si el control por tamaño no aplica).
+
+## hallazgo_candidato y nivel_evidencia
+
+`hallazgo_candidato` = robusta AND NOT solapamiento_definicion AND NOT misma_familia
+AND (resiste el control por tamaño, o el control no aplica).
+
+`nivel_evidencia` (solo hallazgos): **alta** si `alcance_temporal` = toda la historia y
+`escala_relacion` = release a release; **baja** si no tiene fuerza en ningún período o
+es un cambio de etapa; **media** en el resto.
+
+`motivo_descarte` lista por qué un par no es hallazgo.
 
 ## Unión en Looker
 
 `pares_correlacion.par_id = pares_valores.par_id`.
-
-## Cómo reproducir
-
-### Orden de ejecución
-
-1. `export_persona.py` — exporta ventanas de métricas persona desde la DB a `persona_detalle_estable.csv`
-2. `resolver_y_unificar.py` — resuelve identidades y genera `persona_agregado_estable_canary.csv`
-3. `analisis/generar_diccionario.py` → `analisis/salidas/diccionario_variables.csv`
-4. `analisis/generar_correlaciones.py` → `pares_correlacion.csv`, `pares_valores.csv`, `revision_persona.csv`
-
-### Librerías Python requeridas
-
-`numpy`, `scipy`, `psycopg2`
-
-### Fuente de datos
-
-Los datos provienen del seed de la rama `luz/bugs-tipo-issue` en la DB `resultados_metricas`
-(container Docker `tg_metricas_db`, puerto 5432). Las métricas persona se leen
-de `persona_agregado_estable_canary.csv` (generado por los pasos 1–2).
-
-### pares_valores.csv
-
-El archivo `pares_valores.csv` (~85 MB) **no está en el repositorio**.
-Se regenera ejecutando los pasos 3–4, o se descarga desde el Drive del equipo.
