@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from base_metric import GitHubMetric
+from base_metric import GitHubMetric, es_bot
 
 _QUERY_ISSUES = """
 query($owner: String!, $name: String!, $after: String) {
@@ -68,6 +68,8 @@ def calcular_customer_defects_and_regressions(metadata_issues: list[dict], lista
 
     for issue in metadata_issues:
         reportero = issue.get("user_login")
+        if es_bot(reportero):
+            continue  # issues abiertas por bots: no son reportes de usuarios
 
         # 1. Criterio de tipo: ¿Es un error o una regresión?
         es_defecto = _es_defecto(issue, solo_etiquetas)
@@ -99,17 +101,45 @@ class CustomerFoundDefectsAndRegressions(GitHubMetric):
         super().__init__(token, org, repo)
         self.issues: list[dict] = []  # {user_login, labels, tipo, created_at}
         self.core_team: set = set()
+        self.core_team_size = 10
+        self.commits: list[tuple] = []  # (fecha, login) de toda la historia, para el equipo por ventana
+        self._equipo_cache: dict = {}
         self.solo_etiquetas = False
+        # True: el equipo es el top 10 de contribuidores hasta el cierre de cada ventana.
+        # False: el top 10 de hoy aplicado a toda la historia (algoritmo original).
+        self.equipo_historico = True
 
     def fetch(self, core_team_size: int = 10, solo_etiquetas: bool = False):
         self.solo_etiquetas = solo_etiquetas
+        self.core_team_size = core_team_size
         print("Obteniendo equipo principal (core team)...")
         contributors = self._rest(
             f"/repos/{self.org}/{self.repo}/contributors",
             {"per_page": core_team_size},
         )
         self.core_team = {c["login"] for c in contributors[:core_team_size]}
-        print(f"Core team ({len(self.core_team)}): {sorted(self.core_team)}")
+        print(f"Core team de hoy ({len(self.core_team)}): {sorted(self.core_team)}")
+
+        if self.equipo_historico:
+            # Autores de todos los commits de la rama principal, para armar el top 10 de
+            # cada ventana con los commits hechos hasta su cierre.
+            print("Obteniendo autores de commits (equipo por ventana)...")
+            page, commits = 1, []
+            while True:
+                data = self._rest(f"/repos/{self.org}/{self.repo}/commits", {"per_page": 100, "page": page})
+                if not data:
+                    break
+                for c in data:
+                    login = (c.get("author") or {}).get("login")
+                    fecha = (c.get("commit", {}).get("author") or {}).get("date")
+                    if login and fecha and not es_bot(login):
+                        commits.append((datetime.fromisoformat(fecha.replace("Z", "+00:00")), login))
+                print(f"  ...{len(commits)} commits", end="\r")
+                if len(data) < 100:
+                    break
+                page += 1
+            print()
+            self.commits = sorted(commits)
 
         print("Obteniendo issues...")
         issues, cursor, page = [], None, 0
@@ -130,12 +160,27 @@ class CustomerFoundDefectsAndRegressions(GitHubMetric):
         print()
         self.issues = issues
 
+    def _equipo(self, fecha_fin: datetime) -> set:
+        """Top `core_team_size` de contribuidores por commits hechos hasta fecha_fin."""
+        if not self.equipo_historico or not self.commits:
+            return self.core_team
+        if fecha_fin not in self._equipo_cache:
+            conteo: dict[str, int] = {}
+            for fecha, login in self.commits:
+                if fecha > fecha_fin:
+                    break
+                conteo[login] = conteo.get(login, 0) + 1
+            top = sorted(conteo.items(), key=lambda x: x[1], reverse=True)[: self.core_team_size]
+            self._equipo_cache[fecha_fin] = {login for login, _ in top}
+        return self._equipo_cache[fecha_fin]
+
     def _issues_en_periodo(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
         return [i for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin]
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> int | None:
         issues_periodo = self._issues_en_periodo(fecha_inicio, fecha_fin)
-        return calcular_customer_defects_and_regressions(issues_periodo, self.core_team, self.solo_etiquetas)
+        return calcular_customer_defects_and_regressions(issues_periodo, self._equipo(fecha_fin),
+                                                         self.solo_etiquetas)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):
         raise NotImplementedError(

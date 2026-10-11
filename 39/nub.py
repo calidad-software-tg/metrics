@@ -7,6 +7,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
+from issues_comun import normalizar_etiqueta
 
 _QUERY_ISSUES = """
 query($owner: String!, $repo: String!, $cursor: String) {
@@ -28,7 +29,9 @@ query($owner: String!, $repo: String!, $cursor: String) {
 """
 
 # Asociaciones que indican pertenencia al core team en GitHub.
-# authorAssociation = afiliación al momento de reportar el issue (no la de hoy).
+# A VERIFICAR: si authorAssociation es la afiliación al momento de reportar el issue o la
+# de hoy. Si es la de hoy, tiene el mismo problema que el equipo de CFDR: alguien que
+# entró al equipo después cuenta como equipo también en sus issues viejas.
 _CORE_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 
 # Nombres de archivo candidatos para identificar al core team, en orden de preferencia.
@@ -50,11 +53,13 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
     Users.md, sección 1, para el detalle.
     """
 
+    # Nombres completos de etiqueta o tipo de issue (se comparan enteros, ignorando
+    # prefijos como 'type:' o 'kind:'). Antes se buscaban como subcadena y contaban como
+    # bug las etiquetas de área 'Error Handling' y 'Error Overlay' de next.js (de 1 a 5
+    # bugs de más en 39 ventanas de 2025–26).
     _KEYWORDS_BUG = {
         "defect", "error", "bug", "mistake",
         "incorrect", "fault", "flaw",
-        # "issue" eliminado: como substring matchea "good first issue",
-        # "open issue", etc. — demasiados falsos positivos.
     }
 
     def __init__(self, token: str, org: str, repo: str):
@@ -170,16 +175,15 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
         labels_bug_vistos: set[str] = set()
 
         for issue in metadata_issues:
+            if self._es_bot(issue.get("user_login")):
+                continue  # issues abiertas por bots: no son reportes de usuarios
             labels_orig = issue.get("labels", [])
-            etiquetas = [l.lower() for l in labels_orig]
 
-            bug_labels_orig = [
-                orig for orig, low in zip(labels_orig, etiquetas)
-                if any(kw in low for kw in self._KEYWORDS_BUG)
-            ]
-            tipo = (issue.get("tipo") or "").lower()
+            bug_labels_orig = [orig for orig in labels_orig
+                               if normalizar_etiqueta(orig) in self._KEYWORDS_BUG]
+            tipo = issue.get("tipo") or ""
             bug_por_tipo = (not self._solo_etiquetas and not bug_labels_orig
-                            and any(kw in tipo for kw in self._KEYWORDS_BUG))
+                            and normalizar_etiqueta(tipo) in self._KEYWORDS_BUG)
             es_bug = bool(bug_labels_orig) or bug_por_tipo
 
             if es_bug:

@@ -4,20 +4,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
+from issues_comun import descargar_issues
 
-_QUERY_ISSUES = """
-query($owner: String!, $name: String!, $after: String) {
-  repository(owner: $owner, name: $name) {
-    issues(first: 100, after: $after) {
-      pageInfo { hasNextPage endCursor }
-      nodes {
-        createdAt
-        closedAt
-      }
-    }
-  }
-}
-"""
+
 
 
 def calcular_open_issues(metadata_issues: list[dict], fecha_snapshot: datetime = None) -> int:
@@ -66,22 +55,10 @@ class NumberOfOpenIssues(GitHubMetric):
         self.issues: list[dict] = []  # {created_at, closed_at}
 
     def fetch(self):
-        print("Obteniendo issues...")
-        issues, cursor, page = [], None, 0
-        while True:
-            page += 1
-            data = self._graphql(_QUERY_ISSUES, {"owner": self.org, "name": self.repo, "after": cursor})
-            conexion = data["data"]["repository"]["issues"]
-            print(f"  ...issues página {page} ({len(issues)} acumulados)", end="\r")
-            for node in conexion["nodes"]:
-                created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
-                closed = datetime.fromisoformat(node["closedAt"].replace("Z", "+00:00")) if node.get("closedAt") else None
-                issues.append({"created_at": created, "closed_at": closed})
-            if not conexion["pageInfo"]["hasNextPage"]:
-                break
-            cursor = conexion["pageInfo"]["endCursor"]
-        print()
-        self.issues = issues
+        # Descarga común (issues_comun.py): trae el autor para poder descartar las
+        # issues abiertas por bots, que no son trabajo pendiente del equipo.
+        self.issues = [{"created_at": i["created_at"], "closed_at": i["closed_at"]}
+                       for i in descargar_issues(self) if not self._es_bot(i["author"])]
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> int:
         # El snapshot se toma al final del período analizado.

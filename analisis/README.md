@@ -1,5 +1,10 @@
 # Análisis por dimensión
 
+> En la branch `ine/fixes-metricas` las métricas se recalculan con correcciones y en otra base
+> (`resultados_metricas_fixes`). Ver [FIXES_METRICAS.md](../FIXES_METRICAS.md) para qué cambió y en qué
+> orden correr todo; para apuntar cualquier paso de abajo a esa base, anteponer
+> `POSTGRES_DB=resultados_metricas_fixes` al comando.
+
 Cómo generar el análisis de correlaciones y de componentes principales (PCA) de una
 dimensión (Persona, Proceso o Producto). Todo se corre desde la raíz del repositorio.
 

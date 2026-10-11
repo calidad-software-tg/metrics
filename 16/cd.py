@@ -33,6 +33,22 @@ _COMMENT_PATTERNS: dict[str, list[str]] = {
 
 _CODE_EXTENSIONS = set(_COMMENT_PATTERNS.keys())
 
+# Código que no es del proyecto: librerías de terceros ya compiladas y guardadas en el repo
+# (en next.js, packages/next/src/compiled concentraba la mayoría de las líneas de
+# comentario: de 49.000 a 98.000 en la v14.0.2 y a 4.000 en la v15.0.0), código
+# vendorizado, generado o minificado, y dependencias.
+_DIRS_NO_PROPIOS = {"compiled", "vendor", "vendored", "node_modules", "dist", "build",
+                    "third_party", "third-party", "generated", "__generated__"}
+_SUFIJOS_NO_PROPIOS = (".min.js", ".bundle.js", ".production.js", ".development.js")
+
+
+def es_codigo_propio(path: str) -> bool:
+    """¿El archivo es código propio del proyecto (no compilado, vendorizado ni generado)?"""
+    p = Path(path)
+    if p.name.lower().endswith(_SUFIJOS_NO_PROPIOS):
+        return False
+    return not any(part.lower() in _DIRS_NO_PROPIOS for part in p.parts[:-1])
+
 
 def _count_lines(text: str, ext: str) -> tuple[int, int]:
     patterns = [re.compile(p) for p in _COMMENT_PATTERNS.get(ext, [])]
@@ -71,6 +87,7 @@ class CommentDensity(GitHubMetric):
             if e["type"] == "blob"
             and Path(e["path"]).suffix.lower() in _CODE_EXTENSIONS
             and Path(e["path"]).suffix.lower() not in skip_extensions
+            and es_codigo_propio(e["path"])
         ]
         total = len(code_files)
         code_files = code_files[:max_files]
@@ -103,11 +120,11 @@ class CommentDensity(GitHubMetric):
             or (c.get("commit", {}).get("author") or {}).get("name") \
             or "desconocido"
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         total_cloc = sum(f["cloc"] for f in self.files)
         total_lloc = sum(f["lloc"] for f in self.files)
         if total_lloc == 0:
-            return 0.0
+            return None  # sin código propio: no observable
         return round(total_cloc / total_lloc, 4)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:

@@ -5,6 +5,47 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
 
+_QUERY_MILESTONES = """
+query($owner: String!, $name: String!, $after: String) {
+  repository(owner: $owner, name: $name) {
+    milestones(first: 50, after: $after, states: [OPEN, CLOSED]) {
+      pageInfo { hasNextPage endCursor }
+      nodes { number title dueOn createdAt }
+    }
+  }
+}
+"""
+
+_QUERY_ISSUES_MILESTONE = """
+query($owner: String!, $name: String!, $number: Int!, $after: String) {
+  repository(owner: $owner, name: $name) {
+    milestone(number: $number) {
+      issues(first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        nodes { closedAt }
+      }
+    }
+  }
+}
+"""
+
+
+def _fecha(raw):
+    return datetime.fromisoformat(raw.replace("Z", "+00:00")) if raw else None
+
+
+def compliance_a_tiempo(milestone: dict) -> float | None:
+    """Parte de las issues del milestone que se cerró antes de su fecha límite.
+
+    La versión original (calcular_schedule_compliance) usa open_issues/closed_issues de
+    hoy, no al vencer el plazo, y no compara con la fecha límite: un milestone terminado
+    con atraso contaba como cumplido (en next.js valía 1,0 en 39 de 41 milestones)."""
+    cierres = milestone.get("cierres", [])
+    if not cierres or not milestone.get("due_on"):
+        return None
+    a_tiempo = sum(1 for c in cierres if c is not None and c <= milestone["due_on"])
+    return round(a_tiempo / len(cierres), 4)
+
 
 def calcular_schedule_compliance(metadata_milestone: dict) -> float:
     """
@@ -59,40 +100,45 @@ class ScheduleCompliance(GitHubMetric):
 
     def fetch(self):
         print("Obteniendo milestones...")
-        milestones, page = [], 1
+        milestones, cursor = [], None
         while True:
-            data = self._rest(
-                f"/repos/{self.org}/{self.repo}/milestones",
-                {"state": "all", "per_page": 100, "page": page},
-            )
-            if not data:
+            data = self._graphql(_QUERY_MILESTONES, {"owner": self.org, "name": self.repo, "after": cursor})
+            con = data["data"]["repository"]["milestones"]
+            for m in con["nodes"]:
+                milestones.append({"number": m["number"], "title": m["title"],
+                                   "due_on": _fecha(m.get("dueOn")), "created_at": _fecha(m.get("createdAt"))})
+            if not con["pageInfo"]["hasNextPage"]:
                 break
-            milestones.extend(data)
-            print(f"  ...{len(milestones)} milestones descargados", end="\r")
-            if len(data) < 100:
-                break
-            page += 1
-        print()
+            cursor = con["pageInfo"]["endCursor"]
+        # Fecha de cierre de cada issue de los milestones con fecha límite.
+        for m in milestones:
+            if not m["due_on"]:
+                continue
+            cierres, cursor = [], None
+            while True:
+                data = self._graphql(_QUERY_ISSUES_MILESTONE, {"owner": self.org, "name": self.repo,
+                                                               "number": m["number"], "after": cursor})
+                con = data["data"]["repository"]["milestone"]["issues"]
+                cierres.extend(_fecha(n.get("closedAt")) for n in con["nodes"])
+                if not con["pageInfo"]["hasNextPage"]:
+                    break
+                cursor = con["pageInfo"]["endCursor"]
+            m["cierres"] = cierres
+        print(f"Milestones: {len(milestones)} ({sum(1 for m in milestones if m['due_on'])} con fecha límite)")
         self.milestones = milestones
 
     def _milestones_en_periodo(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
-        en_periodo = []
-        for m in self.milestones:
-            fecha_raw = m.get("due_on") or m.get("created_at")
-            if not fecha_raw:
-                continue
-            fecha = datetime.fromisoformat(fecha_raw.replace("Z", "+00:00"))
-            if fecha_inicio <= fecha <= fecha_fin:
-                en_periodo.append(m)
-        return en_periodo
+        """Milestones cuya fecha límite cae en la ventana (los que no tienen fecha límite no
+        se pueden evaluar: no hay plazo con el cual comparar)."""
+        return [m for m in self.milestones if m["due_on"] and fecha_inicio <= m["due_on"] <= fecha_fin]
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
-        milestones = self._milestones_en_periodo(fecha_inicio, fecha_fin)
-        if not milestones:
-            # Sin milestones la ventana no es observable (ej. next.js dejó de usarlos
-            # en 2020): None -> NULL, no 0.0, que se leería como incumplimiento total.
+        scores = [c for c in (compliance_a_tiempo(m) for m in self._milestones_en_periodo(fecha_inicio, fecha_fin))
+                  if c is not None]
+        if not scores:
+            # Sin milestones con fecha límite la ventana no es observable (next.js dejó de
+            # usarlos alrededor de 2020): None, no 0.0, que se leería como incumplimiento.
             return None
-        scores = [calcular_schedule_compliance(m) for m in milestones]
         return round(sum(scores) / len(scores), 4)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):
@@ -112,11 +158,11 @@ class ScheduleCompliance(GitHubMetric):
             print("No se encontraron milestones en el período.")
             return
 
-        print(f"\n{'Milestone':<35} {'Cerradas':>9} {'Abiertas':>9} {'Compliance':>11}")
+        print(f"\n{'Milestone':<35} {'Fecha límite':>12} {'Issues':>7} {'A tiempo':>9}")
         print("-" * 68)
         for m in milestones:
-            score = calcular_schedule_compliance(m)
-            print(f"{m['title']:<35} {m['closed_issues']:>9} {m['open_issues']:>9} {score:>11}")
+            print(f"{m['title']:<35} {m['due_on'].date().isoformat():>12} {len(m.get('cierres', [])):>7} "
+                  f"{compliance_a_tiempo(m)!s:>9}")
 
         promedio = self.por_producto(fecha_inicio, fecha_fin)
         print("-" * 68)

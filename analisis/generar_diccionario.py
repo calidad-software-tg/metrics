@@ -38,8 +38,20 @@ ROOT   = Path(__file__).resolve().parent.parent
 SALIDA = ROOT / "analisis" / "salidas" / "diccionario_variables.csv"
 AGG_CSV = ROOT / "persona_agregado_estable_canary.csv"
 
-DB = dict(host="localhost", port=5432, dbname="resultados_metricas",
-          user="metricas", password="metricas")
+# Credenciales: variables POSTGRES_* del entorno o del .env de la raíz (así se puede apuntar
+# a otra base, ej. POSTGRES_DB=resultados_metricas_fixes).
+import os as _os
+_env = Path(__file__).resolve().parent.parent / ".env"
+if _env.exists():
+    for _l in _env.read_text().splitlines():
+        if "=" in _l and not _l.startswith("#"):
+            _k, _v = _l.split("=", 1)
+            _os.environ.setdefault(_k.strip(), _v.strip())
+DB = dict(host=_os.environ.get("POSTGRES_HOST", "localhost"),
+          port=int(_os.environ.get("POSTGRES_PORT", 5432)),
+          dbname=_os.environ.get("POSTGRES_DB", "resultados_metricas"),
+          user=_os.environ.get("POSTGRES_USER", "metricas"),
+          password=_os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
 EXCLUIR_ESTABLE = frozenset({
     "4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"
@@ -71,6 +83,17 @@ DIMS: dict[str, tuple[int, int, int]] = {
     "nub":                   (0, 1, 1),
     "noi":                   (0, 1, 1),
     "dloc":                  (0, 0, 1),
+    # versiones de flujo de la documentación (fix: DLOC es una foto acumulada)
+    "dloc_flujo":            (0, 0, 1),
+    "commits_doc":           (0, 0, 1),
+    # variantes de MTTR y NCI (fix de bots y del promedio)
+    "mttr_p50":              (0, 1, 1),
+    "mttr_bugs":             (0, 1, 1),
+    "mttr_con_bots":         (0, 1, 1),
+    "nci_con_bots":          (0, 1, 0),
+    # ahora varían por ventana (antes eran constantes)
+    "wp":                    (0, 0, 1),
+    "nob_42":                (0, 1, 1),
     "nci":                   (0, 1, 0),  # PENDIENTE — tratada como Proceso
     # activos/nuevos: Persona
     "activos_commits":       (1, 0, 0),
@@ -126,6 +149,14 @@ NOMBRES = {
     "dis":                 "DIS (Doc Issue Survival)",
     "disc_centrality":     "Disc. Centrality (Discussion Centrality)",
     "dloc":                "DLOC (Documentation Lines of Code)",
+    "dloc_flujo":          "DLOC flujo (líneas de documentación cambiadas en la ventana)",
+    "commits_doc":         "Commits que tocan documentación (proporción)",
+    "mttr_p50":            "MTTR mediana de issues (sin bots)",
+    "mttr_bugs":           "MTTR de bugs (sin bots)",
+    "mttr_con_bots":       "MTTR con bots",
+    "nci_con_bots":        "NCI con bots",
+    "wp":                  "WP (Wiki Presence)",
+    "nob_42":              "NOB (branches activas con PR abierto)",
     "exprev":              "EXPRev (Code Review Experience)",
     "fexp":                "FEXP (File Experience)",
     "jarczyk_success_rate":"Jarczyk Success Rate",
@@ -159,7 +190,9 @@ NOMBRES = {
 # ── Familia (solo para variables con Persona) ────────────────────────────────
 _TAMANO      = {"activos_commits","activos_interaccion","activos_cierre",
                 "activos_comentarios","nuevos_commits","nuevos_interaccion"}
-_COMPOSICION = {"dev_exp","le","rexp","ss",
+# REXP no va en composición: suma 1/(días+1) de los commits de la ventana, o sea que mide
+# actividad ponderada por cercanía al cierre, no experiencia (ver get_familia).
+_COMPOSICION = {"dev_exp","le","ss",
                 "tasa_nuevos_commits","tasa_nuevos_interaccion",
                 "prop_commitean","prop_cierran","prop_comentan"}
 _INTENSIDAD  = {"nc","exprev","sc","nci","dloc"}    # solo p90/share_top10pct
@@ -175,7 +208,7 @@ def get_familia(metrica_id: str, estadistico: str, dp_eff: int) -> str:
         return "composicion"
     if metrica_id in _INTENSIDAD and estadistico in ("p90", "share_top10pct"):
         return "intensidad"
-    if metrica_id == "rexprev":
+    if metrica_id in ("rexprev", "rexp"):
         return "intensidad"
     if metrica_id == "disc_centrality":
         return "red"

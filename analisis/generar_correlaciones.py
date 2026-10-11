@@ -597,6 +597,44 @@ def compute_ratio_agg(agg_data):
     return out
 
 
+# ── Backports ─────────────────────────────────────────────────────────────────
+
+def es_backport(versiones):
+    """Para releases ordenados en el tiempo: True si es parche de una versión mayor anterior
+    (ej. una v14.2.x publicada cuando ya salió la v15)."""
+    marca, maximo = [], -1
+    for v in versiones:
+        try:
+            mayor = int(str(v).lstrip("vV").split(".")[0])
+        except ValueError:
+            marca.append(False)
+            continue
+        marca.append(mayor < maximo)
+        maximo = max(maximo, mayor)
+    return marca
+
+
+def excluir_backports(all_data):
+    """Saca de todas las variables las ventanas de backports, en las dos series.
+
+    Con las ventanas nuevas de run_versiones.py (que ya excluyen backports) no saca nada;
+    con datos viejos, hace que las correlaciones y el PCA usen los mismos releases (antes
+    el PCA los excluía y las correlaciones no). Devuelve {serie: cantidad excluida}."""
+    excluidos = {}
+    for serie in ("versiones", "versiones_canary"):
+        version = {}
+        for d in all_data.values():
+            for pnum, t in d.get(serie, {}).items():
+                version.setdefault(pnum, t[3])
+        orden = sorted(version)
+        bp = {p for p, b in zip(orden, es_backport([version[p] for p in orden])) if b}
+        for d in all_data.values():
+            for pnum in bp:
+                d.get(serie, {}).pop(pnum, None)
+        excluidos[serie] = len(bp)
+    return excluidos
+
+
 # ── Calcular correlaciones por par ────────────────────────────────────────────
 
 def compute_pair(x_data_e, y_data_e, x_data_c, y_data_c):
@@ -830,6 +868,9 @@ def main():
             all_data[vid] = ratio_data.get(vid, {"versiones": {}, "versiones_canary": {}})
         else:
             all_data[vid] = agg_data.get(vid, {"versiones": {}, "versiones_canary": {}})
+
+    excl = excluir_backports(all_data)
+    print(f"  backports excluidos: {excl['versiones']} estables, {excl['versiones_canary']} canary")
 
     # Datos de tamaño (activos_interaccion) para corrección de tamaño
     size_data_e = all_data.get("activos_interaccion_conteo", {}).get("versiones", {})

@@ -19,6 +19,14 @@ _SECCIONES = {
 _TOTAL = len(_SECCIONES)
 
 
+def es_readme_raiz(path: str) -> bool:
+    """Solo el README de la raíz del repositorio. Antes se promediaban todos los README.md
+    del árbol (raíz, packages/, examples/, test/), así que un README de ejemplo de 3 líneas
+    pesaba lo mismo que el principal, y la métrica cambiaba al agregar o borrar ejemplos
+    (en next.js, 341 de 381 README eran de examples/)."""
+    return "/" not in path and path.lower() == "readme.md"
+
+
 def _score(content: str) -> float:
     """Prana et al. (2018): proporción de categorías cubiertas."""
     if not content or len(content) < 10:
@@ -43,10 +51,11 @@ class ReadmeCompleteness(GitHubMetric):
         )
         readme_files = [
             e for e in tree.get("tree", [])
-            if e["type"] == "blob" and Path(e["path"]).name.lower() == "readme.md"
+            if e["type"] == "blob" and es_readme_raiz(e["path"])
         ]
         print(f"README.md encontrados: {len(readme_files)}")
 
+        por_path = {e["path"]: e for e in tree.get("tree", []) if e["type"] == "blob"}
         readmes = []
         for i, entry in enumerate(readme_files):
             blob = self._rest(f"/repos/{self.org}/{self.repo}/git/blobs/{entry['sha']}")
@@ -54,6 +63,12 @@ class ReadmeCompleteness(GitHubMetric):
                 content = base64.b64decode(blob["content"]).decode("utf-8", errors="replace")
             except Exception:
                 continue
+            # Enlace simbólico (modo 120000): el blob tiene la ruta destino, no el texto.
+            # En next.js, readme.md apunta a packages/next/README.md.
+            destino = por_path.get(content.strip()) if entry.get("mode") == "120000" else None
+            if destino:
+                blob = self._rest(f"/repos/{self.org}/{self.repo}/git/blobs/{destino['sha']}")
+                content = base64.b64decode(blob["content"]).decode("utf-8", errors="replace")
             readmes.append({"path": entry["path"], "score": _score(content)})
             print(f"  ...{i + 1}/{len(readme_files)} README analizados", end="\r")
 
@@ -74,9 +89,9 @@ class ReadmeCompleteness(GitHubMetric):
             or "desconocido"
         )
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         if not self.readmes:
-            return 0.0
+            return None  # sin README en la raíz: no observable
         return round(sum(r["score"] for r in self.readmes) / len(self.readmes), 4)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:

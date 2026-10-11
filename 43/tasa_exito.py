@@ -4,21 +4,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
+from issues_comun import descargar_issues
 
-_QUERY_ISSUES = """
-query($owner: String!, $name: String!, $after: String) {
-  repository(owner: $owner, name: $name) {
-    issues(first: 100, after: $after) {
-      pageInfo { hasNextPage endCursor }
-      nodes {
-        createdAt
-        closedAt
-        state
-      }
-    }
-  }
-}
-"""
+
 
 
 def calcular_nci(metadata_issues: list[dict], fecha_inicio: datetime, fecha_fin: datetime) -> int:
@@ -81,26 +69,19 @@ class JarczykSuccessRate(GitHubMetric):
         self.issues: list[dict] = []  # {created_at, closed_at, state}
 
     def fetch(self):
-        print("Obteniendo issues...")
-        issues, cursor, page = [], None, 0
-        while True:
-            page += 1
-            data = self._graphql(_QUERY_ISSUES, {"owner": self.org, "name": self.repo, "after": cursor})
-            conexion = data["data"]["repository"]["issues"]
-            print(f"  ...issues página {page} ({len(issues)} acumulados)", end="\r")
-            for node in conexion["nodes"]:
-                created = datetime.fromisoformat(node["createdAt"].replace("Z", "+00:00"))
-                closed = datetime.fromisoformat(node["closedAt"].replace("Z", "+00:00")) if node.get("closedAt") else None
-                issues.append({
-                    "created_at": created,
-                    "closed_at": closed,
-                    "state": node["state"].lower(),
-                })
-            if not conexion["pageInfo"]["hasNextPage"]:
-                break
-            cursor = conexion["pageInfo"]["endCursor"]
-        print()
-        self.issues = issues
+        # Descarga común (issues_comun.py). Se descartan las issues abiertas por bots, y
+        # las que cerró un bot (o se cerraron sin actor) no cuentan como éxito: el bot de
+        # issues inactivas las cierra sin que nadie las haya resuelto.
+        self.issues = []
+        for i in descargar_issues(self):
+            if self._es_bot(i["author"]):
+                continue
+            cerro_bot = i["closed_at"] is not None and self._es_bot(i["closed_by"] or "desconocido")
+            self.issues.append({
+                "created_at": i["created_at"],
+                "closed_at": None if cerro_bot else i["closed_at"],
+                "state": "open" if cerro_bot else i["state"],
+            })
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         # Población total: issues creados dentro del período observado

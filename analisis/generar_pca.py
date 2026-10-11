@@ -75,21 +75,13 @@ def cargar_datos():
             datos[vid] = ratios.get(vid, vacio)
         else:
             datos[vid] = agg.get(vid, vacio)
+    # misma regla y mismos releases que las correlaciones (generar_correlaciones.main)
+    datos["__backports__"] = gc.excluir_backports(datos)
     return var_dict, datos
 
 
 def es_backport(versiones):
-    """Para releases ordenados en el tiempo: parche de una versión mayor anterior."""
-    marca, maximo = [], -1
-    for v in versiones:
-        try:
-            mayor = int(str(v).lstrip("v").split(".")[0])
-        except ValueError:
-            marca.append(False)
-            continue
-        marca.append(mayor < maximo)
-        maximo = max(maximo, mayor)
-    return marca
+    return gc.es_backport(versiones)
 
 
 def tabla(variables, datos, serie_db):
@@ -106,12 +98,8 @@ def tabla(variables, datos, serie_db):
         t = tam.get(pnum, (None, None))[1]
         filas[pnum] = dict(valores=vals, dur=dur or 1.0, anio=ref[2], version=ref[3], fecha=str(ref[4] or ""),
                            tamano=t)
-    orden = sorted(filas)
-    bp = es_backport([filas[p]["version"] for p in orden])
-    excluidos = [p for p, b in zip(orden, bp) if b]
-    for p in excluidos:
-        del filas[p]
-    return filas, len(excluidos)
+    # los backports ya se excluyeron al cargar (gc.excluir_backports, igual que las correlaciones)
+    return filas, datos.get("__backports__", {}).get(serie_db, 0)
 
 
 def transformar(filas, enfoque):

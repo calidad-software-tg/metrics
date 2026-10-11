@@ -38,9 +38,10 @@ for _d in ["10", "15", "16", "Notion"]:
 
 # Helpers de conteo de las propias métricas de archivos.
 from loc import _CODE_EXTENSIONS as LOC_EXT, _is_excluded, _count_lines as loc_count
-from dloc import _DOC_EXTENSIONS, _count_lines as dloc_count
-from cd import _COMMENT_PATTERNS, _CODE_EXTENSIONS as CD_EXT, _count_lines as cd_count
-from readme_completeness import _score as rc_score
+from dloc import es_documentacion, _count_lines as dloc_count
+from cd import _COMMENT_PATTERNS, _CODE_EXTENSIONS as CD_EXT, _count_lines as cd_count, es_codigo_propio
+from readme_completeness import _score as rc_score, es_readme_raiz
+from base_metric import es_bot
 
 # Clases originales: se instancian y se les carga el estado desde git, después
 # se llama a su propio por_producto()/por_persona() -> fórmula idéntica.
@@ -53,14 +54,16 @@ from developer_ownership import DeveloperOwnership, _CODE_EXTENSIONS as OWN_EXT,
 
 from run_versiones import (
     Base, ventanas_por_version, ventanas_por_version_todas, TIPO_ANALISIS, NOMBRES_METRICA,
-    _fmt, os,  # os ya trae el .env cargado por run_versiones
+    VENTANAS, _fecha_corte, _fmt, os,  # os ya trae el .env cargado por run_versiones
 )
 
 CD_SKIP = frozenset({".md"})          # igual que el default de cd.fetch
 CLONES_DIR = _root / ".clones"        # donde viven los clones locales
 
 ARCHIVOS = {"loc_notion", "dloc", "cd", "rc"}
-COMMITS = {"cdiv", "fexp", "le", "rexp", "anmcc"}
+# dloc_flujo y commits_doc: versiones de flujo de la documentación (lo que pasó en la
+# ventana), porque DLOC es una foto acumulada desde el comienzo del proyecto.
+COMMITS = {"cdiv", "fexp", "le", "rexp", "anmcc", "dloc_flujo", "commits_doc"}
 BLAME = {"developer_ownership_notion"}
 TODAS = ARCHIVOS | COMMITS | BLAME
 
@@ -92,6 +95,20 @@ def clonar_o_actualizar(org: str, repo: str) -> Path:
             print(f"git clone falló: {r.stderr.strip()}", file=sys.stderr)
             sys.exit(1)
     return dest
+
+
+def ref_al_cierre(dir_repo: Path, rama: str, v: dict) -> str:
+    """Commit de la rama principal vigente al cierre de la ventana.
+
+    Las métricas de foto (CD, DLOC, README Completeness, LOC, ownership) se medían en el
+    tag del release, es decir, al principio de la ventana, mientras que las de commits e
+    issues miran lo que pasa durante la ventana. Además, el tag de un backport (ej. v14.2.x
+    publicado en 2025) apunta a una rama de mantenimiento con otro árbol de código. Medir
+    sobre la rama principal al cierre resuelve las dos cosas."""
+    if v.get("abierta") and VENTANAS["hasta"] is None:
+        return rama
+    sha = _git(dir_repo, "rev-list", "-1", f"--before={v['fin'].isoformat()}", rama).strip()
+    return sha or rama
 
 
 def archivos_en_ref(dir_repo: Path, ref: str) -> list[tuple[str, str]]:
@@ -170,7 +187,7 @@ def _path_de_numstat(campo: str) -> str:
 
 
 def commits_en_ventana(dir_repo: Path, ref: str, inicio: datetime, fin: datetime) -> list[dict]:
-    """[{author, timestamp, files:[path]}] de los commits (no-merge) del branch
+    """[{author, timestamp, files:[path], lineas:{path: agregadas+eliminadas}}] de los commits (no-merge) del branch
     `ref` cuya fecha de commit cae en [inicio, fin). Equivale a lo que traía
     /repos/.../commits?since&until, pero con la lista de archivos COMPLETA
     (sin el tope de 300 de la API) y sin --max-commits."""
@@ -188,11 +205,14 @@ def commits_en_ventana(dir_repo: Path, ref: str, inicio: datetime, fin: datetime
             _, autor, fecha_iso = linea.split("\x01")
             actual = {"author": autor.strip() or "desconocido",
                       "timestamp": datetime.fromisoformat(fecha_iso),
-                      "files": []}
+                      "files": [], "lineas": {}}
         elif linea.strip() and actual is not None:
             partes = linea.split("\t")
             if len(partes) == 3:
-                actual["files"].append(_path_de_numstat(partes[2]))
+                path = _path_de_numstat(partes[2])
+                actual["files"].append(path)
+                if partes[0].isdigit() and partes[1].isdigit():  # binarios vienen con "-"
+                    actual["lineas"][path] = int(partes[0]) + int(partes[1])
     if actual:
         commits.append(actual)
     return commits
@@ -242,11 +262,11 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
         ext = Path(path).suffix.lower()
         if quiere_loc and ext in LOC_EXT and not _is_excluded(path):
             sel_loc.append((sha, path))
-        if quiere_dloc and ext in _DOC_EXTENSIONS:
+        if quiere_dloc and es_documentacion(path):
             sel_dloc.append((sha, path))
-        if quiere_cd and ext in CD_EXT and ext not in CD_SKIP:
+        if quiere_cd and ext in CD_EXT and ext not in CD_SKIP and es_codigo_propio(path):
             sel_cd.append((sha, path))
-        if quiere_rc and Path(path).name.lower() == "readme.md":
+        if quiere_rc and es_readme_raiz(path):
             sel_rc.append((sha, path))
 
     shas_unicos = {s for s, _ in (sel_loc + sel_dloc + sel_cd + sel_rc)}
@@ -276,8 +296,20 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
         res["cd"] = {"producto": prod, "por_archivo": por_archivo}
 
     if quiere_rc:
-        por_archivo = {p: rc_score(cont.get(s, "")) for s, p in sel_rc}
-        prod = round(sum(por_archivo.values()) / len(por_archivo), 4) if por_archivo else 0.0
+        # El README de la raíz puede ser un enlace simbólico (en next.js, readme.md apunta a
+        # packages/next/README.md): el blob tiene la ruta destino, no el texto. Se sigue el enlace.
+        por_path = {p: s for s, p in blobs}
+        textos = {}
+        for s, p in sel_rc:
+            texto = cont.get(s, "")
+            destino = str(Path(p).parent / texto.strip()) if texto.strip() and "\n" not in texto.strip() else None
+            if destino:
+                destino = os.path.normpath(destino)
+            if destino in por_path:
+                texto = contenidos(dir_repo, [por_path[destino]]).get(por_path[destino], "")
+            textos[p] = texto
+        por_archivo = {p: rc_score(t) for p, t in textos.items()}
+        prod = round(sum(por_archivo.values()) / len(por_archivo), 4) if por_archivo else None
         res["rc"] = {"producto": prod, "por_archivo": por_archivo}
 
     return res
@@ -287,6 +319,8 @@ def persona_loc_dloc(por_archivo: dict[str, int], autores: dict[str, str]) -> di
     acc: dict[str, int] = {}
     for path, lineas in por_archivo.items():
         a = autores.get(path, "desconocido")
+        if es_bot(a):
+            continue  # archivos cuyo último autor es un bot (o desconocido)
         acc[a] = acc.get(a, 0) + lineas
     return dict(sorted(acc.items(), key=lambda x: x[1], reverse=True))
 
@@ -297,6 +331,8 @@ def persona_rc(por_archivo: dict[str, float], autores: dict[str, str]) -> dict[s
     acc: dict[str, list[float]] = {}
     for path, score in por_archivo.items():
         a = autores.get(path, "desconocido")
+        if es_bot(a):
+            continue  # archivos cuyo último autor es un bot (o desconocido)
         acc.setdefault(a, []).append(score)
     return dict(sorted(
         {a: round(sum(scores) / len(scores), 4) for a, scores in acc.items()}.items(),
@@ -308,6 +344,8 @@ def persona_cd(por_archivo: dict[str, tuple], autores: dict[str, str]) -> dict[s
     acc: dict[str, list[int]] = {}
     for path, (c, l) in por_archivo.items():
         a = autores.get(path, "desconocido")
+        if es_bot(a):
+            continue  # archivos cuyo último autor es un bot (o desconocido)
         acc.setdefault(a, [0, 0])
         acc[a][0] += c
         acc[a][1] += l
@@ -375,6 +413,25 @@ def _eval_commit_metric(k: str, commits: list[dict], v: dict, token, org, repo):
         m.commits = [{"files_count": len(c["files"]), "author": c["author"]} for c in commits]
         return m.por_producto(fi, ff), m.por_persona(fi, ff)
 
+    if k in ("dloc_flujo", "commits_doc"):
+        humanos = [c for c in commits if not es_bot(c["author"])]
+        if not humanos:
+            return None, {}
+        doc_por_autor: dict[str, int] = {}
+        commits_por_autor: dict[str, list[int]] = {}
+        for c in humanos:
+            lineas_doc = sum(n for path, n in c["lineas"].items() if es_documentacion(path))
+            toca_doc = any(es_documentacion(path) for path in c["files"])
+            doc_por_autor[c["author"]] = doc_por_autor.get(c["author"], 0) + lineas_doc
+            commits_por_autor.setdefault(c["author"], []).append(int(toca_doc))
+        if k == "dloc_flujo":
+            # líneas de documentación agregadas o eliminadas en la ventana
+            return sum(doc_por_autor.values()), dict(sorted(doc_por_autor.items(), key=lambda x: x[1], reverse=True))
+        # proporción de commits que tocan documentación
+        total = [x for xs in commits_por_autor.values() for x in xs]
+        pers = {a: round(sum(xs) / len(xs), 4) for a, xs in commits_por_autor.items()}
+        return round(sum(total) / len(total), 4), dict(sorted(pers.items(), key=lambda x: x[1], reverse=True))
+
     raise ValueError(k)
 
 
@@ -390,7 +447,16 @@ def main():
     ap.add_argument("--con-canary", action="store_true",
                     help="no filtra prerelease/canary: una ventana por cada release publicada. "
                          "Guarda en tipo_analisis='versiones_canary', nunca pisa a 'versiones'")
+    ap.add_argument("--con-backports", action="store_true",
+                    help="no excluye los backports al armar ventanas (mismo criterio que run_versiones.py)")
+    ap.add_argument("--min-dias", type=float, default=None,
+                    help="une las ventanas más cortas que esto con la anterior (default: 1 en estables, 0 en canary)")
+    ap.add_argument("--hasta", metavar="AAAA-MM-DD",
+                    help="fecha de corte de las ventanas (mismo criterio que run_versiones.py)")
     args = ap.parse_args()
+    VENTANAS["hasta"] = _fecha_corte(args.hasta)
+    VENTANAS["excluir_backports"] = not args.con_backports
+    VENTANAS["min_dias"] = args.min_dias
 
     tipo_analisis = "versiones_canary" if args.con_canary else TIPO_ANALISIS
 
@@ -461,10 +527,12 @@ def main():
         print(f"[{v['n']:>2}] {tag}  ({v['inicio'].date()} -> "
               f"{'ahora' if v['abierta'] else v['fin'].date()})")
 
-        # --- métricas de archivos (estado del repo en el tag) ---
+        ref = ref_al_cierre(dir_repo, rama, v)
+
+        # --- métricas de archivos (estado de la rama principal al cierre de la ventana) ---
         if q_arch:
-            datos = procesar_tag(dir_repo, tag, q_arch)
-            autores = ultimo_autor_por_archivo(dir_repo, tag)
+            datos = procesar_tag(dir_repo, ref, q_arch)
+            autores = ultimo_autor_por_archivo(dir_repo, ref)
             for k in sorted(q_arch):
                 d = datos.get(k)
                 if not d:
@@ -495,9 +563,9 @@ def main():
                 guardar(k, v, "persona", pers)
                 resumen[k]["ok"] += 1
 
-        # --- blame (developer ownership en el tag) ---
+        # --- blame (developer ownership al cierre de la ventana) ---
         if q_blame:
-            propiedad, total = blame_propiedad(dir_repo, tag)
+            propiedad, total = blame_propiedad(dir_repo, ref)
             m = DeveloperOwnership(token, org, repo)
             m.propiedad, m.total_lineas = propiedad, total
             prod = m.por_producto(v["inicio"], v["fin"])

@@ -46,8 +46,14 @@ TIPO_ANALISIS = "versiones"      # valor que va en periodo.tipo_analisis
 # todavía en la tabla (se inserta al vuelo para respetar la FK de `resultado`).
 NOMBRES_METRICA = {
     "mttr": "MTTR (Tiempo Medio de Reparación)",
+    "mttr_p50": "MTTR, mediana de las issues (sin bots)",
+    "mttr_bugs": "MTTR solo de bugs (sin bots)",
+    "mttr_con_bots": "MTTR con los cierres de bots (versión original)",
     "anmcc": "ANMCC (Número Promedio de Componentes Modificados por Commit)",
     "nci": "Number of Closed Issues (NCI)",
+    "nci_con_bots": "NCI con los cierres de bots (versión original)",
+    "dloc_flujo": "Líneas de documentación agregadas o eliminadas en la ventana",
+    "commits_doc": "Proporción de commits que tocan documentación",
 }
 
 # --- cargar .env -------------------------------------------------------------
@@ -70,9 +76,9 @@ try:
 except ImportError:
     psycopg2 = None
 
-from nci import NumberOfClosedIssues
+from nci import NumberOfClosedIssues, NumberOfClosedIssuesConBots
 from anmcc import AverageNumberOfModifiedComponentsPerCommit
-from mttr import MeanTimeToRepair
+from mttr import MeanTimeToRepair, MeanTimeToRepairMediana, MeanTimeToRepairBugs, MeanTimeToRepairConBots
 from cd import CommentDensity
 from readme_completeness import ReadmeCompleteness
 from wiki_presence import WikiPresence
@@ -127,8 +133,12 @@ from core_devs_prs import CoreDevsPullRequests
 # --- mismo dict que run.py / run_batch_anmcc.py ----------------------------
 metricas = {
     "nci":   NumberOfClosedIssues,
+    "nci_con_bots": NumberOfClosedIssuesConBots,
     "anmcc": AverageNumberOfModifiedComponentsPerCommit,
     "mttr":  MeanTimeToRepair,
+    "mttr_p50": MeanTimeToRepairMediana,
+    "mttr_bugs": MeanTimeToRepairBugs,
+    "mttr_con_bots": MeanTimeToRepairConBots,
     "cd":    CommentDensity,
     "rc":    ReadmeCompleteness,
     "wp":    WikiPresence,
@@ -191,6 +201,77 @@ def _gh(path: str, token: str, params: dict = None) -> requests.Response:
     return resp
 
 
+# --- criterio de ventanas ------------------------------------------------------
+# Releases marcados como estables en GitHub que en realidad son prereleases (mal
+# etiquetados en next.js): no cortan ventanas.
+EXCLUIR_VERSIONES = frozenset({"4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"})
+
+# excluir_backports: un release cuya versión mayor es menor que la más alta publicada hasta
+#   ese momento (ej. una v14.2.x de 2025, cuando la principal ya es v15/v16) es un parche de
+#   una rama de mantenimiento: no corta ventanas. Con backports, las ventanas de la línea
+#   principal quedaban partidas por releases de otra rama y las métricas de foto saltaban
+#   entre dos árboles de código.
+# min_dias: un release publicado menos de min_dias después del anterior que quedó no corta
+#   ventana: su lapso se suma a la ventana anterior. En next.js, 88 de 369 ventanas estables
+#   duraban menos de un día (releases de varias líneas a la vez, hotfixes a las pocas horas)
+#   y casi no tenían actividad. None = 1 día en estables y 0 (sin unir) en canary.
+# hasta: fecha de corte. Los releases posteriores se ignoran y la última ventana termina ahí
+#   (sin corte, termina "ahora"). Sirve para que corridas hechas en días distintos (por
+#   ejemplo, cada integrante con sus métricas) den exactamente las mismas ventanas.
+VENTANAS = {"excluir_backports": True, "min_dias": None, "hasta": None}
+
+
+def _fecha_corte(texto: str | None):
+    if not texto:
+        return None
+    return datetime.fromisoformat(texto).replace(tzinfo=timezone.utc)
+
+
+def _version_mayor(version: str) -> int | None:
+    try:
+        return int(str(version).lstrip("vV").split(".")[0])
+    except ValueError:
+        return None
+
+
+def _armar_ventanas(versiones: list[dict], min_dias_default: float) -> list[dict]:
+    """Ordena las versiones, aplica el criterio de VENTANAS y arma [inicio, fin) por versión."""
+    hasta = VENTANAS["hasta"]
+    versiones = sorted((v for v in versiones if v["version"] not in EXCLUIR_VERSIONES
+                        and (hasta is None or v["fecha"] <= hasta)),
+                       key=lambda v: v["fecha"])
+    if VENTANAS["excluir_backports"]:
+        principales, maximo = [], -1
+        for v in versiones:
+            mayor = _version_mayor(v["version"])
+            if mayor is not None and mayor < maximo:
+                continue  # backport
+            if mayor is not None:
+                maximo = max(maximo, mayor)
+            principales.append(v)
+        versiones = principales
+    min_dias = VENTANAS["min_dias"] if VENTANAS["min_dias"] is not None else min_dias_default
+    quedan: list[dict] = []
+    for v in versiones:
+        if quedan and min_dias and (v["fecha"] - quedan[-1]["fecha"]).total_seconds() < min_dias * 86400:
+            quedan[-1].setdefault("absorbidas", []).append(v["version"])
+            continue
+        quedan.append(dict(v))
+    ahora = hasta or datetime.now(timezone.utc)
+    ventanas = []
+    for i, v in enumerate(quedan):
+        fin = quedan[i + 1]["fecha"] if i + 1 < len(quedan) else ahora
+        ventanas.append({
+            "n": i + 1,
+            "version": v["version"],
+            "inicio": v["fecha"],
+            "fin": fin,
+            "abierta": i + 1 == len(quedan),
+            "absorbidas": v.get("absorbidas", []),
+        })
+    return ventanas
+
+
 def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
     """Una ventana [inicio, fin) por cada versión estable consecutiva. El último va hasta ahora.
 
@@ -251,20 +332,7 @@ def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
             )
             versiones.append({"version": t["name"], "fecha": fecha})
 
-    versiones.sort(key=lambda v: v["fecha"])
-    ahora = datetime.now(timezone.utc)
-
-    ventanas = []
-    for i, v in enumerate(versiones):
-        fin = versiones[i + 1]["fecha"] if i + 1 < len(versiones) else ahora
-        ventanas.append({
-            "n": i + 1,
-            "version": v["version"],
-            "inicio": v["fecha"],
-            "fin": fin,
-            "abierta": i + 1 == len(versiones),
-        })
-    return ventanas
+    return _armar_ventanas(versiones, min_dias_default=1.0)
 
 
 def ventanas_por_version_todas(token: str, org: str, repo: str) -> list[dict]:
@@ -315,20 +383,7 @@ def ventanas_por_version_todas(token: str, org: str, repo: str) -> list[dict]:
             )
             versiones.append({"version": t["name"], "fecha": fecha})
 
-    versiones.sort(key=lambda v: v["fecha"])
-    ahora = datetime.now(timezone.utc)
-
-    ventanas = []
-    for i, v in enumerate(versiones):
-        fin = versiones[i + 1]["fecha"] if i + 1 < len(versiones) else ahora
-        ventanas.append({
-            "n": i + 1,
-            "version": v["version"],
-            "inicio": v["fecha"],
-            "fin": fin,
-            "abierta": i + 1 == len(versiones),
-        })
-    return ventanas
+    return _armar_ventanas(versiones, min_dias_default=0.0)
 
 
 # --- persistencia ----------------------------------------------------------
@@ -423,7 +478,9 @@ class Base:
         periodo_id = self.upsert_periodo(
             repo_id, tipo, ventana["n"],
             ventana["inicio"], ventana["fin"], ventana["version"],
-            {"tag": ventana["version"], "abierta": ventana["abierta"]},
+            {"tag": ventana["version"], "abierta": ventana["abierta"],
+             "absorbidas": ventana.get("absorbidas", []),
+             "excluye_backports": VENTANAS["excluir_backports"]},
         )
         if por == "persona":
             for login, val in (valor or {}).items():
@@ -679,6 +736,13 @@ def main():
     parser.add_argument("--solo-etiquetas", action="store_true",
                         help="cfdr, nub y dis: reconocer bugs/documentación solo por etiqueta, sin el tipo "
                              "de issue de GitHub (algoritmo original de la consigna)")
+    parser.add_argument("--con-backports", action="store_true",
+                        help="no excluye los backports (releases de una versión mayor anterior) al armar ventanas")
+    parser.add_argument("--min-dias", type=float, default=None,
+                        help="une las ventanas más cortas que esto con la anterior "
+                             "(default: 1 en estables, 0 en canary)")
+    parser.add_argument("--hasta", metavar="AAAA-MM-DD",
+                        help="fecha de corte de las ventanas (para que corridas de distintos días coincidan)")
     parser.add_argument("--con-canary", action="store_true",
                         help="no filtra prerelease/canary: una ventana por cada release publicada "
                              "(muchas más, mucho más angostas). Guarda en tipo_analisis='versiones_canary', "
@@ -689,6 +753,9 @@ def main():
     if args.con_canary:
         TIPO_ANALISIS = "versiones_canary"
 
+    VENTANAS["excluir_backports"] = not args.con_backports
+    VENTANAS["min_dias"] = args.min_dias
+    VENTANAS["hasta"] = _fecha_corte(args.hasta)
     LIMITES["max_files"] = args.max_files
     LIMITES["max_commits"] = args.max_commits
     LIMITES["max_contributors"] = args.max_contributors

@@ -23,8 +23,11 @@ def calcular_rexp(user_commits: list[dict], fecha_actual: datetime) -> float:
 class RecentExperience(GitHubMetric):
     """
     REXP (Experiencia Reciente).
-    Experiencia reciente ponderada, dando más peso a las contribuciones
-    realizadas en fechas cercanas a la actual. Solo aplica por persona.
+    Suma 1/(días+1) de cada commit de la persona en la ventana, contando los días hasta
+    el cierre de la ventana. Aunque se llame "experiencia", mide actividad reciente
+    ponderada por cercanía al cierre: no acumula nada fuera de la ventana. En el
+    diccionario de variables va en la familia "intensidad", no en "composición".
+    Solo aplica por persona.
     """
 
     def __init__(self, token: str, org: str, repo: str):

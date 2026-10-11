@@ -23,8 +23,19 @@ import psycopg2
 import psycopg2.extras
 
 ROOT = Path(__file__).resolve().parent
-DB = dict(host="localhost", port=5432, dbname="resultados_metricas",
-          user="metricas", password="metricas")
+# Credenciales: variables POSTGRES_* del entorno o del .env (así se puede apuntar a otra
+# base, ej. POSTGRES_DB=resultados_metricas_fixes).
+_env = ROOT / ".env"
+if _env.exists():
+    for _l in _env.read_text().splitlines():
+        if "=" in _l and not _l.startswith("#"):
+            _k, _v = _l.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+DB = dict(host=os.environ.get("POSTGRES_HOST", "localhost"),
+          port=int(os.environ.get("POSTGRES_PORT", 5432)),
+          dbname=os.environ.get("POSTGRES_DB", "resultados_metricas"),
+          user=os.environ.get("POSTGRES_USER", "metricas"),
+          password=os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
 EXCLUIR_ESTABLE = frozenset({
     "4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"
@@ -566,7 +577,7 @@ def validar(cur, bots):
     """, (tuple(EXCLUIR_ESTABLE),))
     nci_rows = cur.fetchall()
     diffs = [(r[0], r[1], r[2], r[3],
-              abs((r[2] or 0) - (r[3] or 0))) for r in nci_rows if r[4] is not None]
+              abs((r[2] or 0) - (r[3] or 0))) for r in nci_rows if r[3] is not None]  # la fila tiene 4 columnas: r[4] daba IndexError
     diffs.sort(key=lambda x: -x[4])
     print(f"  {'pnum':>5} {'version':<25} {'suma_pers':>10} {'prod':>8} {'|diff|':>8}")
     for pnum, etiq, sp, vp, diff in diffs[:15]:

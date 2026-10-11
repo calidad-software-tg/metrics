@@ -14,6 +14,7 @@ query($owner: String!, $repo: String!, $cursor: String) {
         author { login }
         state
         createdAt
+        closedAt
       }
     }
   }
@@ -29,11 +30,17 @@ query($owner: String!, $repo: String!, $cursor: String) {
         author { login }
         state
         createdAt
+        closedAt
+        mergedAt
       }
     }
   }
 }
 """
+
+
+def _fecha(raw):
+    return datetime.fromisoformat(raw.replace("Z", "+00:00")) if raw else None
 
 
 class SocialContribution(GitHubMetric):
@@ -42,6 +49,11 @@ class SocialContribution(GitHubMetric):
     Suma de: issues abiertos + issues propios cerrados +
              PRs abiertas + PRs cerradas sin merge + PRs mergeadas.
     Solo aplica por persona.
+
+    Un issue o PR abierto en la ventana cuenta como cerrado o mergeado solo si se cerró
+    o mergeó antes del cierre de la ventana. Antes se usaba el estado de hoy (state), así
+    que en las ventanas viejas casi todo aparecía cerrado: SC = 2 en el 82,6 % de las filas
+    de 2020, contra el 40,4 % en 2026, una tendencia temporal que no existía.
     """
 
     def __init__(self, token: str, org: str, repo: str):
@@ -63,7 +75,9 @@ class SocialContribution(GitHubMetric):
                 if not (fecha_inicio <= created <= fecha_fin):
                     continue
                 login = (node.get("author") or {}).get("login", "desconocido")
-                results.append({"author": login, "state": node["state"], "created": created})
+                results.append({"author": login, "state": node["state"], "created": created,
+                                "closed": _fecha(node.get("closedAt")),
+                                "merged": _fecha(node.get("mergedAt"))})
             if not page_info["hasNextPage"]:
                 break
             cursor = page_info["endCursor"]
@@ -97,7 +111,7 @@ class SocialContribution(GitHubMetric):
                 continue
             d = get(i["author"])
             d["issues_opened"] += 1
-            if i["state"] == "CLOSED":
+            if i["closed"] and i["closed"] <= fecha_fin:
                 d["issues_opened_closed"] += 1
 
         for p in self._prs:
@@ -105,10 +119,10 @@ class SocialContribution(GitHubMetric):
                 continue
             d = get(p["author"])
             d["prs_opened"] += 1
-            if p["state"] == "CLOSED":
-                d["prs_opened_closed"] += 1
-            elif p["state"] == "MERGED":
+            if p.get("merged") and p["merged"] <= fecha_fin:
                 d["prs_opened_merged"] += 1
+            elif p["closed"] and p["closed"] <= fecha_fin:
+                d["prs_opened_closed"] += 1
 
         result = {
             login: {**d, "sc": sum(d.values())}

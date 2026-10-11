@@ -6,7 +6,26 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
 
-_DOC_EXTENSIONS = {'.md', '.txt', '.rst'}
+# .mdx incluido: en junio de 2023 la documentación oficial de next.js (docs/) pasó a .mdx
+# (PR #50701) y en julio los mensajes de error (errors/, PR #52038); sin .mdx, DLOC caía de
+# 33.698 a 17.461 líneas sin que se hubiera perdido documentación.
+_DOC_EXTENSIONS = {'.md', '.mdx', '.txt', '.rst'}
+
+# Carpetas que no son documentación del proyecto: ejemplos (cientos de README de proyectos
+# de ejemplo), tests y sus salidas (turbopack/crates trajo unas 27.000 líneas de .md y .txt
+# en la v15.0.0, muchas salidas de tests), fixtures, snapshots y dependencias.
+_DIRS_NO_DOC = {"examples", "example", "test", "tests", "__tests__", "fixtures", "__fixtures__",
+                "snapshots", "__snapshots__", "node_modules", "vendor", "vendored", "compiled"}
+
+
+def es_documentacion(path: str) -> bool:
+    """¿El archivo cuenta como documentación para DLOC?"""
+    p = Path(path)
+    if p.suffix.lower() not in _DOC_EXTENSIONS:
+        return False
+    if p.name.lower() in {"license.md", "license.txt", "licence.md", "third_party_notices.txt"}:
+        return False
+    return not any(part.lower() in _DIRS_NO_DOC for part in p.parts[:-1])
 
 
 def _count_lines(content: str) -> int:
@@ -28,8 +47,7 @@ class DocumentationLinesOfCode(GitHubMetric):
         )
         doc_files = [
             e for e in tree.get("tree", [])
-            if e["type"] == "blob"
-            and Path(e["path"]).suffix.lower() in _DOC_EXTENSIONS
+            if e["type"] == "blob" and es_documentacion(e["path"])
         ]
         total = len(doc_files)
         doc_files = doc_files[:max_files]

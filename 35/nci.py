@@ -4,91 +4,52 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from base_metric import GitHubMetric
-
-_GRAPHQL_QUERY = """
-query($owner: String!, $name: String!, $after: String) {
-  repository(owner: $owner, name: $name) {
-    issues(states: CLOSED, first: 100, after: $after) {
-      pageInfo { hasNextPage endCursor }
-      nodes { number state closedAt }
-    }
-  }
-}
-"""
-
-_GRAPHQL_QUERY_CON_ACTOR = """
-query($owner: String!, $name: String!, $after: String) {
-  repository(owner: $owner, name: $name) {
-    issues(states: CLOSED, first: 25, after: $after) {
-      pageInfo { hasNextPage endCursor }
-      nodes {
-        number state closedAt
-        timelineItems(last: 1, itemTypes: [CLOSED_EVENT]) {
-          nodes { ... on ClosedEvent { actor { login } } }
-        }
-      }
-    }
-  }
-}
-"""
+from issues_comun import descargar_issues
 
 
 class NumberOfClosedIssues(GitHubMetric):
+    """NCI: cantidad de issues cerradas en la ventana.
+
+    A nivel producto ahora descarta los cierres de bots (el bot de issues inactivas y las
+    issues cerradas sin actor registrado): en next.js eran el 23 % de los cierres en 2022,
+    el 31 % en 2024 y el 68 % en 2025. NumberOfClosedIssuesConBots conserva el conteo
+    original, porque el bot es parte de la política del proyecto.
+
+    Las consignas 40 y 43 reexportan esta misma clase (nci_reuse.py, nci_reuse_43.py), así
+    que el filtro también corrige el NCI de Proceso.
+    """
+
+    incluir_bots = False
 
     def __init__(self, token: str, org: str, repo: str):
         super().__init__(token, org, repo)
         self.issues: list[dict] = []
 
     def fetch(self, con_actor: bool = False):
-        issues = []
-        cursor = None
-        query = _GRAPHQL_QUERY_CON_ACTOR if con_actor else _GRAPHQL_QUERY
+        # con_actor se mantiene por compatibilidad: la descarga común siempre trae el actor.
+        self.issues = [i for i in descargar_issues(self) if i["closed_at"]]
 
-        while True:
-            data = self._graphql(query, {"owner": self.org, "name": self.repo, "after": cursor})
-            page = data["data"]["repository"]["issues"]
-
-            for node in page["nodes"]:
-                closed_raw = node.get("closedAt")
-                timeline_nodes = node.get("timelineItems", {}).get("nodes", []) if con_actor else []
-                actor = (timeline_nodes[0].get("actor") or {}) if timeline_nodes else {}
-                issues.append({
-                    "number": node["number"],
-                    "state": node["state"].lower(),
-                    "closed_at": datetime.fromisoformat(closed_raw.replace("Z", "+00:00")) if closed_raw else None,
-                    "closed_by": actor.get("login"),
-                    "pull_request": None,
-                })
-
-            if not page["pageInfo"]["hasNextPage"]:
-                break
-            cursor = page["pageInfo"]["endCursor"]
-            print(f"  ...{len(issues)} issues descargados", end="\r")
-
-        self.issues = issues
+    def _cerrador_es_bot(self, issue: dict) -> bool:
+        return self._es_bot(issue["closed_by"] or "desconocido")
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> int:
         return sum(
-            1 for issue in self.issues
-            if issue["closed_at"] and fecha_inicio <= issue["closed_at"] <= fecha_fin
+            1 for i in self.issues
+            if fecha_inicio <= i["closed_at"] <= fecha_fin
+            and (self.incluir_bots or not self._cerrador_es_bot(i))
         )
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, int]:
         conteo: dict[str, int] = {}
-        for issue in self.issues:
-            if issue["closed_at"] and fecha_inicio <= issue["closed_at"] <= fecha_fin:
-                login = issue["closed_by"] or "desconocido"
-                if self._es_bot(login):
-                    continue
-                conteo[login] = conteo.get(login, 0) + 1
+        for i in self.issues:
+            if fecha_inicio <= i["closed_at"] <= fecha_fin and not self._cerrador_es_bot(i):
+                conteo[i["closed_by"]] = conteo.get(i["closed_by"], 0) + 1
         return dict(sorted(conteo.items(), key=lambda x: x[1], reverse=True))
 
     def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto"):
-        print(f"Descargando issues cerrados de {self.org}/{self.repo}...")
-
+        self.fetch()
+        print(f"Issues cerradas descargadas: {len(self.issues)}\n")
         if por == "persona":
-            self.fetch(con_actor=True)
-            print(f"Issues descargados: {len(self.issues)}\n")
             conteo = self.por_persona(fecha_inicio, fecha_fin)
             print(f"{'Colaborador':<30} NCI")
             print("-" * 40)
@@ -97,7 +58,9 @@ class NumberOfClosedIssues(GitHubMetric):
             print("-" * 40)
             print(f"{'Total':<30} {sum(conteo.values())}")
         else:
-            self.fetch(con_actor=False)
-            print(f"Issues descargados: {len(self.issues)}\n")
-            nci = self.por_producto(fecha_inicio, fecha_fin)
-            print(f"NCI (Number of Closed Issues): {nci}")
+            print(f"NCI (Number of Closed Issues): {self.por_producto(fecha_inicio, fecha_fin)}")
+
+
+class NumberOfClosedIssuesConBots(NumberOfClosedIssues):
+    """NCI original, con los cierres de bots. Por persona igual descarta bots."""
+    incluir_bots = True

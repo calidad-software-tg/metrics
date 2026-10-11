@@ -1,6 +1,8 @@
+import csv
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 import requests
 
@@ -101,13 +103,32 @@ BOTS_CONOCIDOS = {
 }
 
 
+# Cuentas clasificadas a mano en bots_clasificados.csv (clasificar_cuentas.py). Antes solo
+# las usaba el export; el cálculo usaba nada más BOTS_CONOCIDOS y el sufijo "[bot]", así
+# que una cuenta clasificada como bot pero fuera de esa lista contaba como humana.
+_CSV_BOTS = Path(__file__).resolve().parent / "bots_clasificados.csv"
+_TIPOS_NO_HUMANOS = {"bot", "agente_ia", "desconocido"}
+_bots_csv: set[str] | None = None
+
+
+def _bots_clasificados() -> set[str]:
+    global _bots_csv
+    if _bots_csv is None:
+        _bots_csv = set()
+        if _CSV_BOTS.exists():
+            with open(_CSV_BOTS, newline="", encoding="utf-8") as f:
+                _bots_csv = {r["login"] for r in csv.DictReader(f)
+                             if r.get("tipo_cuenta", "").strip() in _TIPOS_NO_HUMANOS}
+    return _bots_csv
+
+
 def es_bot(login: str | None) -> bool:
-    """True si `login` es una cuenta de automatización: está en BOTS_CONOCIDOS,
-    o sigue la convención de GitHub Apps (sufijo "[bot]", ej. "github-actions[bot]",
-    "next-js-bot[bot]")."""
+    """True si `login` es una cuenta de automatización: está en BOTS_CONOCIDOS, está
+    clasificada como bot, agente de IA o desconocida en bots_clasificados.csv, o sigue
+    la convención de GitHub Apps (sufijo "[bot]", ej. "github-actions[bot]")."""
     if not login:
         return False
-    return login in BOTS_CONOCIDOS or login.endswith("[bot]")
+    return login in BOTS_CONOCIDOS or login.endswith("[bot]") or login in _bots_clasificados()
 
 
 class GitHubMetric:
