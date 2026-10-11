@@ -84,6 +84,8 @@ class MeanTimeToRepair(GitHubMetric):
         by_actor: dict[str, list[float]] = {}
         for i in self._issues_en_rango(fecha_inicio, fecha_fin):
             login = i["closed_by"] or "desconocido"
+            if self._es_bot(login):
+                continue
             horas = (i["cierre"] - i["creacion"]).total_seconds() / 3600
             by_actor.setdefault(login, []).append(horas)
 

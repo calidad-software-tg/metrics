@@ -98,8 +98,10 @@ class DevelopmentProcessPerformance(GitHubMetric):
     def _issues_en_periodo(self, fecha_inicio: datetime, fecha_fin: datetime) -> list[dict]:
         return [i for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin]
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime, dias_umbral: int = 3) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime, dias_umbral: int = 3) -> float | None:
         issues_periodo = self._issues_en_periodo(fecha_inicio, fecha_fin)
+        if not issues_periodo:
+            return None  # ventana sin issues creados: no observable (NULL, no 0.0)
         return calcular_process_performance(issues_periodo, dias_umbral=dias_umbral)
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):

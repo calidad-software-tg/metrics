@@ -75,6 +75,8 @@ class AverageNumberOfModifiedComponentsPerCommit(GitHubMetric):
         by_author: dict[str, list[int]] = {}
         for commit in self.commits:
             login = commit["author"]
+            if self._es_bot(login):
+                continue
             by_author.setdefault(login, []).append(commit["files_count"])
 
         result = {

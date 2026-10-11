@@ -79,6 +79,13 @@ def calcular_skill_similarity(user_languages: set, repo_languages: set) -> float
     return len(habilidades_comunes) / len(repo_languages)
 
 
+# Cache de proceso login -> lenguajes de sus repos propios. /users/{login}/repos es
+# un snapshot ACTUAL (no depende de la ventana), así que pedirlo una vez por
+# persona da el mismo resultado que pedirlo en cada ventana: con 3.855 ventanas
+# canary pasa de ~58k requests a una por colaborador distinto.
+_USER_LANGS_CACHE: dict[str, set] = {}
+
+
 class SkillSimilarity(GitHubMetric):
     """
     Skill Similarity (SS).
@@ -144,7 +151,8 @@ class SkillSimilarity(GitHubMetric):
                 break
             for c in data:
                 login = (c.get("author") or {}).get("login")
-                if login and login not in vistos:
+                # Los bots no ocupan lugar en el tope de max_contributors.
+                if login and login not in vistos and not self._es_bot(login):
                     vistos.add(login)
                     logins.append(login)
                     if len(vistos) >= max_contributors:
@@ -166,12 +174,17 @@ class SkillSimilarity(GitHubMetric):
 
         user_languages = {}
         for i, login in enumerate(logins):
-            repos = self._rest(
-                f"/users/{login}/repos",
-                {"per_page": max_user_repos, "type": "owner"},
-            )
-            langs = {r["language"] for r in repos if r.get("language")}
-            user_languages[login] = langs
+            if login not in _USER_LANGS_CACHE:
+                resp = self._get(
+                    f"https://api.github.com/users/{login}/repos",
+                    {"per_page": max_user_repos, "type": "owner"},
+                )
+                if resp.status_code == 404:
+                    continue  # cuenta borrada/renombrada: sin datos, no corta la ventana
+                if not resp.ok:
+                    raise RuntimeError(f"GitHub API error {resp.status_code} en /users/{login}/repos")
+                _USER_LANGS_CACHE[login] = {r["language"] for r in resp.json() if r.get("language")}
+            user_languages[login] = _USER_LANGS_CACHE[login]
             print(f"  ...{i + 1}/{len(logins)} colaboradores analizados", end="\r")
         print()
         self.user_languages = user_languages
@@ -183,6 +196,7 @@ class SkillSimilarity(GitHubMetric):
         resultado = {
             login: round(calcular_skill_similarity(langs, self.repo_languages), 4)
             for login, langs in self.user_languages.items()
+            if not self._es_bot(login)
         }
         return dict(sorted(resultado.items(), key=lambda x: x[1], reverse=True))
 

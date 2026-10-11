@@ -186,6 +186,8 @@ class RecentReviewExperience(GitHubMetric):
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, float]:
         por_usuario: dict[str, list[dict]] = {}
         for e in self.eventos:
+            if self._es_bot(e["login"]):
+                continue
             por_usuario.setdefault(e["login"], []).append(e)
 
         resultado = {

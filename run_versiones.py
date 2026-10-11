@@ -192,30 +192,128 @@ def _gh(path: str, token: str, params: dict = None) -> requests.Response:
 
 
 def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
-    """Una ventana [inicio, fin) por cada tag consecutivo. El último va hasta ahora."""
-    tags = []
+    """Una ventana [inicio, fin) por cada versión estable consecutiva. El último va hasta ahora.
+
+    Usa /releases, no /tags: trae el flag `prerelease` para descartar versiones
+    de prueba (ej. canary de next.js, ~88% de sus tags) sin adivinar por el
+    nombre, y ya incluye `published_at`, así que no hace falta una llamada
+    extra a /commits/{sha} por versión como en la implementación anterior
+    basada en tags (para un repo con miles de tags, esa llamada extra por
+    cada uno se comía casi toda la cuota antes de calcular una sola métrica).
+
+    Fallback a /tags (comportamiento anterior, sin filtrar) para repos que no
+    usan GitHub Releases o donde ninguna release está marcada como estable
+    (ej. cpython). Si el repo sí usa Releases pero con nombres tipo canary,
+    usar siempre la rama de /releases de arriba, nunca este fallback.
+    """
+    releases = []
     page = 1
     while True:
-        batch = _gh(f"/repos/{org}/{repo}/tags", token, {"per_page": 100, "page": page}).json()
+        batch = _gh(f"/repos/{org}/{repo}/releases", token, {"per_page": 100, "page": page}).json()
         if not batch:
             break
-        tags.extend(batch)
+        releases.extend(batch)
         if len(batch) < 100:
             break
         page += 1
 
-    if not tags:
-        print(f"{org}/{repo} no tiene tags; no se puede cortar por versiones", file=sys.stderr)
-        sys.exit(1)
+    estables = [r for r in releases if not r["prerelease"] and not r["draft"]]
 
-    versiones = []
-    for t in tags:
-        sha = t["commit"]["sha"]
-        commit = _gh(f"/repos/{org}/{repo}/commits/{sha}", token).json()
-        fecha = datetime.fromisoformat(
-            commit["commit"]["committer"]["date"].replace("Z", "+00:00")
-        )
-        versiones.append({"version": t["name"], "fecha": fecha})
+    if estables:
+        versiones = [
+            {"version": r["tag_name"],
+             "fecha": datetime.fromisoformat(r["published_at"].replace("Z", "+00:00"))}
+            for r in estables
+        ]
+    else:
+        print(f"{org}/{repo}: sin releases estables, uso tags crudos (sin filtrar prerelease)", file=sys.stderr)
+        tags = []
+        page = 1
+        while True:
+            batch = _gh(f"/repos/{org}/{repo}/tags", token, {"per_page": 100, "page": page}).json()
+            if not batch:
+                break
+            tags.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+
+        if not tags:
+            print(f"{org}/{repo} no tiene tags ni releases; no se puede cortar por versiones", file=sys.stderr)
+            sys.exit(1)
+
+        versiones = []
+        for t in tags:
+            sha = t["commit"]["sha"]
+            commit = _gh(f"/repos/{org}/{repo}/commits/{sha}", token).json()
+            fecha = datetime.fromisoformat(
+                commit["commit"]["committer"]["date"].replace("Z", "+00:00")
+            )
+            versiones.append({"version": t["name"], "fecha": fecha})
+
+    versiones.sort(key=lambda v: v["fecha"])
+    ahora = datetime.now(timezone.utc)
+
+    ventanas = []
+    for i, v in enumerate(versiones):
+        fin = versiones[i + 1]["fecha"] if i + 1 < len(versiones) else ahora
+        ventanas.append({
+            "n": i + 1,
+            "version": v["version"],
+            "inicio": v["fecha"],
+            "fin": fin,
+            "abierta": i + 1 == len(versiones),
+        })
+    return ventanas
+
+
+def ventanas_por_version_todas(token: str, org: str, repo: str) -> list[dict]:
+    """Igual que ventanas_por_version, pero SIN filtrar prerelease/canary --
+    una ventana por cada release publicada, estable o no. Para un repo con
+    cadencia canary diaria (ej. next.js) esto multiplica por ~10 la cantidad
+    de ventanas y las angosta a horas en vez de semanas/meses -- guardar bajo
+    tipo_analisis='versiones_canary', nunca pisa a 'versiones' (estables).
+    """
+    releases = []
+    page = 1
+    while True:
+        batch = _gh(f"/repos/{org}/{repo}/releases", token, {"per_page": 100, "page": page}).json()
+        if not batch:
+            break
+        releases.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+
+    if releases:
+        versiones = [
+            {"version": r["tag_name"],
+             "fecha": datetime.fromisoformat(r["published_at"].replace("Z", "+00:00"))}
+            for r in releases if not r["draft"]
+        ]
+    else:
+        print(f"{org}/{repo}: sin releases, uso tags crudos", file=sys.stderr)
+        tags = []
+        page = 1
+        while True:
+            batch = _gh(f"/repos/{org}/{repo}/tags", token, {"per_page": 100, "page": page}).json()
+            if not batch:
+                break
+            tags.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+        if not tags:
+            print(f"{org}/{repo} no tiene tags ni releases; no se puede cortar por versiones", file=sys.stderr)
+            sys.exit(1)
+        versiones = []
+        for t in tags:
+            sha = t["commit"]["sha"]
+            commit = _gh(f"/repos/{org}/{repo}/commits/{sha}", token).json()
+            fecha = datetime.fromisoformat(
+                commit["commit"]["committer"]["date"].replace("Z", "+00:00")
+            )
+            versiones.append({"version": t["name"], "fecha": fecha})
 
     versiones.sort(key=lambda v: v["fecha"])
     ahora = datetime.now(timezone.utc)
@@ -342,7 +440,18 @@ class Base:
                 else:
                     self.upsert_resultado(periodo_id, metrica_id, login, float(val), None)
         elif isinstance(valor, (dict, list)):
-            self.upsert_resultado(periodo_id, metrica_id, None, None, valor)
+            # Para métricas de producto que devuelven {repo: {key: escalar, ...}},
+            # extraer el número principal a value y guardar el dict completo en
+            # value_extra para no perder el desglose (ej. nub, nob_42).
+            escalar = None
+            if isinstance(valor, dict):
+                if len(valor) == 1:
+                    inner = next(iter(valor.values()))
+                    if isinstance(inner, dict):
+                        escalar = _escalar_de(inner)
+                else:
+                    escalar = _escalar_de(valor)
+            self.upsert_resultado(periodo_id, metrica_id, None, escalar, valor)
         elif isinstance(valor, bool):
             self.upsert_resultado(periodo_id, metrica_id, None, float(valor), None)
         elif valor is not None:
@@ -359,6 +468,11 @@ class Base:
 # Topes opcionales para métricas caras (se setean desde --max-files / --max-commits).
 LIMITES = {"max_files": None, "max_commits": None, "max_contributors": None}
 
+# Opciones de criterio que se pasan a fetch si la métrica las acepta (se setean desde la línea de comandos).
+# solo_etiquetas: cfdr, nub y dis reconocen bugs/documentación solo por etiqueta, sin el tipo de
+# issue de GitHub (algoritmo original de la consigna).
+OPCIONES = {"solo_etiquetas": False}
+
 
 def _fetch(metric, fecha_inicio, fecha_fin, por: str):
     """Llama fetch adaptándose a su firma (fecha_inicio/fecha_fin y/o con_actor)."""
@@ -368,6 +482,9 @@ def _fetch(metric, fecha_inicio, fecha_fin, por: str):
         kwargs["con_actor"] = True
     for nombre, valor in LIMITES.items():
         if valor is not None and nombre in params:
+            kwargs[nombre] = valor
+    for nombre, valor in OPCIONES.items():
+        if nombre in params:
             kwargs[nombre] = valor
     if "fecha_inicio" in params and "fecha_fin" in params:
         metric.fetch(fecha_inicio, fecha_fin, **kwargs)
@@ -397,7 +514,7 @@ def _fmt(valor) -> str:
 
 # Claves de resumen conocidas en salidas compuestas por persona.
 _CLAVES_ESCALAR = ("sc", "experiencia_meses", "porcentaje", "value", "valor",
-                   "total", "score", "count")
+                   "total", "score", "count", "nub", "nob")
 
 
 def _escalar_de(d: dict):
@@ -445,6 +562,13 @@ SLICEABLE = {
     "sc":              [("_issues", "created"), ("_prs", "created")],
     "sc_disc":         [("_issues", "created"), ("_prs", "created")],
     "dev_exp":         [],
+    # nob_42: devuelve conteo actual de branches (no histórico); un fetch global
+    # evita repetirlo una vez por ventana sin cambiar el resultado.
+    "nob_42":          [],
+    # nub: un fetch global descarga todos los issues del rango completo; SLICEABLE
+    # los filtra por ventana usando 'created'. Evita ~373 fetches completos del
+    # issue tracker de next.js (que tiene >40k issues).
+    "nub":             [("_issues", "created")],
 }
 
 
@@ -552,11 +676,23 @@ def main():
     parser.add_argument("--max-files", type=int, help="tope de archivos para métricas de árbol (cd, dloc, loc_notion...)")
     parser.add_argument("--max-commits", type=int, help="tope de commits para métricas de historial (fexp, le, rexp...)")
     parser.add_argument("--max-contributors", type=int, help="tope de contribuidores (ss)")
+    parser.add_argument("--solo-etiquetas", action="store_true",
+                        help="cfdr, nub y dis: reconocer bugs/documentación solo por etiqueta, sin el tipo "
+                             "de issue de GitHub (algoritmo original de la consigna)")
+    parser.add_argument("--con-canary", action="store_true",
+                        help="no filtra prerelease/canary: una ventana por cada release publicada "
+                             "(muchas más, mucho más angostas). Guarda en tipo_analisis='versiones_canary', "
+                             "nunca pisa a 'versiones' (solo estables)")
     args = parser.parse_args()
+
+    global TIPO_ANALISIS
+    if args.con_canary:
+        TIPO_ANALISIS = "versiones_canary"
 
     LIMITES["max_files"] = args.max_files
     LIMITES["max_commits"] = args.max_commits
     LIMITES["max_contributors"] = args.max_contributors
+    OPCIONES["solo_etiquetas"] = args.solo_etiquetas
 
     token = os.environ.get("GITHUB_TOKEN", "")
     if not token:
@@ -600,7 +736,7 @@ def main():
             print("Corré con --no-guardar, o levantá la base (db/README.md).", file=sys.stderr)
             sys.exit(1)
 
-    ventanas = ventanas_por_version(token, org, repo)
+    ventanas = (ventanas_por_version_todas if args.con_canary else ventanas_por_version)(token, org, repo)
 
     print(f"Repo     : {org}/{repo}")
     print(f"Métricas : {len(claves)} -> {', '.join(claves)}")

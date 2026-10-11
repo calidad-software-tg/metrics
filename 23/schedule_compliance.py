@@ -86,10 +86,12 @@ class ScheduleCompliance(GitHubMetric):
                 en_periodo.append(m)
         return en_periodo
 
-    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float:
+    def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> float | None:
         milestones = self._milestones_en_periodo(fecha_inicio, fecha_fin)
         if not milestones:
-            return 0.0
+            # Sin milestones la ventana no es observable (ej. next.js dejó de usarlos
+            # en 2020): None -> NULL, no 0.0, que se leería como incumplimiento total.
+            return None
         scores = [calcular_schedule_compliance(m) for m in milestones]
         return round(sum(scores) / len(scores), 4)
 

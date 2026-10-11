@@ -10,11 +10,15 @@ _TIMEOUT = (10, 60)          # (connect, read) en segundos: sin esto un socket c
 _REINTENTOS = 5
 _STATUS_REINTENTABLES = {500, 502, 503, 504, 520, 522}
 _MAX_ESPERAS_RL = 4         # cuántas veces dormir hasta un reset de cuota por request
+# Errores de red (DNS, conexión caída): se toleran cortes de internet de hasta
+# ~40 min (2+4+8+16+32 s y después 60 s por intento). Con 5 reintentos un corte
+# de un minuto mataba cada métrica y se perdían horas de descarga ya hecha.
+_REINTENTOS_RED = 45
 
 
-def _backoff(intento: int, motivo: str):
-    espera = min(2 ** intento, 45)
-    print(f"  (reintento {intento}/{_REINTENTOS} por {motivo}, espero {espera}s)", file=sys.stderr)
+def _backoff(intento: int, motivo: str, total: int = _REINTENTOS, tope: int = 45):
+    espera = min(2 ** intento, tope)
+    print(f"  (reintento {intento}/{total} por {motivo}, espero {espera}s)", file=sys.stderr)
     time.sleep(espera)
 
 
@@ -56,6 +60,56 @@ def _slim_comentario(item: dict) -> dict:
     return d
 
 
+# Cuentas de automatización detectadas al revisar cada repo candidato (ver
+# SELECCION_REPOSITORIO.md), no personas. Un commit/comentario de una de estas
+# cuentas contamina cualquier métrica de Persona (REXP, EXPRev, FEXP, REXPRev,
+# Contribution Diversity, Skill Similarity, Development Experience) si se
+# cuenta como si fuera un colaborador más. Se completa a mano a medida que se
+# detectan nuevas — no hay forma confiable de listarlas todas de antemano.
+BOTS_CONOCIDOS = {
+    "vercel-release-bot",       # next.js: bump automático de la versión interna de React
+    # Nombres de git (no logins) de los mismos bots de next.js: las métricas
+    # locales (run_versiones_local.py) atribuyen por nombre de autor de git.
+    "Vercel Release Bot",       # next.js: 643 commits, email ...+vercel-release-bot@users.noreply
+    "nextjs-bot",               # next.js: ~600 commits de release, email it+nextjs-bot@vercel.com
+    "skia-flutter-autoroll",    # flutter: autoroll de dependencias de Skia
+    "engine-flutter-autoroll",  # flutter: autoroll del motor de Flutter
+    "CLAassistant",             # tldr: bot de firma de CLA, comenta en casi todos los PRs
+    "tldr-bot",                 # tldr: bot de bienvenida/lint automático
+    # "github-actions" sin sufijo "[bot]": así lo devuelve GraphQL en
+    # ClosedEvent.actor.login (detectado en mttr sobre next.js — cierra
+    # issues automáticamente, con tiempos de cierre ~0 que no son reparación
+    # real). La REST API sí le pone el sufijo ("github-actions[bot]"), por
+    # eso hace falta la entrada explícita acá además del chequeo de sufijo.
+    "github-actions",
+    # GraphQL devuelve estos logins de GitHub Apps SIN el sufijo "[bot]" (mismo
+    # caso que github-actions): detectados en exprev/nc sobre next.js.
+    "next-js-bot",
+    "dependabot",
+    "greenkeeperio-bot",
+    "codetriage-readme-bot",
+    "diffray-bot",
+    "askdevai-bot",
+    # Agentes de IA que abren PRs / comentan: no son desarrolladores.
+    "Copilot",
+    "copilot-swe-agent",
+    "devin-ai-integration",
+    # No es una persona: el placeholder que usan las métricas cuando la cuenta
+    # autora fue borrada (GitHub la muestra como "ghost"); agrupa a muchos.
+    "desconocido",
+    "ghost",
+}
+
+
+def es_bot(login: str | None) -> bool:
+    """True si `login` es una cuenta de automatización: está en BOTS_CONOCIDOS,
+    o sigue la convención de GitHub Apps (sufijo "[bot]", ej. "github-actions[bot]",
+    "next-js-bot[bot]")."""
+    if not login:
+        return False
+    return login in BOTS_CONOCIDOS or login.endswith("[bot]")
+
+
 class GitHubMetric:
 
     def __init__(self, token: str, org: str, repo: str):
@@ -73,17 +127,18 @@ class GitHubMetric:
     def _get(self, url: str, params: dict = None) -> requests.Response:
         """GET con timeout, reintentos (red / 5xx) y espera de rate limit (403/429)."""
         intento = 0
+        fallos_red = 0
         esperas_rl = 0
         while True:
             try:
                 resp = requests.get(url, headers=self._headers(),
                                     params=params or {}, timeout=_TIMEOUT)
             except requests.exceptions.RequestException as exc:
-                intento += 1
-                if intento >= _REINTENTOS:
+                fallos_red += 1
+                if fallos_red >= _REINTENTOS_RED:
                     print(f"GitHub API sin respuesta: {exc}", file=sys.stderr)
                     sys.exit(1)
-                _backoff(intento, type(exc).__name__)
+                _backoff(fallos_red, type(exc).__name__, _REINTENTOS_RED, tope=60)
                 continue
             if _es_rate_limit(resp):
                 esperas_rl += 1
@@ -181,6 +236,7 @@ class GitHubMetric:
     def _graphql(self, query: str, variables: dict) -> dict:
         headers = {"Authorization": f"Bearer {self.token}"}
         intento = 0
+        fallos_red = 0
         esperas_rl = 0
         while True:
             try:
@@ -191,11 +247,11 @@ class GitHubMetric:
                     timeout=_TIMEOUT,
                 )
             except requests.exceptions.RequestException as exc:
-                intento += 1
-                if intento >= _REINTENTOS:
+                fallos_red += 1
+                if fallos_red >= _REINTENTOS_RED:
                     print(f"GitHub GraphQL sin respuesta: {exc}", file=sys.stderr)
                     sys.exit(1)
-                _backoff(intento, type(exc).__name__)
+                _backoff(fallos_red, type(exc).__name__, _REINTENTOS_RED, tope=60)
                 continue
             if _es_rate_limit(resp):
                 esperas_rl += 1
@@ -219,6 +275,10 @@ class GitHubMetric:
             print(f"GraphQL error: {data['errors']}", file=sys.stderr)
             sys.exit(1)
         return data
+
+    def _es_bot(self, login: str | None) -> bool:
+        """Wrapper de conveniencia sobre `es_bot()` para llamar como self._es_bot(login)."""
+        return es_bot(login)
 
     def _resolve_ref(self, fecha_fin) -> str:
         """SHA del último commit de la rama default con fecha <= fecha_fin.

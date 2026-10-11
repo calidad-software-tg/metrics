@@ -186,6 +186,8 @@ class ReviewExperience(GitHubMetric):
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, int]:
         metadata_por_usuario: dict[str, dict] = {}
         for e in self.eventos:
+            if self._es_bot(e["login"]):
+                continue
             d = metadata_por_usuario.setdefault(e["login"], {})
             d[e["tipo"]] = d.get(e["tipo"], 0) + 1
 

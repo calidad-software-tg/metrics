@@ -93,12 +93,16 @@ class SocialContribution(GitHubMetric):
             return contribs[login]
 
         for i in self._issues:
+            if self._es_bot(i["author"]):
+                continue
             d = get(i["author"])
             d["issues_opened"] += 1
             if i["state"] == "CLOSED":
                 d["issues_opened_closed"] += 1
 
         for p in self._prs:
+            if self._es_bot(p["author"]):
+                continue
             d = get(p["author"])
             d["prs_opened"] += 1
             if p["state"] == "CLOSED":

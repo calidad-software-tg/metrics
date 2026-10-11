@@ -1,0 +1,59 @@
+variable_id,nombre_legible,metrica_id,nivel,estadistico,dim_persona,dim_proceso,dim_producto,dim_persona_por_nivel,dims_texto,familia,n_estable,n_canary,pct_moda,rho_tiempo,rho_duracion,incluida,motivo_exclusion,advertencia
+anmcc_producto,ANMCC (Avg Modified Components per Commit) [producto],anmcc,producto,valor,0,1,1,0,Proceso+Producto,,369,3851,10.3,0.310,0.301,sí,,
+cd_producto,CD (Comment Density) [producto],cd,producto,valor,0,0,1,0,Producto,,369,3851,5.1,-0.214,0.141,sí,,
+cfdr_producto,CFDR (Customer Found Defects & Regressions) [producto],cfdr,producto,valor,0,1,1,0,Proceso+Producto,,229,2303,4.8,-0.278,0.783,sí,,Solo releases desde mediados de 2020 — antes el repo no clasificaba bugs
+dis_producto,DIS (Doc Issue Survival) [producto],dis,producto,valor,0,1,0,0,Proceso,,143,570,17.5,0.318,0.310,sí,,DIS: posible falso positivo por etiquetas que contienen 'doc' (ej. 'Docker') debido a match de subcadena en _DOC_KEYWORDS
+dloc_producto,DLOC (Documentation Lines of Code) [producto],dloc,producto,valor,0,0,1,0,Producto,,369,3851,5.4,0.860,-0.181,sí,,
+jarczyk_success_rate_producto,Jarczyk Success Rate [producto],jarczyk_success_rate,producto,valor,0,1,0,0,Proceso,,324,3137,7.1,-0.286,0.552,sí,,
+le_producto,LE (Learning Ease) [producto],le,producto,valor,0,0,1,0,Producto,,330,3662,0.6,0.808,-0.276,sí,,
+mttr_producto,MTTR (Mean Time to Repair) [producto],mttr,producto,valor,0,1,1,0,Proceso+Producto,,369,3851,13.8,0.274,0.482,sí,,
+nci_producto,NCI (Number of Closed Issues) [producto],nci,producto,valor,0,1,0,0,Proceso,,369,3851,13.6,-0.173,0.914,sí,,
+nob_42_producto,nob_42 [producto],nob_42,producto,valor,0,0,0,0,Sin dimensión,,371,0,100.0,nan,nan,no,valor constante 2706 en todas las ventanas estables,
+noi_producto,NOI (Number of Open Issues) [producto],noi,producto,valor,0,1,1,0,Proceso+Producto,,371,3856,2.4,0.802,-0.165,sí,,
+noi_28_producto,noi_28 [producto],noi_28,producto,valor,0,0,0,0,Sin dimensión,,371,0,2.4,0.802,-0.165,no,prácticamente idéntica a noi (difieren en 1 ventana de 371),
+nub_producto,NUB (Bugs Detected by Users) [producto],nub,producto,valor,0,1,1,0,Proceso+Producto,,229,2305,5.2,-0.278,0.783,sí,,NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs (substring match en _KEYWORDS_BUG); solo releases desde mediados de 2020 — antes el repo no clasificaba bugs
+process_performance_producto,Process Performance [producto],process_performance,producto,valor,0,1,0,0,Proceso,,324,3137,4.3,-0.348,0.087,sí,,
+rc_producto,RC (Readme Completeness) [producto],rc,producto,valor,0,1,1,0,Proceso+Producto,,369,3851,9.2,0.208,-0.137,sí,,
+schedule_compliance_producto,Schedule Compliance [producto],schedule_compliance,producto,valor,0,1,0,0,Proceso,,41,56,95.1,0.277,-0.081,no,pct_moda=95.1% > 80%,
+wp_producto,wp [producto],wp,producto,valor,0,0,0,0,Sin dimensión,,369,3851,100.0,nan,nan,no,valor constante 0 en todas las ventanas estables,
+activos_cierre_conteo,Activos (cierre de issues) [conteo],activos_cierre,persona_agregada,conteo,1,0,0,0,Persona,tamano,317,2901,5.7,-0.110,0.845,sí,,
+activos_comentarios_conteo,Activos (comentarios) [conteo],activos_comentarios,persona_agregada,conteo,1,0,0,0,Persona,tamano,341,3750,2.9,-0.060,0.879,sí,,
+activos_commits_conteo,Activos (commits) [conteo],activos_commits,persona_agregada,conteo,1,0,0,0,Persona,tamano,329,3690,4.3,0.146,0.814,sí,,
+activos_interaccion_conteo,Activos (interacción) [conteo],activos_interaccion,persona_agregada,conteo,1,0,0,0,Persona,tamano,344,3778,2.6,-0.021,0.881,sí,,
+anmcc_mediana,ANMCC (Avg Modified Components per Commit) [mediana],anmcc,persona_agregada,mediana,1,1,1,1,Persona+Proceso+Producto,amplitud,329,3661,19.8,0.561,-0.208,sí,,
+cd_mediana,CD (Comment Density) [mediana],cd,persona_agregada,mediana,1,0,1,0,Persona+Producto,otra,369,3855,8.4,0.209,-0.253,sí,,
+cdiv_mediana,CDIV (Contribution Diversity) [mediana],cdiv,persona_agregada,mediana,1,1,0,0,Persona+Proceso,amplitud,330,3665,20.9,0.613,-0.209,sí,,
+cdiv_p90,CDIV (Contribution Diversity) [p90],cdiv,persona_agregada,p90,1,1,0,0,Persona+Proceso,amplitud,330,3665,2.7,0.584,0.334,sí,,
+cdiv_share_top10pct,CDIV (Contribution Diversity) [share_top10pct],cdiv,persona_agregada,share_top10pct,1,1,0,0,Persona+Proceso,amplitud,330,3665,3.6,-0.194,0.140,sí,,
+dev_exp_mediana,dev_exp (Development Experience) [mediana],dev_exp,persona_agregada,mediana,1,1,0,0,Persona+Proceso,composicion,329,0,1.5,0.718,-0.435,sí,,
+dis_mediana,DIS (Doc Issue Survival) [mediana],dis,persona_agregada,mediana,1,1,0,1,Persona+Proceso,otra,141,533,23.4,0.372,0.206,sí,,DIS: posible falso positivo por etiquetas que contienen 'doc' (ej. 'Docker') debido a match de subcadena en _DOC_KEYWORDS
+disc_centrality_mediana,Disc. Centrality (Discussion Centrality) [mediana],disc_centrality,persona_agregada,mediana,1,0,0,0,Persona,red,341,3752,62.8,-0.320,0.536,sí,,
+dloc_mediana,DLOC (Documentation Lines of Code) [mediana],dloc,persona_agregada,mediana,1,0,1,1,Persona+Producto,otra,369,3855,13.6,0.619,-0.115,sí,,
+dloc_p90,DLOC (Documentation Lines of Code) [p90],dloc,persona_agregada,p90,1,0,1,1,Persona+Producto,intensidad,369,3855,9.2,0.132,0.062,sí,,
+dloc_share_top10pct,DLOC (Documentation Lines of Code) [share_top10pct],dloc,persona_agregada,share_top10pct,1,0,1,1,Persona+Producto,intensidad,369,3855,5.4,0.445,-0.135,sí,,
+exprev_mediana,EXPRev (Code Review Experience) [mediana],exprev,persona_agregada,mediana,1,1,0,0,Persona+Proceso,otra,344,3778,91.0,-0.085,-0.171,no,pct_moda=91.0% > 80%,
+exprev_p90,EXPRev (Code Review Experience) [p90],exprev,persona_agregada,p90,1,1,0,0,Persona+Proceso,intensidad,344,3778,31.7,0.239,0.068,sí,,
+exprev_share_top10pct,EXPRev (Code Review Experience) [share_top10pct],exprev,persona_agregada,share_top10pct,1,1,0,0,Persona+Proceso,intensidad,344,3778,2.6,0.316,0.449,sí,,
+fexp_mediana,FEXP (File Experience) [mediana],fexp,persona_agregada,mediana,1,0,0,0,Persona,amplitud,330,3665,92.4,0.083,-0.080,no,pct_moda=92.4% > 80%,
+le_mediana,LE (Learning Ease) [mediana],le,persona_agregada,mediana,1,0,1,0,Persona+Producto,composicion,330,3665,31.8,0.654,-0.544,sí,,
+mttr_mediana,MTTR (Mean Time to Repair) [mediana],mttr,persona_agregada,mediana,1,1,1,1,Persona+Proceso+Producto,otra,314,2804,0.6,0.672,-0.080,sí,,
+nc_mediana,NC (Number of Comments) [mediana],nc,persona_agregada,mediana,1,1,0,0,Persona+Proceso,otra,341,3750,93.8,-0.019,-0.233,no,pct_moda=93.8% > 80%,
+nc_p90,NC (Number of Comments) [p90],nc,persona_agregada,p90,1,1,0,0,Persona+Proceso,intensidad,341,3750,28.7,0.289,0.117,sí,,
+nc_share_top10pct,NC (Number of Comments) [share_top10pct],nc,persona_agregada,share_top10pct,1,1,0,0,Persona+Proceso,intensidad,341,3750,2.9,0.387,0.384,sí,,
+nci_mediana,NCI (Number of Closed Issues) [mediana],nci,persona_agregada,mediana,1,1,0,1,Persona+Proceso,otra,314,2804,88.2,-0.026,-0.383,no,pct_moda=88.2% > 80%,
+nci_p90,NCI (Number of Closed Issues) [p90],nci,persona_agregada,p90,1,1,0,1,Persona+Proceso,intensidad,314,2804,21.3,-0.258,0.294,sí,,
+nci_share_top10pct,NCI (Number of Closed Issues) [share_top10pct],nci,persona_agregada,share_top10pct,1,1,0,1,Persona+Proceso,intensidad,314,2804,5.7,-0.436,0.238,sí,,
+nuevos_commits_conteo,Nuevos contribuyentes (commits) [conteo],nuevos_commits,persona_agregada,conteo,1,0,0,0,Persona,tamano,329,3690,13.4,-0.175,0.837,sí,,
+nuevos_interaccion_conteo,Nuevos contribuyentes (interacción) [conteo],nuevos_interaccion,persona_agregada,conteo,1,0,0,0,Persona,tamano,344,3778,4.9,-0.052,0.901,sí,,
+prop_cierran_ratio,Proporción que cierra issues [ratio],prop_cierran,persona_agregada,ratio,1,0,0,0,Persona,composicion,317,2900,1.9,-0.390,-0.103,sí,,Proporción derivada: numerador/denominador por release; vacío si denominador = 0
+prop_comentan_ratio,Proporción que comenta [ratio],prop_comentan,persona_agregada,ratio,1,0,0,0,Persona,composicion,341,3742,3.5,-0.417,0.166,sí,,Proporción derivada: numerador/denominador por release; vacío si denominador = 0
+prop_commitean_ratio,Proporción que commitea [ratio],prop_commitean,persona_agregada,ratio,1,0,0,0,Persona,composicion,329,3668,1.2,0.127,-0.417,sí,,Proporción derivada: numerador/denominador por release; vacío si denominador = 0
+rc_mediana,RC (Readme Completeness) [mediana],rc,persona_agregada,mediana,1,1,1,1,Persona+Proceso+Producto,otra,369,3855,59.3,-0.098,-0.087,sí,,
+rexp_mediana,REXP (Recent Experience) [mediana],rexp,persona_agregada,mediana,1,0,0,0,Persona,composicion,330,3665,25.5,0.285,-0.813,sí,,
+rexprev_mediana,REXPRev (Recent Review Experience) [mediana],rexprev,persona_agregada,mediana,1,1,0,0,Persona+Proceso,intensidad,344,3778,28.2,0.142,-0.961,sí,,
+sc_mediana,SC (Social Contribution) [mediana],sc,persona_agregada,mediana,1,1,0,0,Persona+Proceso,otra,335,3636,99.7,0.080,-0.059,no,pct_moda=99.7% > 80%,
+sc_p90,SC (Social Contribution) [p90],sc,persona_agregada,p90,1,1,0,0,Persona+Proceso,intensidad,335,3636,48.1,0.495,0.262,sí,,
+sc_share_top10pct,SC (Social Contribution) [share_top10pct],sc,persona_agregada,share_top10pct,1,1,0,0,Persona+Proceso,intensidad,335,3636,3.0,0.360,0.344,sí,,
+ss_mediana,SS (Skill Similarity) [mediana],ss,persona_agregada,mediana,1,0,0,0,Persona,composicion,330,3663,33.9,-0.167,0.084,sí,,"Lenguajes del usuario tomados hoy (snapshot actual de repos propios), no en cada release; tope de 15 contribuyentes activos por ventana (bots excluidos del tope)"
+tasa_nuevos_commits_ratio,Tasa de ingreso (commits) [ratio],tasa_nuevos_commits,persona_agregada,ratio,1,0,0,0,Persona,composicion,329,3661,13.4,-0.533,0.616,sí,,Proporción derivada: numerador/denominador por release; vacío si denominador = 0
+tasa_nuevos_interaccion_ratio,Tasa de ingreso (interacción) [ratio],tasa_nuevos_interaccion,persona_agregada,ratio,1,0,0,0,Persona,composicion,344,3778,4.9,-0.202,0.760,sí,,Proporción derivada: numerador/denominador por release; vacío si denominador = 0

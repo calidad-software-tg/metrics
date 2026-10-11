@@ -41,10 +41,11 @@ CREATE TABLE IF NOT EXISTS periodo (
     periodo_id         SERIAL PRIMARY KEY,
     repo_id            INTEGER NOT NULL REFERENCES repos(repo_id),
     tipo_analisis      TEXT NOT NULL CHECK (tipo_analisis IN (
-                            'bloque_fijo',   -- calendario, ancho parejo
-                            'adaptativo',    -- calendario, ancho fusionado hasta un piso mínimo de actividad
-                            'versiones',     -- un período entre cada release/tag consecutivo
-                            'volumen'        -- un período cada N eventos acumulados (commits o issues cerradas)
+                            'bloque_fijo',      -- calendario, ancho parejo
+                            'adaptativo',       -- calendario, ancho fusionado hasta un piso mínimo de actividad
+                            'versiones',        -- un período entre cada release estable consecutiva (sin prerelease/canary)
+                            'volumen',          -- un período cada N eventos acumulados (commits o issues cerradas)
+                            'versiones_canary'  -- como 'versiones', pero sin filtrar canary/prerelease -- ventanas mucho más angostas
                         )),
     periodo_num        INTEGER NOT NULL,     -- orden dentro de (repo_id, tipo_analisis): 1, 2, 3...
     fecha_inicio       TIMESTAMPTZ NOT NULL,

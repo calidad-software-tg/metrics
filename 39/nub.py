@@ -15,15 +15,21 @@ query($owner: String!, $repo: String!, $cursor: String) {
       pageInfo { hasNextPage endCursor }
       nodes {
         createdAt
+        authorAssociation
         author { login }
         labels(first: 20) {
           nodes { name }
         }
+        issueType { name }
       }
     }
   }
 }
 """
+
+# Asociaciones que indican pertenencia al core team en GitHub.
+# authorAssociation = afiliación al momento de reportar el issue (no la de hoy).
+_CORE_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 
 # Nombres de archivo candidatos para identificar al core team, en orden de preferencia.
 _MAINTAINERS_CANDIDATES = ["MAINTAINERS.md", ".github/MAINTAINERS.md", "CODEOWNERS", ".github/CODEOWNERS"]
@@ -45,14 +51,18 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
     """
 
     _KEYWORDS_BUG = {
-        "defect", "error", "bug", "issue", "mistake",
+        "defect", "error", "bug", "mistake",
         "incorrect", "fault", "flaw",
+        # "issue" eliminado: como substring matchea "good first issue",
+        # "open issue", etc. — demasiados falsos positivos.
     }
 
     def __init__(self, token: str, org: str, repo: str):
         super().__init__(token, org, repo)
         self._issues: list[dict] = []
         self._core_team: set[str] = set()
+        # True reproduce el algoritmo original: solo etiquetas, sin el tipo de issue.
+        self._solo_etiquetas = False
 
     def _fetch_core_team(self) -> set[str]:
         headers = {
@@ -71,10 +81,38 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 if handles:
                     print(f"Core team detectado en '{path}': {len(handles)} usuarios")
                     return handles
-        print("No se encontró MAINTAINERS.md/CODEOWNERS legible; core team queda vacío (revisar manualmente).")
+        # Fallback: miembros de la organización (funciona para orgs públicas
+        # como vercel cuando no hay MAINTAINERS.md/CODEOWNERS).
+        headers_json = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        handles: set[str] = set()
+        page = 1
+        while True:
+            resp = requests.get(
+                f"https://api.github.com/orgs/{self.org}/members",
+                headers=headers_json,
+                params={"per_page": 100, "page": page},
+            )
+            if not resp.ok:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            handles |= {m["login"] for m in batch if "login" in m}
+            if len(batch) < 100:
+                break
+            page += 1
+        if handles:
+            print(f"Core team vía org members ({self.org}): {len(handles)} usuarios")
+            return handles
+        print("No se encontró MAINTAINERS.md/CODEOWNERS ni org members; core team queda vacío.")
         return set()
 
-    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, **kwargs):
+    def fetch(self, fecha_inicio: datetime, fecha_fin: datetime, solo_etiquetas: bool = False, **kwargs):
+        self._solo_etiquetas = solo_etiquetas
         self._core_team = self._fetch_core_team()
 
         cursor, page = None, 0
@@ -91,57 +129,116 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                     continue
                 login = (node.get("author") or {}).get("login", "desconocido")
                 labels = [n["name"] for n in node.get("labels", {}).get("nodes", [])]
-                self._issues.append({"user_login": login, "labels": labels})
+                # 'created' se guarda para que SLICEABLE pueda recortar por ventana
+                # sin necesidad de repetir el fetch en cada una.
+                self._issues.append({
+                    "user_login": login,
+                    "labels": labels,
+                    "tipo": (node.get("issueType") or {}).get("name"),
+                    "created": created,
+                    "author_association": node.get("authorAssociation", ""),
+                })
             if not page_info["hasNextPage"]:
                 break
             cursor = page_info["endCursor"]
         print()
         print(f"Issues en período: {len(self._issues)}")
 
-    def _calcular_bugs_detectados_por_usuarios(self, metadata_issues: list[dict], lista_historica_core_team: set[str]) -> int:
+    def _calcular_bugs_detectados_por_usuarios(
+        self, metadata_issues: list[dict], lista_historica_core_team: set[str]
+    ) -> dict:
         """
-        Fiel al algoritmo original de la consigna, con una corrección:
-        la comprensión original reutilizaba la variable `key` en los dos
-        `for` y referenciaba una `label` nunca definida (NameError). Se
-        corrige a `for label in etiquetas for keyword in keywords_bug`.
+        Fiel al algoritmo original de la consigna, con tres correcciones:
+        1. La comprensión original reutilizaba la variable `key` y referenciaba
+           una `label` nunca definida (NameError). Corregido a `for label in
+           etiquetas for keyword in keywords_bug`.
+        2. Criterio de afiliación: se usa `authorAssociation` (campo GraphQL,
+           afiliación al momento del reporte) como fuente principal. Solo si
+           el campo no está disponible se cae al fallback de la lista de core team.
+        3. Tipo de issue: además de las etiquetas, cuenta como bug el tipo de issue
+           de GitHub ('Bug'), que algunos proyectos usan en lugar de la etiqueta
+           (next.js pasó de la etiqueta 'bug' al tipo 'Bug' en 2025). En repos sin
+           tipos de issue el resultado no cambia. Se desactiva con solo_etiquetas.
+
+        Devuelve un dict con el desglose completo. `nub=None` cuando ningún issue
+        está marcado como bug en la ventana (métrica no observable, ≠ "cero bugs").
         """
         conteo_user_bugs = 0
+        con_label_bug = 0  # issues marcados como bug, por etiqueta o por tipo
+        por_tipo = 0       # de esos, cuántos solo por el tipo de issue
+        por_asociacion: dict[str, int] = {}
+        labels_bug_vistos: set[str] = set()
 
         for issue in metadata_issues:
-            reportero = issue.get("user_login")
-            etiquetas = [et.lower() for et in issue.get("labels", [])]
+            labels_orig = issue.get("labels", [])
+            etiquetas = [l.lower() for l in labels_orig]
 
-            # Criterio de tipo: ¿está etiquetado como bug?
-            es_bug = any(keyword in label for label in etiquetas for keyword in self._KEYWORDS_BUG)
+            bug_labels_orig = [
+                orig for orig, low in zip(labels_orig, etiquetas)
+                if any(kw in low for kw in self._KEYWORDS_BUG)
+            ]
+            tipo = (issue.get("tipo") or "").lower()
+            bug_por_tipo = (not self._solo_etiquetas and not bug_labels_orig
+                            and any(kw in tipo for kw in self._KEYWORDS_BUG))
+            es_bug = bool(bug_labels_orig) or bug_por_tipo
 
             if es_bug:
-                # Criterio de afiliación: ¿el reportero es externo al core team?
-                if reportero not in lista_historica_core_team:
+                con_label_bug += 1
+                por_tipo += bug_por_tipo
+                labels_bug_vistos.update(bug_labels_orig)
+
+                association = issue.get("author_association", "")
+                por_asociacion[association] = por_asociacion.get(association, 0) + 1
+
+                if association:
+                    es_externo = association not in _CORE_ASSOCIATIONS
+                else:
+                    reportero = issue.get("user_login", "")
+                    es_externo = reportero not in lista_historica_core_team
+                if es_externo:
                     conteo_user_bugs += 1
 
-        return conteo_user_bugs
+        return {
+            # None = no observable (sin labels de bug en la ventana).
+            # 0 = observable pero todos los bugs los reportó el core team.
+            "nub": conteo_user_bugs if con_label_bug > 0 else None,
+            "con_label_bug": con_label_bug,
+            "bug_solo_por_tipo": por_tipo,
+            "por_asociacion": por_asociacion,
+            # Lista vacía es el detector de ventana no observable.
+            "labels_bug_vistos": sorted(labels_bug_vistos),
+        }
 
     def por_persona(self, fecha_inicio: datetime, fecha_fin: datetime):
         raise NotImplementedError("NUB es una métrica por producto, no aplica por persona.")
 
     def por_producto(self, fecha_inicio: datetime, fecha_fin: datetime) -> dict[str, dict]:
-        nub = self._calcular_bugs_detectados_por_usuarios(self._issues, self._core_team)
+        breakdown = self._calcular_bugs_detectados_por_usuarios(self._issues, self._core_team)
         return {
             self.repo: {
+                "nub": breakdown["nub"],
                 "issues_analizados": len(self._issues),
-                "core_team_size": len(self._core_team),
-                "nub": nub,
+                "con_label_bug": breakdown["con_label_bug"],
+                "bug_solo_por_tipo": breakdown["bug_solo_por_tipo"],
+                "por_asociacion": breakdown["por_asociacion"],
+                "labels_bug_vistos": breakdown["labels_bug_vistos"],
+                "criterio_bug": "etiquetas" if self._solo_etiquetas else "etiquetas+tipo",
+                "criterio_afiliacion": "authorAssociation",
+                "core_team_fallback_size": len(self._core_team),
             }
         }
 
-    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto", **kwargs):
+    def run(self, fecha_inicio: datetime, fecha_fin: datetime, por: str = "producto",
+            solo_etiquetas: bool = False, **kwargs):
         if por == "persona":
             print("Number of Bugs Detected by Users no aplica por persona: es una métrica por producto.")
             return
-        self.fetch(fecha_inicio, fecha_fin)
+        self.fetch(fecha_inicio, fecha_fin, solo_etiquetas=solo_etiquetas)
         resultado = self.por_producto(fecha_inicio, fecha_fin)
         for repo, d in resultado.items():
             print(f"\nRepositorio: {repo}")
             print(f"Issues analizados     : {d['issues_analizados']}")
-            print(f"Core team detectado   : {d['core_team_size']}")
+            print(f"Marcados como bug     : {d['con_label_bug']} ({d['bug_solo_por_tipo']} solo por tipo de issue)")
+            print(f"Distribución afiliación: {d['por_asociacion']}")
+            print(f"Labels bug vistos     : {d['labels_bug_vistos']}")
             print(f"Bugs detectados por usuarios (NUB): {d['nub']}")
