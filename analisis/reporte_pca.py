@@ -455,10 +455,36 @@ def _nombre(d, v):
     return d["nombres"][v].replace(" [producto]", "")
 
 
+def _scree_svg(R, W=560, H=260):
+    p, m = R["p"], dict(l=44, r=14, t=14, b=36)
+    ymax = max(R["autovalores"] + R["horn95"] + [1.2])
+    ymax = float(int(ymax) + 1)
+    sx = lambda i: m["l"] + i / (p - 1) * (W - m["l"] - m["r"])
+    sy = lambda v: m["t"] + (1 - v / ymax) * (H - m["t"] - m["b"])
+    s = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Gráfico de sedimentación">']
+    paso = 1 if ymax > 4 else 0.5
+    v = 0.0
+    while v <= ymax + 1e-9:
+        s.append(f'<line x1="{m["l"]}" x2="{W - m["r"]}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" class="grid"/>'
+                 f'<text x="{m["l"] - 6}" y="{sy(v):.1f}" class="ticky">{_f(v, 1)}</text>')
+        v += paso
+    for i in range(p):
+        s.append(f'<text x="{sx(i):.1f}" y="{H - m["b"] + 6}" class="tick">{i + 1}</text>')
+    s.append(f'<text x="{(m["l"] + W - m["r"]) / 2}" y="{H - 6}" class="eje">componente</text>')
+    s.append(f'<line x1="{m["l"]}" x2="{W - m["r"]}" y1="{sy(1):.1f}" y2="{sy(1):.1f}" class="kaiser"/>')
+    s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(i):.1f},{sy(v):.1f}' for i, v in enumerate(R["horn95"])) + '" class="horn"/>')
+    s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(i):.1f},{sy(v):.1f}' for i, v in enumerate(R["autovalores"])) + '" class="scree"/>')
+    for i, v in enumerate(R["autovalores"]):
+        s.append(f'<circle cx="{sx(i):.1f}" cy="{sy(v):.1f}" r="{5 if i < R["k"] else 3.5}" class="scree-pt" '
+                 f'fill-opacity="{1 if i < R["k"] else .45}"><title>CP{i + 1}: {_f(v)} · Horn {_f(R["horn95"][i])}</title></circle>')
+    s.append("</svg>")
+    return "".join(s)
+
+
 def pieza(d: dict, tipo: str, conjunto: str, serie: str = "estable", enfoque: str = "ajustado") -> str:
     clave = f"{conjunto}|{serie}|{enfoque}"
     R = d["resultados"].get(clave)
-    if tipo != "comparacion" and tipo != "criterios" and R is None:
+    if tipo not in ("comparacion", "criterios", "screes") and R is None:
         return f'<p class="error-marca">No hay resultados de PCA para {html.escape(clave)}.</p>'
     vs = R["variables"] if R and "variables" in R else d["conjuntos"].get(conjunto, [])
     cfg = f'{d["series"][serie]} · {d["enfoques"][enfoque]} · {len(vs)} variables'
@@ -476,32 +502,22 @@ def pieza(d: dict, tipo: str, conjunto: str, serie: str = "estable", enfoque: st
                 f'<p class="nota">Carga: correlación entre la variable y el componente (en negrita si |carga| ≥ 0,4; naranja positiva, '
                 f'azul negativa). Debajo de cada componente, el porcentaje de la varianza total que explica después de la rotación. '
                 f'Comunalidad: parte de la variable que explican los {k} componentes juntos.</p></div>')
+    leyenda = (f'<div class="leyenda"><span><i class="lin"></i>autovalor</span><span><i class="lin horn"></i>Horn: percentil '
+               f'{d["parametros"]["percentil_horn"]} con datos permutados</span><span><i class="lin kaiser"></i>Kaiser (1)</span></div>')
+    if tipo == "screes":
+        paneles = []
+        for c in conjunto.split("+"):
+            Rc = d["resultados"].get(f"{c}|{serie}|{enfoque}")
+            if Rc is None:
+                continue
+            titulo = f'{len(Rc["variables"])} variables' + (" a nivel producto" if c == "producto" else "")
+            paneles.append(f'<figure style="margin:0">{_scree_svg(Rc, 400, 250)}<figcaption class="nota" style="text-align:center;margin-top:2px">'
+                           f'<b>{titulo}</b> · {Rc["k"]} componentes retenidos</figcaption></figure>')
+        return (f'<div class="panel inserto"><h4>Gráfico de sedimentación · {d["series"][serie]} · {d["enfoques"][enfoque]}</h4>'
+                f'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">{"".join(paneles)}</div>'
+                f'{leyenda}<p class="nota">Puntos grandes: componentes retenidos (los que superan la línea de Horn).</p></div>')
     if tipo == "scree":
-        p, W, H, m = R["p"], 560, 260, dict(l=44, r=14, t=14, b=36)
-        ymax = max(R["autovalores"] + R["horn95"] + [1.2])
-        ymax = float(int(ymax) + 1)
-        sx = lambda i: m["l"] + i / (p - 1) * (W - m["l"] - m["r"])
-        sy = lambda v: m["t"] + (1 - v / ymax) * (H - m["t"] - m["b"])
-        s = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Gráfico de sedimentación">']
-        paso = 1 if ymax > 4 else 0.5
-        v = 0.0
-        while v <= ymax + 1e-9:
-            s.append(f'<line x1="{m["l"]}" x2="{W - m["r"]}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" class="grid"/>'
-                     f'<text x="{m["l"] - 6}" y="{sy(v):.1f}" class="ticky">{_f(v, 1)}</text>')
-            v += paso
-        for i in range(p):
-            s.append(f'<text x="{sx(i):.1f}" y="{H - m["b"] + 6}" class="tick">{i + 1}</text>')
-        s.append(f'<text x="{(m["l"] + W - m["r"]) / 2}" y="{H - 6}" class="eje">componente</text>')
-        s.append(f'<line x1="{m["l"]}" x2="{W - m["r"]}" y1="{sy(1):.1f}" y2="{sy(1):.1f}" class="kaiser"/>')
-        s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(i):.1f},{sy(v):.1f}' for i, v in enumerate(R["horn95"])) + '" class="horn"/>')
-        s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(i):.1f},{sy(v):.1f}' for i, v in enumerate(R["autovalores"])) + '" class="scree"/>')
-        for i, v in enumerate(R["autovalores"]):
-            s.append(f'<circle cx="{sx(i):.1f}" cy="{sy(v):.1f}" r="{5 if i < R["k"] else 3.5}" class="scree-pt" '
-                     f'fill-opacity="{1 if i < R["k"] else .45}"><title>CP{i + 1}: {_f(v)} · Horn {_f(R["horn95"][i])}</title></circle>')
-        s.append("</svg>")
-        return (f'<div class="panel inserto"><h4>Gráfico de sedimentación · {cfg}</h4>{"".join(s)}'
-                f'<div class="leyenda"><span><i class="lin"></i>autovalor</span><span><i class="lin horn"></i>Horn: percentil '
-                f'{d["parametros"]["percentil_horn"]} con datos permutados</span><span><i class="lin kaiser"></i>Kaiser (1)</span></div>'
+        return (f'<div class="panel inserto"><h4>Gráfico de sedimentación · {cfg}</h4>{_scree_svg(R)}{leyenda}'
                 f'<p class="nota">Puntos grandes: componentes retenidos (los que superan la línea de Horn).</p></div>')
     if tipo == "criterios":
         filas = []

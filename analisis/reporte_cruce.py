@@ -762,9 +762,10 @@ function barrasPeriodo(cont, p) {
     + `<text x="${W - m.r}" y="${sy(p.corr) - 5}" class="ref-txt" style="text-anchor:end">toda la historia: ${fmt(p.corr)}</text>`;
   cont.innerHTML = s + '</svg>';
   cont.querySelectorAll('.per-grupo').forEach(g => {
-    if (cont.closest('.inserto')) return;   // ídem
-    g.addEventListener('click', () => elegirPeriodo(+g.dataset.i));
-    g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); elegirPeriodo(+g.dataset.i); } });
+    const elegir = periodoPara(cont);
+    if (!elegir) return;
+    g.addEventListener('click', () => elegir(+g.dataset.i));
+    g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); elegir(+g.dataset.i); } });
   });
 }
 
@@ -772,6 +773,13 @@ let modoTiempo = 'original';
 let periodoSel = null;   // índice de ETAPAS_T o null = toda la historia
 const ETAPA_ID = ['2016-2019', '2020-2022', '2023-2024', '2025-2026'];
 function elegirPeriodo(i) { periodoSel = (i === null || periodoSel === i) ? null : i; mostrar(); }
+// a quién le toca elegir el período al hacer clic en una franja: el explorador del reporte, el análisis
+// particular de un informe (elegirPeriodoLocal, si existe) o nadie (gráficos insertados en el texto)
+function periodoPara(cont) {
+  const det = cont.closest('.detalle-local');
+  if (det && cont.closest('.graficos-par') && window.elegirPeriodoLocal) return i => window.elegirPeriodoLocal(det, i);
+  return cont.closest('.inserto') ? null : elegirPeriodo;
+}
 const ETAPAS_T = [[2016, 2020, '2016–19'], [2020, 2023, '2020–22'], [2023, 2025, '2023–24'], [2025, 2027, '2025–26']];
 const fechaMs = n => Date.parse(D.releases[n][4] + 'T00:00:00Z');
 
@@ -871,12 +879,13 @@ function temporal(cont, x, y, p, inv, leyenda = document.getElementById('leyenda
   // clic en una franja: ver solo ese período (o volver a toda la historia)
   el.style.cursor = 'pointer';
   el.addEventListener('click', ev => {
-    if (cont.closest('.inserto')) return;   // en el informe, los gráficos insertados no cambian el período del explorador
+    const elegir = periodoPara(cont);
+    if (!elegir) return;
     const r = el.getBoundingClientRect(), px = (ev.clientX - r.left) * W / r.width;
     if (px < m.l || px > W - m.r) return;
     const t = t0 + (px - m.l) / (W - m.l - m.r) * (t1 - t0), anio = new Date(t).getUTCFullYear();
     const i = ETAPAS_T.findIndex(([a, b]) => anio >= a && anio < b);
-    if (i >= 0) elegirPeriodo(i);
+    if (i >= 0) elegir(i);
   });
 }
 

@@ -27,6 +27,7 @@ Marcas (cada una sola en su línea):
     [[grafico forest]]            intervalos de las relaciones significativas
     [[grafico estabilidad]]       estabilidad por período
     [[grafico mapa]]              mapa de calor (ρ corregida)
+    [[grafico red | chico]]       cualquier gráfico, más angosto y centrado
     [[tabla robustas]]            también: positivas, negativas, significativas, hallazgos
     [[tabla significativas | direccion]]   con selector Todas / Positivas / Negativas
     [[ficha x_id y_id]]           resultados de un par
@@ -43,7 +44,7 @@ Marcas (cada una sola en su línea):
         (dispersion = ajustada y original; también dispersion_ajustada, dispersion_original)
 
 Markdown soportado: títulos (#), párrafos, listas con - o 1. (anidadas con sangría),
-tablas con |, citas con > (se muestran como notas), **negrita**, *cursiva*, `código` y [enlaces](url).
+tablas con |, citas con > (se muestran como notas), >> (texto aparte, con sangría y más chico), **negrita**, *cursiva*, `código` y [enlaces](url).
 """
 import argparse
 import json
@@ -71,14 +72,8 @@ GRAFICOS = {
                     "Naranja / azul: relación positiva / negativa en ese período (|ρ| ≥ 0,1 e intervalo sin el 0); "
                     "gris: sin relación; vacío: menos de 15 ventanas."),
     "mapa": ("Mapa de calor",
-             "Azul: negativa; naranja: positiva; gris: cerca de 0. "
-             "<b>ρ cruda</b> compara los valores tal como se midieron: si dos métricas crecen (o decrecen) a lo largo de "
-             "la historia del proyecto, aparecen muy correlacionadas aunque no tengan nada que ver, solo porque comparten "
-             "la tendencia. <b>ρ corregida</b> descuenta el momento del proyecto y la duración de cada ventana, y mide si "
-             "las métricas se mueven juntas más allá de esa tendencia. Por eso el mapa crudo se ve más intenso: buena parte "
-             "de esas relaciones es crecimiento compartido. También puede pasar lo contrario: una relación que la tendencia "
-             "tapaba (por ejemplo, dos métricas que suben en el largo plazo pero se mueven en sentido opuesto release a "
-             "release) aparece más fuerte al corregir."),
+             "Azul: negativa; naranja: positiva; gris: cerca de 0. La ρ cruda compara los valores tal como se midieron; "
+             "la corregida descuenta el momento del proyecto y la duración de cada ventana."),
 }
 TABLAS = {"robustas", "positivas", "negativas", "significativas", "hallazgos"}
 GRAF_PAR = {
@@ -103,21 +98,21 @@ def inline(t: str) -> str:
 
 
 def lista(lineas: list[str]) -> str:
-    """Listas anidadas por sangría, con - o 1."""
-    items = []  # (sangría, ordenada, texto)
+    """Listas anidadas por sangría, con - o 1. (una lista numerada sigue desde su primer número)."""
+    items = []  # (sangría, número o None, texto)
     for l in lineas:
         m = re.match(r"^(\s*)(?:([-*])|(\d+)\.)\s+(.*)$", l)
         if m:
-            items.append([len(m.group(1).replace("\t", "    ")), m.group(3) is not None, m.group(4)])
+            items.append([len(m.group(1).replace("\t", "    ")), int(m.group(3)) if m.group(3) else None, m.group(4)])
         elif items:
             items[-1][2] += " " + l.strip()
     out, pila = [], []  # pila de (sangría, etiqueta)
-    for sang, ordenada, texto in items:
-        etiqueta = "ol" if ordenada else "ul"
+    for sang, numero, texto in items:
+        etiqueta = "ol" if numero is not None else "ul"
         while pila and sang < pila[-1][0]:
             out.append(f"</li></{pila.pop()[1]}>")
         if not pila or sang > pila[-1][0]:
-            out.append(f"<{etiqueta}>")
+            out.append(f'<ol start="{numero}">' if numero not in (None, 1) else f"<{etiqueta}>")
             pila.append((sang, etiqueta))
         else:
             out.append("</li>")
@@ -184,6 +179,12 @@ def markdown(texto: str, inserto) -> tuple[str, list]:
                 bloque.append(lineas[i]); i += 1
             out.append(lista(bloque))
             continue
+        if l.lstrip().startswith(">>"):
+            bloque = []
+            while i < len(lineas) and lineas[i].lstrip().startswith(">>"):
+                bloque.append(lineas[i].lstrip()[2:].strip()); i += 1
+            out.append(f'<div class="aparte">{markdown(chr(10).join(bloque), inserto)[0]}</div>')
+            continue
         if l.lstrip().startswith(">"):
             bloque = []
             while i < len(lineas) and lineas[i].lstrip().startswith(">"):
@@ -210,6 +211,9 @@ def hacer_inserto(piezas: dict, pca: dict | None = None):
                 return f'<p class="error-marca">Marca de PCA incompleta: [[{html.escape(marca)}]]</p>'
             return rpca.pieza(pca, *args[:4])
         if tipo == "grafico":
+            resto, _, opcion = resto.partition("|")
+            resto, opcion = resto.strip(), opcion.strip()
+            ancho = ' style="max-width:560px;margin-left:auto;margin-right:auto"' if opcion == "chico" else ""
             if resto == "kpis":
                 return piezas["kpis"]
             if resto == "categorias":
@@ -222,7 +226,7 @@ def hacer_inserto(piezas: dict, pca: dict | None = None):
                               '<button type="button" data-modo="corr" class="activo">ρ corregida</button>'
                               '<button type="button" data-modo="cruda">ρ cruda</button></div>')
                     extra = '<div class="leyenda-mapa"></div>'
-                return (f'<div class="panel inserto"><h4>{titulo}</h4>{arriba}<div class="grafico-disp" data-inserto="{resto}"></div>'
+                return (f'<div class="panel inserto"{ancho}><h4>{titulo}</h4>{arriba}<div class="grafico-disp" data-inserto="{resto}"></div>'
                         f'{extra}<p class="nota">{nota}</p></div>')
         if tipo == "tabla":
             nombre_t, _, op = resto.partition("|")
@@ -305,6 +309,8 @@ ESTILO_INFORME = """
 .modo-dir { margin: 0 0 10px; }
 .nota-editor { border-left: 3px solid var(--serie2); background: var(--hover); padding: 8px 14px; border-radius: 0 8px 8px 0; margin: 14px 0; }
 .nota-editor p { margin: 6px 0; }
+.aparte { margin: 4px 0 14px 28px; font-size: 13.5px; color: var(--texto2); }
+.aparte p, .aparte ul { margin: 4px 0; }
 .error-marca { color: #c03; font-weight: 600; }
 .indice { background: var(--superficie); border: 1px solid var(--borde); border-radius: 10px; padding: 12px 18px; margin: 16px 0 8px; }
 .indice ol { margin: 6px 0; padding-left: 0; list-style: none; } .indice li { margin: 2px 0; } .indice a { color: var(--texto); }
@@ -364,6 +370,15 @@ SCRIPT_INSERTOS = r"""
 
   // ── explorador local: la tabla elige el par y el detalle muestra su análisis particular ──
   const seleccionLocal = {};
+  const periodoLocal = {};   // período elegido con un clic en los gráficos del análisis particular
+  window.elegirPeriodoLocal = (det, i) => {
+    const loc = det.dataset.local;
+    periodoLocal[loc] = (i === null || periodoLocal[loc] === i) ? null : i;
+    const etiqueta = periodoLocal[loc] === null ? '' : Object.keys(ETAPA_IDX)[periodoLocal[loc]];
+    const graficos = det.querySelector('.graficos-par');
+    graficos.querySelectorAll('[data-inserto="par"]').forEach(c => { c.dataset.periodo = etiqueta; });
+    renderInsertos(graficos);
+  };
   const mismaClave = (a, b) => a.split(' ').sort().join(' ') === b.split(' ').sort().join(' ');
   function seleccionarLocal(loc, id, desplazar) {
     seleccionLocal[loc] = id;
@@ -373,6 +388,8 @@ SCRIPT_INSERTOS = r"""
     if (!det || !id) return;
     const p = D.pares[id];
     det.querySelectorAll('[data-x]').forEach(c => { c.dataset.x = p.x; c.dataset.y = p.y; });
+    periodoLocal[loc] = null;
+    det.querySelectorAll('.graficos-par [data-inserto="par"]').forEach(c => { c.dataset.periodo = ''; });
     const notas = det.querySelector('.notas-local');
     notas.innerHTML = '';
     renderInsertos(det);
