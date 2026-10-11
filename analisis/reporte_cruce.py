@@ -417,8 +417,8 @@ function colorDiv(v) {
   const t = Math.max(-1, Math.min(1, v)), fin = t < 0 ? neg : pos, a = Math.abs(t);
   return `rgb(${mid.map((c, i) => Math.round(c + (fin[i] - c) * a)).join(',')})`;
 }
-function renderMapa() {
-  const cont = document.getElementById('mapaCalor'), n = idsMapa.length;
+function renderMapa(cont = document.getElementById('mapaCalor'), leyenda = document.getElementById('leyendaMapa')) {
+  const n = idsMapa.length;
   const maxCar = Math.max(...idsMapa.map(id => nombre[id].length));
   const LW = Math.min(240, maxCar * 6.2 + 12);
   const celda = Math.max(13, Math.min(34, (940 - LW) / n));
@@ -461,7 +461,7 @@ function renderMapa() {
   });
   // leyenda: gradiente de −1 a 1
   const ley = [-1, -0.5, 0, 0.5, 1];
-  document.getElementById('leyendaMapa').innerHTML = `<svg viewBox="0 0 320 34" style="max-width:320px">
+  if (leyenda) leyenda.innerHTML = `<svg viewBox="0 0 320 34" style="max-width:320px">
     <defs><linearGradient id="gradMapa">${ley.map(v => `<stop offset="${(v + 1) / 2}" stop-color="${colorDiv(v)}"/>`).join('')}</linearGradient></defs>
     <rect x="10" y="4" width="300" height="10" rx="2" fill="url(#gradMapa)"/>
     ${ley.map(v => `<text x="${10 + (v + 1) / 2 * 300}" y="18" class="tick">${fmt(v, 1)}</text>`).join('')}</svg>`;
@@ -474,7 +474,7 @@ document.querySelectorAll('#modoMapa button').forEach(b => b.addEventListener('c
 const _renderTablaBase = renderTabla;
 renderTabla = function () { _renderTablaBase(); renderMapa(); };
 renderMapa();
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderMapa);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => renderMapa());
 
 // ── Vista general del cruce ──
 const signif = p => p.cat === 'Positiva' || p.cat === 'Negativa';
@@ -507,7 +507,7 @@ function interactivo(cont) {   // tooltip con data-tip y clic con data-par, una 
   });
 }
 
-function renderEmbudo() {
+function renderEmbudo(cont = document.getElementById('vEmbudo')) {
   const ev = evaluados.map(([, p]) => p), total = ev.length;
   const pasos = [
     ['Pares evaluados', p => true],
@@ -517,7 +517,6 @@ function renderEmbudo() {
     ['+ no dependen de ventanas cortas (robustos)', p => p.robusta],
     ['+ resisten el control por tamaño (o no aplica)', p => p.robusta && p.tamano !== 'no pasa'],
     ['+ sin solapamiento de definición', p => p.robusta && p.tamano !== 'no pasa' && !p.solap],
-    ['+ de familias distintas (hallazgos)', p => p.hallazgo],
   ];
   const LW = 300, W = 980, fila = 30, H = pasos.length * fila + 6;
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Embudo de filtrado de pares">`;
@@ -527,10 +526,10 @@ function renderEmbudo() {
       + (n ? `<rect x="${LW}" y="${y + 5}" width="${Math.max(w, 2)}" height="${fila - 10}" rx="3" class="marca"/>` : '')
       + `<text x="${LW + w + 8}" y="${y + fila / 2}" class="val">${n} (${total ? Math.round(100 * n / total) : 0}%)</text>`;
   });
-  document.getElementById('vEmbudo').innerHTML = s + '</svg>';
+  cont.innerHTML = s + '</svg>';
 }
 
-function renderCrudaCorr() {
+function renderCrudaCorr(cont = document.getElementById('vCrudaCorr')) {
   const W = 520, H = 440, m = { l: 50, r: 14, t: 12, b: 44 };
   const sx = v => m.l + (v + 1) / 2 * (W - m.l - m.r), sy = v => m.t + (1 - v) / 2 * (H - m.t - m.b);
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Correlación cruda contra corregida">`
@@ -550,10 +549,10 @@ function renderCrudaCorr() {
   }
   s += `<text x="${m.l + (W - m.l - m.r) / 2}" y="${H - 8}" class="eje">ρ cruda</text>`
     + `<text transform="translate(14 ${m.t + (H - m.t - m.b) / 2}) rotate(-90)" class="eje">ρ corregida</text></svg>`;
-  document.getElementById('vCrudaCorr').innerHTML = s;
+  cont.innerHTML = s;
 }
 
-function renderRed() {
+function renderRed(cont = document.getElementById('vRed')) {
   const W = 520, H = 460, cx = W / 2, cy = H / 2, n = idsMapa.length;
   const R = Math.min(150, 60 + n * 3);
   const pos = Object.fromEntries(idsMapa.map((id, i) => {
@@ -575,7 +574,7 @@ function renderRed() {
       + `<text x="${lx}" y="${ly}" class="lbl-nodo${grado[id] ? '' : ' solo'}" style="text-anchor:${der ? 'start' : 'end'}">${nombre[id]}</text>`;
   }
   s += aristas.length ? '' : `<text x="${cx}" y="${cy}" class="eje">Ningún par significativo con estos filtros</text>`;
-  document.getElementById('vRed').innerHTML = s + '</svg>';
+  cont.innerHTML = s + '</svg>';
 }
 
 const anchoEtiquetas = filas => Math.min(420, Math.max(200, ...filas.map(([, p]) => nPar(p).length * 6.6 + 24)));
@@ -583,9 +582,8 @@ function filasSignif() {
   return evaluados.filter(([id, p]) => signif(p) && visible(id));
 }
 
-function renderForest() {
+function renderForest(cont = document.getElementById('vForest')) {
   const filas = filasSignif().sort((a, b) => b[1].corr - a[1].corr);
-  const cont = document.getElementById('vForest');
   if (!filas.length) { cont.innerHTML = '<p class="vacio">Ningún par significativo con estos filtros.</p>'; return; }
   const LW = anchoEtiquetas(filas), W = 980, fila = 24, top = 26, H = top + filas.length * fila + 30;
   const sx = v => LW + (v + 1) / 2 * (W - LW - 60);
@@ -605,9 +603,8 @@ function renderForest() {
   cont.innerHTML = s + '</svg>';
 }
 
-function renderEstab() {
+function renderEstab(cont = document.getElementById('vEstab')) {
   const filas = filasSignif().sort((a, b) => Math.abs(b[1].corr) - Math.abs(a[1].corr));
-  const cont = document.getElementById('vEstab');
   if (!filas.length) { cont.innerHTML = '<p class="vacio">Ningún par significativo con estos filtros.</p>'; return; }
   const cols = ['Toda la historia', '2016–19', '2020–22', '2023–24', '2025–26'];
   const LW = anchoEtiquetas(filas), cw = 120, fila = 26, top = 30, W = LW + cw * cols.length + 10, H = top + filas.length * fila + 4;
@@ -635,7 +632,7 @@ function renderVista() {
 const _renderTablaMapa = renderTabla;
 renderTabla = function () { _renderTablaMapa(); renderVista(); };
 renderTabla();   // dibuja la tabla, el mapa de calor y la vista general
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', renderVista);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => renderVista());
 """
 
 SCRIPT = r"""
@@ -765,6 +762,7 @@ function barrasPeriodo(cont, p) {
     + `<text x="${W - m.r}" y="${sy(p.corr) - 5}" class="ref-txt" style="text-anchor:end">toda la historia: ${fmt(p.corr)}</text>`;
   cont.innerHTML = s + '</svg>';
   cont.querySelectorAll('.per-grupo').forEach(g => {
+    if (cont.closest('.inserto')) return;   // ídem
     g.addEventListener('click', () => elegirPeriodo(+g.dataset.i));
     g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); elegirPeriodo(+g.dataset.i); } });
   });
@@ -777,7 +775,7 @@ function elegirPeriodo(i) { periodoSel = (i === null || periodoSel === i) ? null
 const ETAPAS_T = [[2016, 2020, '2016–19'], [2020, 2023, '2020–22'], [2023, 2025, '2023–24'], [2025, 2027, '2025–26']];
 const fechaMs = n => Date.parse(D.releases[n][4] + 'T00:00:00Z');
 
-function temporal(cont, x, y, p, inv) {
+function temporal(cont, x, y, p, inv, leyenda = document.getElementById('leyendaTiempo')) {
   const W = 980, PH = 140, GAP = 40, m = { l: 66, r: 16, t: 30, b: 34 };
   const H = m.t + PH * 2 + GAP + m.b;
   let sX, sY;
@@ -798,7 +796,7 @@ function temporal(cont, x, y, p, inv) {
     t0 = Math.max(ini, t0); t1 = Math.min(fin, t1);
     if (!sX.length && !sY.length) {
       cont.innerHTML = '<p class="vacio">Este par no tiene datos en el período elegido.</p>';
-      document.getElementById('leyendaTiempo').innerHTML = ''; return;
+      if (leyenda) leyenda.innerHTML = ''; return;
     }
   }
   const sx = t => m.l + (t - t0) / ((t1 - t0) || 1) * (W - m.l - m.r);
@@ -838,7 +836,7 @@ function temporal(cont, x, y, p, inv) {
   svg += `<line class="guia" y1="${m.t}" y2="${yb}" x1="-10" x2="-10"/>`
     + `<circle class="marca-x" r="4.5" cx="-10" cy="-10"/><circle class="marca-y" r="4.5" cx="-10" cy="-10"/></svg>`;
   cont.innerHTML = svg + '<div class="tooltip"></div>';
-  document.getElementById('leyendaTiempo').innerHTML =
+  if (leyenda) leyenda.innerHTML =
     `<span><i></i>${nombre[x]}</span><span><i class="y"></i>${nombre[y]}</span><span><i class="rug"></i>backport (parche de una versión mayor anterior)</span>`;
 
   const el = cont.querySelector('svg'), tip = cont.querySelector('.tooltip');
@@ -873,6 +871,7 @@ function temporal(cont, x, y, p, inv) {
   // clic en una franja: ver solo ese período (o volver a toda la historia)
   el.style.cursor = 'pointer';
   el.addEventListener('click', ev => {
+    if (cont.closest('.inserto')) return;   // en el informe, los gráficos insertados no cambian el período del explorador
     const r = el.getBoundingClientRect(), px = (ev.clientX - r.left) * W / r.width;
     if (px < m.l || px > W - m.r) return;
     const t = t0 + (px - m.l) / (W - m.l - m.r) * (t1 - t0), anio = new Date(t).getUTCFullYear();
@@ -1051,16 +1050,15 @@ abrirPar = function (id) {
   selX.value = p.x; elegirX(p.y);
   document.getElementById('explorador').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-abrirPar(D.inicial);
+// #par=<id> en la dirección abre ese par (lo usa el enlace del informe)
+const parUrl = location.hash.startsWith('#par=') ? decodeURIComponent(location.hash.slice(5)) : null;
+abrirPar(parUrl && D.pares[parUrl] ? parUrl : D.inicial);
 """
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cruce", help="por ejemplo Producto-Producto o Persona-Proceso")
-    args = ap.parse_args()
-    cruce = normalizar_cruce(args.cruce)
-
+def construir(cruce: str) -> dict:
+    """Arma las piezas del reporte de un cruce (ya normalizado). Las usa main() para
+    escribir el reporte y generar_informe.py para insertarlas en un informe."""
     pares = pd.read_csv(PARES)
     p = pares[pares.cruce == cruce].copy()
     if p.empty:
@@ -1216,6 +1214,32 @@ También podés hacer clic en una fila de la tabla de pares.</p>
   <p class="nota">Naranja / azul: relación positiva / negativa en ese período (|ρ| ≥ 0,1 e intervalo sin el 0);
   gris: sin relación en ese período; vacío: menos de 15 ventanas.</p></div>"""
 
+    scripts = (f'<script type="application/json" id="datos">{json.dumps(datos, ensure_ascii=False, separators=(",", ":"))}</script>\n'
+               f"<script>{SCRIPT_TABLA}</script>\n{script_explorador}")
+    resumen = (f"{cruce}: {len(p)} pares, {len(ev)} evaluados, {len(pos)} positivas, {len(neg)} negativas, "
+               f"{len(robustas)} robustos, {int((tam == 'pasa').sum())} pasan tamaño, "
+               f"{len(sin_solap)} sin solapamiento, {len(hallazgos)} hallazgos")
+    return {
+        "cruce": cruce, "kpis": f'<div class="kpis">{kpi_html}</div>', "tabla_pares": tabla_pares,
+        "categorias": (f'<h2>Pares por categoría</h2>\n<p class="sub">{len(ev)} pares evaluados '
+                       f'(sin los {int(control.sum())} de control)</p>\n<div class="panel">{grafico(conteos, len(ev))}</div>'),
+        "grafico_categorias": grafico(conteos, len(ev)),
+        "explorador": explorador, "scripts": scripts, "resumen": resumen,
+    }
+
+
+NOTA_FINAL = """<p class="nota">Control por tamaño: "pasa" si con el control la correlación mantiene el signo y |ρ| ≥ 0,1;
+"no aplica" en pares de control o con variables de la familia tamaño. Robusta: significativa, con el mismo
+signo en todos los períodos y en canary, y sin depender de las ventanas de menos de 1 día.</p>"""
+
+
+def archivo_reporte(cruce: str) -> Path:
+    return SALIDA / f"reporte_{cruce.replace('–', '_').lower()}.html"
+
+
+def escribir_reporte(cruce: str, r: dict | None = None) -> Path:
+    """Escribe el reporte del cruce (ya normalizado) y devuelve su ruta."""
+    r = r or construir(cruce)
     titulo = f"Correlaciones {cruce}"
     doc = f"""<!doctype html>
 <html lang="es"><head><meta charset="utf-8">
@@ -1224,29 +1248,31 @@ También podés hacer clic en una fila de la tabla de pares.</p>
 <body><main>
 <h1>{esc(titulo)}</h1>
 <p class="sub">Fuente: analisis/salidas/pares_correlacion.csv y pares_valores.csv · correlación corregida por tiempo y duración · serie estable de next.js</p>
-<div class="kpis">{kpi_html}</div>
-{tabla_pares}
+{r["kpis"]}
+{r["tabla_pares"]}
 
-<h2>Pares por categoría</h2>
-<p class="sub">{len(ev)} pares evaluados (sin los {int(control.sum())} de control)</p>
-<div class="panel">{grafico(conteos, len(ev))}</div>
+{r["categorias"]}
 
-{explorador}
-<script type="application/json" id="datos">{json.dumps(datos, ensure_ascii=False, separators=(",", ":"))}</script>
-<script>{SCRIPT_TABLA}</script>
-{script_explorador}
+{r["explorador"]}
+{r["scripts"]}
 
-<p class="nota">Control por tamaño: "pasa" si con el control la correlación mantiene el signo y |ρ| ≥ 0,1;
-"no aplica" en pares de control o con variables de la familia tamaño. Robusta: significativa, con el mismo
-signo en todos los períodos y en canary, y sin depender de las ventanas de menos de 1 día.</p>
+{NOTA_FINAL}
 </main></body></html>
 """
     SALIDA.mkdir(parents=True, exist_ok=True)
-    destino = SALIDA / f"reporte_{cruce.replace('–', '_').lower()}.html"
+    destino = archivo_reporte(cruce)
     destino.write_text(doc, encoding="utf-8")
-    print(f"{cruce}: {len(p)} pares, {len(ev)} evaluados, {len(pos)} positivas, {len(neg)} negativas, "
-          f"{len(robustas)} robustos, {int((tam == 'pasa').sum())} pasan tamaño, "
-          f"{len(sin_solap)} sin solapamiento, {len(hallazgos)} hallazgos")
+    return destino
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("cruce", help="por ejemplo Producto-Producto o Persona-Proceso")
+    args = ap.parse_args()
+    cruce = normalizar_cruce(args.cruce)
+    r = construir(cruce)
+    destino = escribir_reporte(cruce, r)
+    print(r["resumen"])
     print(f"Reporte: {destino} ({destino.stat().st_size / 1e6:.1f} MB)")
 
 

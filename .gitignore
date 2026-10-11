@@ -8,3 +8,8 @@ backups/
 analisis/salidas/pares_valores*.csv
 persona_detalle_estable.csv
 persona_agregado_estable_canary.csv
+
+# análisis - resultados que se regeneran
+.DS_Store
+analisis/salidas/pca/
+analisis/salidas/reportes/*.html
