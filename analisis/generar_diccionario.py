@@ -22,7 +22,7 @@ Dimensiones por métrica (planilla del equipo):
   Proceso+Producto      : anmcc, mttr, rc, cfdr, nub, noi
   Producto              : dloc
   nci                   : Proceso (confirmado por planilla del equipo)
-  wp/nob_42/noi_28      : excluidas (constante o casi-duplicada)
+  noi_28                : excluida (idéntica a noi); wp y nob_42 varían por ventana desde los fixes
   activos_cierre, activos_comentarios: conteo (n_contribuyentes), Persona
 """
 import csv
@@ -130,10 +130,9 @@ METRICAS_PRODUCTO = {
     "process_performance", "rc", "schedule_compliance", "wp",
 }
 # Excluidas explícitamente por ser constantes o casi-duplicadas
+# wp y nob_42 ya no van acá: con los fixes varían por ventana (antes eran constantes).
 EXCLUIDAS_FIJAS = {
-    "wp":     "valor constante 0 en todas las ventanas estables",
-    "nob_42": "valor constante 2706 en todas las ventanas estables",
-    "noi_28": "prácticamente idéntica a noi (difieren en 1 ventana de 371)",
+    "noi_28": "idéntica a noi (misma descarga y mismo cálculo)",
 }
 
 # Métricas de persona con estadísticos adicionales (p90 y share_top10pct)
@@ -243,7 +242,8 @@ def spearman_safe(x: list, y: list) -> str:
              and not (isinstance(yi, float) and isnan(yi))]
     if len(pairs) < 5:
         return ""
-    xs, ys = zip(*pairs)
+    # float(): la duración llega de Postgres como Decimal y spearmanr no mezcla tipos
+    xs, ys = [float(v) for v, _ in pairs], [float(v) for _, v in pairs]
     rho, _ = spearmanr(xs, ys)
     return f"{rho:.3f}"
 

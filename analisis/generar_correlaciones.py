@@ -385,6 +385,15 @@ def fmt(v, decimals=4):
     return round(v, decimals) if isinstance(v, float) else v
 
 
+# Versiones alternativas de una misma métrica (branch de fixes): un par entre una de estas
+# y su métrica base, o entre dos versiones de la misma, es control (misma métrica).
+VARIANTE_DE = {"mttr_p50": "mttr", "mttr_bugs": "mttr", "mttr_con_bots": "mttr", "nci_con_bots": "nci"}
+
+
+def metrica_base(metrica_id: str) -> str:
+    return VARIANTE_DE.get(metrica_id, metrica_id)
+
+
 def es_por_construccion(x_id, y_id, misma_metrica):
     if misma_metrica:
         return True
@@ -895,7 +904,7 @@ def main():
             x_data_e, y_data_e, x_data_c, y_data_c)
 
         metricas     = (rx["metrica_id"], ry["metrica_id"])
-        misma_meta   = (metricas[0] == metricas[1])
+        misma_meta   = (metrica_base(metricas[0]) == metrica_base(metricas[1]))
         por_constr   = es_por_construccion(x_id, y_id, misma_meta)
         solapamiento = es_solapamiento_definicion(x_id, y_id, metricas)
 

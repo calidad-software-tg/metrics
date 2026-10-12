@@ -119,29 +119,53 @@ def exportar(dbname: str, metricas: list[str], salida: Path):
     print(f"{len(filas)} resultados de {', '.join(metricas)} exportados a {salida}")
 
 
-def importar(dbname: str, archivo: Path):
-    sys.path.insert(0, str(ROOT))
-    os.environ["POSTGRES_DB"] = dbname
-    from run_versiones import Base  # mismos upserts que las corridas
-    base = Base()
-    n = 0
-    repos: dict[str, int] = {}
-    with gzip.open(archivo, "rt", newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            if r["repo"] not in repos:
-                org, repo = r["repo"].split("/", 1)
-                repos[r["repo"]] = base.repo_id(org, repo)
-            base.ensure_metrica(r["metrica_id"])
-            periodo_id = base.upsert_periodo(repos[r["repo"]], r["tipo_analisis"], int(r["periodo_num"]),
-                                             r["fecha_inicio"], r["fecha_fin"], r["etiqueta"],
-                                             json.loads(r["parametros"]) if r["parametros"] else {})
-            base.upsert_resultado(periodo_id, r["metrica_id"], r["contribuyente_login"] or None,
-                                  float(r["value"]) if r["value"] != "" else None,
-                                  json.loads(r["value_extra"]) if r["value_extra"] else None)
-            n += 1
-    base.commit()
-    base.close()
-    print(f"{n} resultados importados en {dbname} desde {archivo}")
+def importar(dbname: str, archivo: Path, repo: str = REPO):
+    """Carga el archivo con COPY a una tabla temporal y hace upsert de períodos y resultados
+    en bloque (un archivo de persona en canary puede tener más de 10 millones de filas: de a
+    una fila tardaría horas). Solo importa las series de releases del repo indicado."""
+    con = conectar(dbname)
+    cur = con.cursor()
+    cur.execute("""CREATE TEMP TABLE carga (repo text, tipo_analisis text, periodo_num int,
+                   fecha_inicio timestamptz, fecha_fin timestamptz, etiqueta text, parametros text,
+                   metrica_id text, contribuyente_login text, value text, value_extra text)""")
+    with gzip.open(archivo, "rt", encoding="utf-8") as f:
+        cur.copy_expert("COPY carga FROM STDIN WITH (FORMAT csv, HEADER true)", f)
+    cur.execute("DELETE FROM carga WHERE repo <> %s OR tipo_analisis <> ALL(%s)", (repo, list(TIPOS)))
+    cur.execute("SELECT count(*) FROM carga")
+    n = cur.fetchone()[0]
+    cur.execute("SELECT repo_id FROM repos WHERE full_name = %s", (repo,))
+    repo_id = cur.fetchone()[0]
+    cur.execute("""INSERT INTO metrica (metrica_id, nombre)
+                   SELECT DISTINCT metrica_id, metrica_id FROM carga ON CONFLICT (metrica_id) DO NOTHING""")
+    cur.execute("""
+        INSERT INTO periodo (repo_id, tipo_analisis, periodo_num, fecha_inicio, fecha_fin, etiqueta, parametros)
+        SELECT DISTINCT ON (tipo_analisis, periodo_num) %s, tipo_analisis, periodo_num, fecha_inicio, fecha_fin,
+               etiqueta, COALESCE(NULLIF(parametros, ''), '{}')::jsonb
+        FROM carga ORDER BY tipo_analisis, periodo_num
+        ON CONFLICT (repo_id, tipo_analisis, periodo_num) DO UPDATE SET
+            fecha_inicio = EXCLUDED.fecha_inicio, fecha_fin = EXCLUDED.fecha_fin,
+            etiqueta = EXCLUDED.etiqueta, parametros = EXCLUDED.parametros""", (repo_id,))
+    comunes = """FROM carga c JOIN periodo p ON p.repo_id = %s AND p.tipo_analisis = c.tipo_analisis
+                                           AND p.periodo_num = c.periodo_num"""
+    cur.execute(f"""
+        INSERT INTO resultado (periodo_id, metrica_id, contribuyente_login, value, value_extra)
+        SELECT p.periodo_id, c.metrica_id, NULL, NULLIF(c.value, '')::double precision,
+               NULLIF(c.value_extra, '')::jsonb {comunes}
+        WHERE NULLIF(c.contribuyente_login, '') IS NULL
+        ON CONFLICT (periodo_id, metrica_id) WHERE contribuyente_login IS NULL
+        DO UPDATE SET value = EXCLUDED.value, value_extra = EXCLUDED.value_extra, calculado_en = now()""",
+                (repo_id,))
+    cur.execute(f"""
+        INSERT INTO resultado (periodo_id, metrica_id, contribuyente_login, value, value_extra)
+        SELECT p.periodo_id, c.metrica_id, c.contribuyente_login, NULLIF(c.value, '')::double precision,
+               NULLIF(c.value_extra, '')::jsonb {comunes}
+        WHERE NULLIF(c.contribuyente_login, '') IS NOT NULL
+        ON CONFLICT (periodo_id, metrica_id, contribuyente_login) WHERE contribuyente_login IS NOT NULL
+        DO UPDATE SET value = EXCLUDED.value, value_extra = EXCLUDED.value_extra, calculado_en = now()""",
+                (repo_id,))
+    con.commit()
+    con.close()
+    print(f"{n} resultados de {repo} importados en {dbname} desde {archivo}")
 
 
 def main():

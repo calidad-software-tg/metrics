@@ -13,3 +13,5 @@ persona_agregado_estable_canary.csv
 .DS_Store
 analisis/salidas/pca/
 analisis/salidas/reportes/*.html
+analisis/salidas_originales/
+db/fixes_seed.sql.gz

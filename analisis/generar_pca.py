@@ -49,6 +49,9 @@ ENFOQUES = ["crudo", "ajustado", "tamano"]
 NOMBRE_ENFOQUE = {"crudo": "Crudo", "ajustado": "Ajustado", "tamano": "Ajustado y sin tamaño"}
 NOMBRE_SERIE = {"estable": "Estables", "canary": "Canary"}
 VARIABLE_TAMANO = "activos_interaccion_conteo"
+# Versiones alternativas de una misma métrica (para comparar, no para el PCA): si entran junto
+# con la principal forman un componente entre ellas (las 4 de MTTR cargaban 0,81–0,92 en el CP1).
+VARIANTES = {"mttr_p50", "mttr_bugs", "mttr_con_bots", "nci_con_bots"}
 
 N_PERMUTACIONES = 500     # análisis paralelo de Horn
 N_BOOTSTRAP = 500         # bootstrap de bloques
@@ -286,6 +289,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dimension", help="Persona, Proceso o Producto")
     ap.add_argument("--k", type=int, default=None, help="cantidad de componentes (por defecto, la del análisis paralelo)")
+    ap.add_argument("--con-variantes", action="store_true",
+                    help=f"incluye las versiones alternativas de una métrica ({', '.join(sorted(VARIANTES))})")
     args = ap.parse_args()
     dim = args.dimension.strip().capitalize()
     if dim not in gc.DIM_ORDER:
@@ -294,7 +299,8 @@ def main():
 
     print(f"=== generar_pca.py · {dim} ===", flush=True)
     var_dict, datos = cargar_datos()
-    de_dim = sorted((v for v, row in var_dict.items() if dim in row["dims_texto"].split("+")),
+    de_dim = sorted((v for v, row in var_dict.items() if dim in row["dims_texto"].split("+")
+                     and (args.con_variantes or row["metrica_id"] not in VARIANTES)),
                     key=lambda v: (var_dict[v]["nivel"] != "producto", v))
     conjuntos = {
         "producto": [v for v in de_dim if var_dict[v]["nivel"] == "producto"],
@@ -324,12 +330,21 @@ def main():
                     print(f"  {conj}/{serie}/{enf}: menos de 3 variables")
                     continue
                 filas, n_bp = tabla(vars_enf, datos, serie_db)
+                # variables constantes en los releases elegidos (ej. Wiki Presence vale 0 en todas
+                # las ventanas desde 2020): no aportan al PCA y rompen la matriz de correlaciones
+                constantes = [v for j, v in enumerate(vars_enf)
+                              if len({f["valores"][j] for f in filas.values()}) < 2]
+                if constantes:
+                    print(f"  {conj}/{serie}/{enf}: constantes en estos releases, se excluyen {', '.join(constantes)}")
+                    excluidas = excluidas + [v for v in constantes if v not in excluidas]
+                    vars_enf = [v for v in vars_enf if v not in constantes]
+                    filas, n_bp = tabla(vars_enf, datos, serie_db)
                 res = analizar(vars_enf, filas, enf, args.k, rng) if len(filas) >= 30 else None
                 if res is None:
                     print(f"  {conj}/{serie}/{enf}: pocos releases ({len(filas)})")
                     continue
                 res.update(variables=vars_enf, filas=filas, backports=n_bp,
-                           excluidas=excluidas + [v for v in vars_serie if v not in vars_enf])
+                           excluidas=excluidas + [v for v in vars_serie if v not in vars_enf and v not in excluidas])
                 resultados[(conj, serie, enf)] = res
                 c = res["criterios"]
                 print(f"  {conj:8s} {serie:7s} {enf:8s} n={res['n']:5d}  k={res['k']}  "
