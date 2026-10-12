@@ -142,3 +142,44 @@ y de `analisis/salidas/pca/`, para comparar los resultados originales con los co
 - Verificar `authorAssociation` en NUB (punto 22) con un token válido.
 - Las métricas nuevas no tienen versión por persona agregada en `persona_agregado_estable_canary.csv`:
   `export_persona.py` exporta solo las métricas que ya conocía.
+
+## Analizar sobre la base corregida y comparar con el análisis original
+
+La base corregida completa (las tres etapas ya integradas) se comparte como seed
+(`fixes_seed.sql.gz`, por Drive: no entra en git). Para cargarla:
+
+```bash
+docker exec tg_metricas_db dropdb -U metricas --if-exists resultados_metricas_fixes
+docker exec tg_metricas_db createdb -U metricas resultados_metricas_fixes
+gunzip -c fixes_seed.sql.gz | docker exec -i tg_metricas_db psql -q -U metricas -d resultados_metricas_fixes
+```
+
+Antes de regenerar nada, guardar los resultados originales (los scripts escriben siempre en los mismos
+archivos, lean de la base que lean):
+
+```bash
+mkdir -p analisis/salidas_originales
+cp -rp analisis/salidas/* persona_agregado_estable_canary.csv metricas_persona.csv analisis/salidas_originales/
+```
+
+Después, sobre la base corregida:
+
+```bash
+POSTGRES_DB=resultados_metricas_fixes python3 export_persona.py
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/generar_diccionario.py
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/generar_correlaciones.py
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/generar_pca.py Persona
+python3 analisis/comparar_resultados.py Persona-Persona
+```
+
+`comparar_resultados.py` compara `analisis/salidas_originales/` con `analisis/salidas/` para un cruce:
+cantidad de pares por categoría, relaciones robustas que se mantienen, se pierden o aparecen, los pares
+cuya ρ corregida más cambió, y si los componentes del PCA de la dimensión siguen siendo los mismos
+(congruencia de Tucker sobre las variables comunes). Lo guarda en `analisis/salidas/comparacion_<cruce>.md`.
+
+Ajustes del análisis en esta branch:
+
+- Las variantes de una misma métrica (`mttr_p50`, `mttr_bugs`, `mttr_con_bots`, `nci_con_bots`) son
+  pares de control en las correlaciones y no entran al PCA (con `--con-variantes` se incluyen).
+- El PCA saca las variables constantes en los releases que usa (por ejemplo, Wiki Presence vale 0 en
+  todas las ventanas desde 2020).
