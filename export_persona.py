@@ -51,6 +51,75 @@ NON_HUMAN = frozenset({"bot","agente_ia","desconocido"})
 
 _LOGIN_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$')
 
+# ── Tabla de alias nombre_git -> login (ver db/mapear_identidades.py) ────────
+#
+# Las métricas del runner local (run_versiones_local.py) atribuyen por el nombre
+# de git del autor (%an, sin mailmap), mientras que las de la API atribuyen por
+# `author.user.login`. Para unir la misma persona entre las dos fuentes, canon()
+# se aplica SOLO a las métricas del runner local — si se aplicara a las de API
+# (todas logins) correría el riesgo de fusionar logins reales con nombres de git
+# coincidentes de otras personas.
+#
+# Lista exacta tomada de run_versiones_local.py (ARCHIVOS ∪ COMMITS ∪ BLAME):
+METRICAS_RUNNER_LOCAL = frozenset({
+    # ARCHIVOS
+    "loc_notion", "dloc", "cd", "rc",
+    # COMMITS
+    "cdiv", "fexp", "le", "rexp", "anmcc", "dloc_flujo", "commits_doc",
+    # BLAME
+    "developer_ownership_notion",
+})
+
+_ALIAS: dict[str, str] = {}        # nombre_git -> login_github
+_ALIAS_N_COMMITS: dict[str, int] = {}
+_ALIAS_ACTIVO = True
+
+def load_alias(path: Path = None) -> None:
+    """Carga db/identidades_git.csv en _ALIAS. Llamar una vez al inicio."""
+    global _ALIAS, _ALIAS_N_COMMITS
+    path = path or (ROOT / "db" / "identidades_git.csv")
+    if not path.exists():
+        print(f"  ⚠ No encuentro {path}, canon() no traducirá nada", flush=True)
+        return
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            nombre = r["nombre_git"]
+            _ALIAS[nombre] = r["login"]
+            try:
+                _ALIAS_N_COMMITS[nombre] = int(r.get("n_commits") or 0)
+            except (TypeError, ValueError):
+                _ALIAS_N_COMMITS[nombre] = 0
+    print(f"  {len(_ALIAS):,} aliases nombre_git -> login cargados", flush=True)
+
+def _parece_login(s: str) -> bool:
+    """True si `s` cumple el formato de login de GitHub (sin espacios, chars válidos)."""
+    if not s or ' ' in s:
+        return False
+    return bool(_LOGIN_RE.match(s))
+
+def canon(identidad: str | None, metrica: str) -> str | None:
+    """Login canonizado si corresponde para esa métrica, o la identidad original.
+
+    Reglas:
+    - `metrica` en METRICAS_RUNNER_LOCAL (anmcc, cdiv, fexp, le, rexp, cd, dloc,
+      rc, loc_notion, commits_doc, dloc_flujo, developer_ownership_notion): el
+      campo guarda nombre_git → traducir con la tabla si hay entrada.
+    - `metrica` == 'dev_exp': traduce solo si la identidad NO parece un login válido
+      (dev_exp ya aplica `_resolver_identidades` en el fetch y guarda logins; los
+      pocos nombres de git que caen son commits sin cuenta vinculada).
+    - Resto (nc, exprev, rexprev, disc_centrality, sc, sc_disc, nci, mttr y
+      variantes, dis, ss): sin traducción. Son métricas de API, guardan login.
+    """
+    if identidad is None or not _ALIAS_ACTIVO:
+        return identidad
+    if metrica in METRICAS_RUNNER_LOCAL:
+        return _ALIAS.get(identidad, identidad)
+    if metrica == "dev_exp":
+        if _parece_login(identidad):
+            return identidad
+        return _ALIAS.get(identidad, identidad)
+    return identidad
+
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def identidad(login: str) -> str:
@@ -101,18 +170,28 @@ def load_bots() -> dict[str, str]:
     return out
 
 def primera_fecha_lookup(cur, metricas: frozenset, tipo: str) -> dict[str,str]:
-    """login → primera fecha_fin (AAAAMMDDhhmmss) en esas métricas en esa serie."""
+    """identidad canonizada -> primera fecha_fin (AAAAMMDDhhmmss) en esas métricas.
+
+    Para pf_commits (METRICAS_COMMITS = anmcc/cdiv/fexp/rexp/le, todas locales),
+    canon() traduce nombres git a logins. Para pf_interac (METRICAS_INTERACCION,
+    todas API), canon() es identidad: los valores quedan iguales al comportamiento
+    anterior.
+    """
     cur.execute("""
-        SELECT r.contribuyente_login,
-               MIN(p.fecha_fin) AS pf
+        SELECT r.contribuyente_login, r.metrica_id, p.fecha_fin
         FROM resultado r
         JOIN periodo p ON p.periodo_id = r.periodo_id
         WHERE r.metrica_id = ANY(%s)
           AND p.tipo_analisis = %s
           AND r.contribuyente_login IS NOT NULL
-        GROUP BY r.contribuyente_login
     """, (list(metricas), tipo))
-    return {r[0]: fmt_ts(r[1]) for r in cur.fetchall()}
+    por_persona: dict[str, object] = {}
+    for lg, mid, pf in cur.fetchall():
+        c = canon(lg, mid)
+        prev = por_persona.get(c)
+        if prev is None or pf < prev:
+            por_persona[c] = pf
+    return {c: fmt_ts(pf) for c, pf in por_persona.items()}
 
 # ── ARCHIVO 3: metricas_persona.csv ──────────────────────────────────────────
 
@@ -190,12 +269,15 @@ def write_metricas():
 # ── ARCHIVO 1: persona_detalle_estable.csv ────────────────────────────────────
 
 def write_detalle(cur, bots, pf_commits, pf_interac, exclude_cd=False):
+    """Escribe persona_detalle_estable.csv con canon() aplicado a contribuyente_login.
+    El filtro de dev_exp con anmcc se hace en Python sobre identidades canonizadas,
+    no por EXISTS SQL (que compara login exacto)."""
     p = ROOT / "persona_detalle_estable.csv"
     metricas_a_exportar = (TODAS_PERSONA - METRICAS_ACUM)
     if exclude_cd:
         metricas_a_exportar = metricas_a_exportar - {"cd"}
 
-    # anmcc contributors per periodo_id for dev_exp filter
+    # anmcc por periodo canonizado — set de identidades canónicas con anmcc
     cur.execute("""
         SELECT p.periodo_id, r.contribuyente_login
         FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
@@ -203,8 +285,8 @@ def write_detalle(cur, bots, pf_commits, pf_interac, exclude_cd=False):
           AND r.contribuyente_login IS NOT NULL
     """)
     anmcc_set: dict[int, set] = defaultdict(set)
-    for row in cur.fetchall():
-        anmcc_set[row[0]].add(row[1])
+    for pid, lg in cur.fetchall():
+        anmcc_set[pid].add(canon(lg, 'anmcc'))
 
     cols = ["periodo_num","version","fecha_hora","anio","duracion_dias",
             "metrica_id","contribuyente_login","tipo_cuenta","identidad",
@@ -233,16 +315,17 @@ def write_detalle(cur, bots, pf_commits, pf_interac, exclude_cd=False):
             rows = cur.fetchmany(20000)
             if not rows: break
             for r in rows:
-                lg = r[6]; v = r[7]
+                mid = r[5]
+                lg = canon(r[6], mid); v = r[7]
                 w.writerow([
                     r[1], r[2], fmt_ts(r[4]), r[4].year, fmt_dur(r[3], r[4]),
-                    r[5], lg, bots.get(lg,'humano'), identidad(lg),
+                    mid, lg, bots.get(lg,'humano'), identidad(lg),
                     fmt_v(v),
                     pf_commits.get(lg,''), pf_interac.get(lg,''),
                 ])
                 n += 1
 
-        # dev_exp: solo si tienen anmcc en el mismo periodo
+        # dev_exp: filtro por anmcc del mismo periodo, usando identidades canonizadas
         cur.execute("""
             SELECT p.periodo_id, p.periodo_num, p.etiqueta,
                    p.fecha_inicio, p.fecha_fin,
@@ -253,19 +336,15 @@ def write_detalle(cur, bots, pf_commits, pf_interac, exclude_cd=False):
               AND r.contribuyente_login IS NOT NULL
               AND p.etiqueta NOT IN %s
               AND r.metrica_id='dev_exp'
-              AND EXISTS (
-                  SELECT 1 FROM resultado r2
-                  WHERE r2.periodo_id=r.periodo_id
-                    AND r2.metrica_id='anmcc'
-                    AND r2.contribuyente_login=r.contribuyente_login
-              )
             ORDER BY p.periodo_num
         """, (excl_tuple,))
         while True:
             rows = cur.fetchmany(5000)
             if not rows: break
             for r in rows:
-                lg = r[5]; v = r[6]
+                pid = r[0]; lg = canon(r[5], 'dev_exp'); v = r[6]
+                if lg not in anmcc_set.get(pid, ()):   # filtro reemplaza al EXISTS
+                    continue
                 w.writerow([
                     r[1], r[2], fmt_ts(r[4]), r[4].year, fmt_dur(r[3], r[4]),
                     'dev_exp', lg, bots.get(lg,'humano'), identidad(lg),
@@ -279,17 +358,75 @@ def write_detalle(cur, bots, pf_commits, pf_interac, exclude_cd=False):
 
 # ── ARCHIVO 2: persona_agregado_estable_canary.csv ────────────────────────────
 
-def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_interac_c):
+
+# ── Reglas de dedup por métrica cuando dos identidades crudas colapsan al mismo canon.
+#   suma: dloc, rexp (métricas aditivas por autor; ver 16/dloc.py:92, 15/rexp.py:17-20).
+#   max:  dev_exp     (primer commit más antiguo entre las dos identidades, 38/dev_experience.py).
+#   gan:  resto       (anmcc, cdiv, le, fexp, cd, ss y cualquier otra): sin recalcular desde
+#                      los commits no se puede combinar; se queda con la identidad de más
+#                      n_commits en el clon (como antes). CD podría ser promedio ponderado
+#                      por líneas, pero value_extra no guarda cloc/lloc (verificado en DB).
+DEDUPE_REGLA = {
+    "dloc":    "suma",
+    "rexp":    "suma",
+    "dev_exp": "max",
+}
+
+def _agrupar_con_dedupe(crudo, dedupe_log, serie, metrica):
+    """De [(pid, identidad_cruda, value)], devuelve {pid: {canon: value}} aplicando la
+    regla de DEDUPE_REGLA (default: quedarse con la identidad de más n_commits en el clon).
+    Registra en dedupe_log (serie, metrica, pid, canon, descartada, val_desc, ganadora,
+    val_gan, regla, val_final).
+
+    canon() se aplica según `metrica`: solo traduce para las métricas del runner local
+    y, en dev_exp, solo para identidades que no son logins. En las métricas de API es
+    identidad y, por tanto, no hay colisiones."""
+    regla = DEDUPE_REGLA.get(metrica, "gan")
+
+    # Primera pasada: juntar por (pid, canon) todas las (val, identidad, prio).
+    por_canon: dict[int, dict[str, list[tuple[float, str, int]]]] = defaultdict(lambda: defaultdict(list))
+    for pid, lg, val in crudo:
+        if val is None: continue
+        v = float(val)
+        c = canon(lg, metrica)
+        prio = _ALIAS_N_COMMITS.get(lg, 0)
+        por_canon[pid][c].append((v, lg, prio))
+
+    salida: dict[int, dict[str, float]] = {}
+    for pid, canons in por_canon.items():
+        salida[pid] = {}
+        for c, items in canons.items():
+            if len(items) == 1:
+                salida[pid][c] = items[0][0]
+                continue
+            # Hay colisión: aplicar regla.
+            items_ord = sorted(items, key=lambda x: -x[2])  # mayor prio primero
+            ganadora = items_ord[0]
+            if regla == "suma":
+                val_final = sum(x[0] for x in items)
+            elif regla == "max":
+                val_final = max(x[0] for x in items)
+            else:  # "gan": max n_commits
+                val_final = ganadora[0]
+            salida[pid][c] = val_final
+            # Registrar las descartadas (todas menos la ganadora) con la regla aplicada.
+            for desc in items_ord[1:]:
+                dedupe_log.append((serie, metrica, pid, c,
+                                   desc[1], desc[0],
+                                   ganadora[1], ganadora[0],
+                                   regla, val_final))
+    return salida
+
+
+def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_interac_c, dedupe_log):
     p = ROOT / "persona_agregado_estable_canary.csv"
     excl = tuple(EXCLUIR_ESTABLE)
     cols = ["serie","periodo_num","version","fecha_hora","anio","duracion_dias",
             "metrica_id","alcance","n_contribuyentes","suma","media","mediana",
             "p90","maximo","share_top1","share_top10pct"]
 
-    # Structure: rows_out = list of col dicts
     rows_out: list[dict] = []
 
-    # --- helper to make a row dict ---
     def make_row(serie, pnum, vetiq, fini, ffin, mid, alcance, stats, extra_n=None):
         n = extra_n if extra_n is not None else stats['n']
         return {
@@ -310,69 +447,56 @@ def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_inter
         print(f"    Procesando {label}...", flush=True)
         excl_sql = excl if serie == 'versiones' else ()
 
-        # Load period metadata
         cur.execute("""
             SELECT periodo_id, periodo_num, etiqueta, fecha_inicio, fecha_fin
             FROM periodo WHERE tipo_analisis=%s ORDER BY periodo_num
         """, (serie,))
-        periods = {r[0]: r for r in cur.fetchall()}  # {pid: (pid,pnum,etiq,ini,fin)}
+        periods = {r[0]: r for r in cur.fetchall()}
 
         pf_commits = pf_commits_v if serie == 'versiones' else pf_commits_c
         pf_interac = pf_interac_v if serie == 'versiones' else pf_interac_c
 
-        # ── Regular metrics ────────────────────────────────────────────────────
+        # anmcc canonizado por periodo — se usa para filtrar dev_exp
+        anmcc_params = [serie, 'anmcc'] + ([excl_sql] if excl_sql else [])
+        excl_clause = "AND p.etiqueta NOT IN %s" if excl_sql else ""
+        cur.execute(f"""
+            SELECT r.periodo_id, r.contribuyente_login
+            FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
+            WHERE p.tipo_analisis=%s AND r.metrica_id=%s
+              AND r.contribuyente_login IS NOT NULL {excl_clause}
+        """, anmcc_params)
+        anmcc_canon_set: dict[int, set] = defaultdict(set)
+        for pid, lg in cur.fetchall():
+            anmcc_canon_set[pid].add(canon(lg, 'anmcc'))
+
+        # ── Métricas regulares ─────────────────────────────────────────────────
         for metrica in sorted(TODAS_PERSONA):
-            # For dev_exp: use anmcc-filtered data
+            params = [serie, metrica] + ([excl_sql] if excl_sql else [])
+            cur.execute(f"""
+                SELECT r.periodo_id, r.contribuyente_login, r.value
+                FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
+                WHERE p.tipo_analisis=%s AND r.metrica_id=%s
+                  AND r.contribuyente_login IS NOT NULL
+                  {excl_clause}
+            """, params)
+            crudo = cur.fetchall()
+
+            # Para dev_exp, filtrar por intersección canónica con anmcc.
             if metrica == 'dev_exp':
-                excl_clause = "AND p.etiqueta NOT IN %s" if excl_sql else ""
-                params = [serie]
-                if excl_sql: params.append(excl_sql)
-                cur.execute(f"""
-                    SELECT r.periodo_id, r.contribuyente_login, r.value
-                    FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
-                    WHERE p.tipo_analisis=%s
-                      AND r.metrica_id='dev_exp'
-                      AND r.contribuyente_login IS NOT NULL
-                      {excl_clause}
-                      AND EXISTS (
-                        SELECT 1 FROM resultado r2
-                        WHERE r2.periodo_id=r.periodo_id AND r2.metrica_id='anmcc'
-                          AND r2.contribuyente_login=r.contribuyente_login
-                      )
-                """, params)
-            else:
-                excl_clause = "AND p.etiqueta NOT IN %s" if excl_sql else ""
-                params = [serie, metrica]
-                if excl_sql: params.append(excl_sql)
-                cur.execute(f"""
-                    SELECT r.periodo_id, r.contribuyente_login, r.value
-                    FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
-                    WHERE p.tipo_analisis=%s AND r.metrica_id=%s
-                      AND r.contribuyente_login IS NOT NULL
-                      {excl_clause}
-                """, params)
+                crudo = [(pid, lg, v) for (pid, lg, v) in crudo
+                         if canon(lg, 'dev_exp') in anmcc_canon_set.get(pid, ())]
 
-            # Group by periodo_id
-            by_period: dict[int, dict] = defaultdict(lambda: {'todas': [], 'humanos': []})
-            for pid, login, val in cur.fetchall():
-                if val is None: continue
-                v = float(val)
-                by_period[pid]['todas'].append(v)
-                if bots.get(login, 'humano') == 'humano':
-                    by_period[pid]['humanos'].append(v)
+            por_canon = _agrupar_con_dedupe(crudo, dedupe_log, serie, metrica)
 
-            for pid, pd_data in by_period.items():
+            for pid, canon_val in por_canon.items():
                 if pid not in periods: continue
                 _, pnum, etiq, fini, ffin = periods[pid]
-                for alcance in ('todas', 'humanos'):
-                    st = agg_stats(pd_data[alcance])
-                    rows_out.append(make_row(serie, pnum, etiq, fini, ffin, metrica, alcance, st))
+                todas = list(canon_val.values())
+                humanos = [v for c, v in canon_val.items() if bots.get(c, 'humano') == 'humano']
+                for alcance, vals in [('todas', todas), ('humanos', humanos)]:
+                    rows_out.append(make_row(serie, pnum, etiq, fini, ffin, metrica, alcance, agg_stats(vals)))
 
-        # ── Pseudo-métricas ─────────────────────────────────────────────────────
-        # Cargar datos base para pseudo-métricas
-        excl_clause = "AND p.etiqueta NOT IN %s" if excl_sql else ""
-
-        # anmcc y exprev (base para activos/nuevos)
+        # ── Pseudo-métricas: activos y nuevos ──────────────────────────────────
         for base_metrica, pf_key in [('anmcc', pf_commits), ('exprev', pf_interac)]:
             pnombre = 'activos_commits' if base_metrica == 'anmcc' else 'activos_interaccion'
             nuevos_nombre = 'nuevos_commits' if base_metrica == 'anmcc' else 'nuevos_interaccion'
@@ -384,21 +508,21 @@ def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_inter
                   AND r.contribuyente_login IS NOT NULL {excl_clause}
             """, params)
 
-            by_period_logins: dict[int, list] = defaultdict(list)
-            for pid, login in cur.fetchall():
-                by_period_logins[pid].append(login)
+            by_period_canons: dict[int, set] = defaultdict(set)
+            for pid, lg in cur.fetchall():
+                by_period_canons[pid].add(canon(lg, base_metrica))
 
-            for pid, logins in by_period_logins.items():
+            for pid, logins_set in by_period_canons.items():
                 if pid not in periods: continue
                 _, pnum, etiq, fini, ffin = periods[pid]
                 ts_fin = fmt_ts(ffin)
 
-                humanos = [l for l in logins if bots.get(l,'humano') == 'humano']
-                nuevos_todas = [l for l in logins if pf_key.get(l,'') == ts_fin]
-                nuevos_hum   = [l for l in humanos if pf_key.get(l,'') == ts_fin]
+                humanos = {l for l in logins_set if bots.get(l,'humano') == 'humano'}
+                nuevos_todas = {l for l in logins_set if pf_key.get(l,'') == ts_fin}
+                nuevos_hum   = {l for l in humanos    if pf_key.get(l,'') == ts_fin}
 
                 for alcance, cnt_act, cnt_new in [
-                    ('todas', len(logins), len(nuevos_todas)),
+                    ('todas', len(logins_set), len(nuevos_todas)),
                     ('humanos', len(humanos), len(nuevos_hum)),
                 ]:
                     rows_out.append(make_row(
@@ -412,7 +536,7 @@ def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_inter
                         extra_n=cnt_new
                     ))
 
-        # activos_cierre (nci) y activos_comentarios (nc)
+        # activos_cierre (nci) y activos_comentarios (nc) — ambas API, canon() es identidad.
         for base_m, pseudo_m in [('nci','activos_cierre'), ('nc','activos_comentarios')]:
             params = [serie, base_m] + ([excl_sql] if excl_sql else [])
             cur.execute(f"""
@@ -421,38 +545,57 @@ def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_inter
                 WHERE p.tipo_analisis=%s AND r.metrica_id=%s
                   AND r.contribuyente_login IS NOT NULL {excl_clause}
             """, params)
-            by_period_logins = defaultdict(list)
-            for pid, login in cur.fetchall():
-                by_period_logins[pid].append(login)
-            for pid, logins in by_period_logins.items():
+            by_period_canons: dict[int, set] = defaultdict(set)
+            for pid, lg in cur.fetchall():
+                by_period_canons[pid].add(canon(lg, base_m))
+            for pid, logins_set in by_period_canons.items():
                 if pid not in periods: continue
                 _, pnum, etiq, fini, ffin = periods[pid]
-                humanos = [l for l in logins if bots.get(l,'humano') == 'humano']
-                for alcance, cnt in [('todas', len(logins)), ('humanos', len(humanos))]:
+                humanos = {l for l in logins_set if bots.get(l,'humano') == 'humano'}
+                for alcance, cnt in [('todas', len(logins_set)), ('humanos', len(humanos))]:
                     rows_out.append(make_row(
                         serie, pnum, etiq, fini, ffin, pseudo_m, alcance,
                         {k:'' for k in ('suma','media','mediana','p90','maximo','share_top1','share_top10pct')},
                         extra_n=cnt
                     ))
 
-        # cuentas_por_tipo: n_contribuyentes por tipo en anmcc ∪ exprev
-        params_anmcc  = [serie, 'anmcc']  + ([excl_sql] if excl_sql else [])
+        # cuentas_por_tipo: identidades únicas en anmcc ∪ exprev. Hacemos DOS consultas
+        # separadas y aplicamos canon() a cada una según su métrica (anmcc = runner local,
+        # se canoniza; exprev = API, no). Después se unen y se cuentan por tipo.
+        por_pid_canon_tipo: dict[tuple, str] = {}
+
+        # anmcc → canon(lg, 'anmcc') traduce nombre git a login
+        params_anmcc = [serie, 'anmcc'] + ([excl_sql] if excl_sql else [])
+        cur.execute(f"""
+            SELECT DISTINCT p.periodo_id, r.contribuyente_login
+            FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
+            WHERE p.tipo_analisis=%s AND r.metrica_id=%s
+              AND r.contribuyente_login IS NOT NULL {excl_clause}
+        """, params_anmcc)
+        for pid, lg in cur.fetchall():
+            c = canon(lg, 'anmcc')
+            tc = bots.get(c, 'humano')
+            prev = por_pid_canon_tipo.get((pid, c))
+            if prev is None or (tc in NON_HUMAN and prev == 'humano'):
+                por_pid_canon_tipo[(pid, c)] = tc
+
+        # exprev → canon(lg, 'exprev') es identidad, los logins quedan como vienen
         params_exprev = [serie, 'exprev'] + ([excl_sql] if excl_sql else [])
         cur.execute(f"""
             SELECT DISTINCT p.periodo_id, r.contribuyente_login
             FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
             WHERE p.tipo_analisis=%s AND r.metrica_id=%s
               AND r.contribuyente_login IS NOT NULL {excl_clause}
-            UNION
-            SELECT DISTINCT p.periodo_id, r.contribuyente_login
-            FROM resultado r JOIN periodo p ON p.periodo_id=r.periodo_id
-            WHERE p.tipo_analisis=%s AND r.metrica_id=%s
-              AND r.contribuyente_login IS NOT NULL {excl_clause}
-        """, params_anmcc + params_exprev)
+        """, params_exprev)
+        for pid, lg in cur.fetchall():
+            c = canon(lg, 'exprev')
+            tc = bots.get(c, 'humano')
+            prev = por_pid_canon_tipo.get((pid, c))
+            if prev is None or (tc in NON_HUMAN and prev == 'humano'):
+                por_pid_canon_tipo[(pid, c)] = tc
 
         by_period_tipo: dict[int, dict] = defaultdict(lambda: defaultdict(int))
-        for pid, login in cur.fetchall():
-            tc = bots.get(login, 'humano')
+        for (pid, _c), tc in por_pid_canon_tipo.items():
             by_period_tipo[pid][tc] += 1
 
         for pid, tipo_counts in by_period_tipo.items():
@@ -465,7 +608,6 @@ def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_inter
                     extra_n=cnt
                 ))
 
-    # Write
     with open(p, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
@@ -629,7 +771,20 @@ def validar(cur, bots):
 # ── MAIN ─────────────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--sin-alias", action="store_true",
+                    help="No traducir nombres git a logins (comportamiento anterior).")
+    args = ap.parse_args()
+
     print("=== export_persona.py ===", flush=True)
+    global _ALIAS_ACTIVO
+    if args.sin_alias:
+        _ALIAS_ACTIVO = False
+        print("  --sin-alias: canon() desactivado (comportamiento antiguo)", flush=True)
+    else:
+        load_alias()
+
     bots = load_bots()
     print(f"  {len(bots):,} logins clasificados", flush=True)
 
@@ -641,16 +796,16 @@ def main():
     mp = write_metricas()
     print(f"  {mp.stat().st_size/1024:.1f} KB, {len(METRICAS_META)} filas")
 
-    # ── Lookups primera_fecha ─────────────────────────────────────────────────
+    # ── Lookups primera_fecha (ya canonizados) ────────────────────────────────
     print("\nBuilding primera_fecha lookups (versiones)...", flush=True)
     pf_c_v = primera_fecha_lookup(cur, METRICAS_COMMITS,     'versiones')
     pf_i_v = primera_fecha_lookup(cur, METRICAS_INTERACCION, 'versiones')
-    print(f"  commits: {len(pf_c_v):,} logins | interaccion: {len(pf_i_v):,} logins")
+    print(f"  commits: {len(pf_c_v):,} identidades | interaccion: {len(pf_i_v):,}")
 
     print("Building primera_fecha lookups (versiones_canary)...", flush=True)
     pf_c_c = primera_fecha_lookup(cur, METRICAS_COMMITS,     'versiones_canary')
     pf_i_c = primera_fecha_lookup(cur, METRICAS_INTERACCION, 'versiones_canary')
-    print(f"  commits: {len(pf_c_c):,} logins | interaccion: {len(pf_i_c):,} logins")
+    print(f"  commits: {len(pf_c_c):,} identidades | interaccion: {len(pf_i_c):,}")
 
     # ── Archivo 1 ─────────────────────────────────────────────────────────────
     print("\n[2/3] persona_detalle_estable.csv...", flush=True)
@@ -663,11 +818,26 @@ def main():
 
     # ── Archivo 2 ─────────────────────────────────────────────────────────────
     print("\n[3/3] persona_agregado_estable_canary.csv...", flush=True)
-    agg_p, agg_n, agg_mb = write_agregado(cur, bots, pf_c_v, pf_i_v, pf_c_c, pf_i_c)
+    dedupe_log: list = []  # (serie, metrica, pid, canon, ident_descartada, val_desc, ident_ganadora, val_gan)
+    agg_p, agg_n, agg_mb = write_agregado(cur, bots, pf_c_v, pf_i_v, pf_c_c, pf_i_c, dedupe_log)
     print(f"  {agg_n:,} filas, {agg_mb:.1f} MB")
 
+    # Volcar casos de dedupe (dos identidades crudas → mismo canónico en la misma métrica/ventana)
+    if dedupe_log:
+        dp = ROOT / "persona_duplicados_canon.csv"
+        with open(dp, 'w', newline='', encoding='utf-8') as f:
+            w = csv.writer(f)
+            w.writerow(["serie","metrica","periodo_id","canon",
+                        "descartada","value_descartada",
+                        "ganadora","value_ganadora",
+                        "regla","value_final"])
+            w.writerows(dedupe_log)
+        print(f"  Dedupe: {len(dedupe_log)} colisiones (misma persona canonizada bajo dos identidades crudas) en {dp.name}", flush=True)
+    else:
+        print(f"  Dedupe: 0 colisiones")
+
     # ── Validaciones ─────────────────────────────────────────────────────────
-    cur2 = con.cursor()  # fresh cursor for validations (no RealDictCursor needed)
+    cur2 = con.cursor()
     validar(cur2, bots)
 
     con.close()
