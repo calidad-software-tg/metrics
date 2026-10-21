@@ -8,9 +8,9 @@ Datos relevados con la API de GitHub en septiembre de 2026.
 
 | # | Repositorio | Tamaño | Commits | Contribuyentes | Issues abiertas | Releases / tags | Lenguajes principales | Resultado |
 |---|---|---|---|---|---|---|---|---|
-| 1 | [VS Code / Code-OSS](https://github.com/microsoft/vscode) | 1,46 GB | 165.345 | 3.235 | 21.138 | 239 / 390 | TypeScript 96 % | Mejor rankeado, no elegido |
-| 2 | [CPython](https://github.com/python/cpython) | 855 MB | 133.194 | 4.040 | 9.638 | 0 / 668 | Python 61 %, C 34 % | Finalista |
-| 3 | [Next.js](https://github.com/vercel/next.js) | 2,5 GB | 35.676 | 4.154 | 3.362 | 3.849 / 4.051 | JavaScript 46 %, TypeScript 31 %, Rust 13 % | **Elegido** |
+| 1 | [Next.js](https://github.com/vercel/next.js) | 2,5 GB | 35.676 | 4.154 | 3.362 | 3.849 / 4.051 | JavaScript 46 %, TypeScript 31 %, Rust 13 % | **Elegido** |
+| 2 | [VS Code / Code-OSS](https://github.com/microsoft/vscode) | 1,46 GB | 165.345 | 3.235 | 21.138 | 239 / 390 | TypeScript 96 % | Finalista |
+| 3 | [CPython](https://github.com/python/cpython) | 855 MB | 133.194 | 4.040 | 9.638 | 0 / 668 | Python 61 %, C 34 % | Finalista |
 | 4 | [Home Assistant Core](https://github.com/home-assistant/core) | 876 MB | 116.895 | 5.815 | 3.531 | 1.644 / 1.645 | Python 99,99 % | Finalista |
 | 5 | [TensorFlow](https://github.com/tensorflow/tensorflow) | 1,35 GB | 198.969 | 5.318 | 3.146 | 222 / 226 | C++ 58 %, Python 26 %, otros | Elegible |
 | 6 | [Flutter](https://github.com/flutter/flutter) | 461 MB | 91.537 | 2.406 | 13.176 | 7 / 1.115 | Dart 69 %, C++ 15 % | Elegible |
@@ -23,9 +23,9 @@ Datos relevados con la API de GitHub en septiembre de 2026.
 
 | Repositorio | A favor | En contra |
 |---|---|---|
+| **Next.js** | Miles de releases con una marca confiable de estable o preliminar. La mejor historia de adopción tecnológica de los diez: reescribió su compilador en Rust. Comunidad sana (el principal autor tiene el 9,2 % de los commits). Volumen de actividad manejable | El 87 % de los releases recientes son canary (preliminares) y hay que separarlos. Un bot de releases figura entre los principales autores y hay que filtrarlo. Mezcla JavaScript, TypeScript y Rust |
 | **VS Code** | Un solo lenguaje dominante (TypeScript). Producto bien delimitado. Adopción tecnológica real y fechable (CLI en Rust). Comunidad sana: nadie supera el 9 % de los commits. Tiene wiki | Es el de mayor volumen de actividad: 165.000 commits y más de 235.000 issues cerradas. Tiene tres quiebres estructurales en su historia (flujo de PRs en 2022, cambio en cómo se cierran las issues, releases semanales desde 2026). Hay que definir si `extensions/` (37 % del código) es parte del producto |
 | **CPython** | El mejor documentado (PEPs, proceso formal). Comunidad repartida. Varios cambios tecnológicos fechados (JIT, modo sin GIL) | Mezcla Python y C. No usa los Releases de GitHub: hay que deducir las versiones de los tags |
-| **Next.js** | Miles de releases con una marca confiable de estable o preliminar. La mejor historia de adopción tecnológica de los diez: reescribió su compilador en Rust. Comunidad sana (el principal autor tiene el 9,2 % de los commits). Volumen de actividad manejable | El 87 % de los releases recientes son canary (preliminares) y hay que separarlos. Un bot de releases figura entre los principales autores y hay que filtrarlo. Mezcla JavaScript, TypeScript y Rust |
 | **Home Assistant** | Prácticamente un solo lenguaje (Python). Releases mensuales con marca de preliminar confiable. Comunidad grande y repartida | No es un único producto: son unas 1.000 integraciones casi independientes, y 855 tienen un solo dueño. Eso vuelve ambiguas las métricas de código |
 | **TensorFlow** | Producto de software claro. Comunidad amplia | El más heterogéneo en lenguajes (C++, Python, MLIR, Starlark, Go, Java, Swift), lo que complica todas las métricas de código |
 | **Flutter** | Producto claro. Casos reales de adopción tecnológica (motor Impeller) | Releases mal etiquetados: el filtro de estable o preliminar no es confiable. Los dos autores con más commits son bots |
@@ -36,7 +36,7 @@ Datos relevados con la API de GitHub en septiembre de 2026.
 
 ## 3. Por qué Next.js
 
-En el ranking por criterios quedó primero **VS Code**: es el único candidato sin problemas de delimitación del producto, casi en un solo lenguaje y con un cambio tecnológico fechable. Pero la decisión práctica, confirmada con el director, fue **Next.js**. El motivo principal fue el **tamaño del trabajo de cálculo**.
+Se eligió **Next.js**, con la confirmación del director. El otro candidato fuerte era **VS Code**, que tiene un producto bien delimitado, casi un solo lenguaje y un cambio tecnológico fechable. El motivo principal para preferir Next.js fue el **tamaño del trabajo de cálculo**.
 
 **El tamaño que importa es el de la actividad, no el de los archivos.** En disco Next.js es más pesado (2,5 GB contra 1,46 GB), pero la mayoría de las métricas no recorre archivos. Recorren commits, issues, pull requests y comentarios, y la mayor parte de esos datos se descarga de la API de GitHub, que permite unas 5.000 consultas por hora. En ese volumen la diferencia es grande:
 
