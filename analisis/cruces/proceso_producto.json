@@ -1,0 +1,15 @@
+{
+  "lados": {
+    "Proceso": {"niveles": ["producto"]},
+    "Producto": {"niveles": ["producto"]}
+  },
+  "compartidas": "excluir",
+  "asignar": {},
+  "escala": {"familias": ["tamano"]},
+  "componentes": {
+    "conjunto": {"Proceso": "producto", "Producto": "producto"},
+    "enfoque": "ajustado",
+    "umbral_bootstrap": 0.85,
+    "umbral_canary": 0.70
+  }
+}

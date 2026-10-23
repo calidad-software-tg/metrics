@@ -15,3 +15,4 @@ analisis/salidas/pca/
 analisis/salidas/reportes/*.html
 analisis/salidas_originales/
 db/fixes_seed.sql.gz
+analisis/salidas/cruces/

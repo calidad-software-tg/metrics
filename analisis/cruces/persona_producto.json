@@ -1,0 +1,13 @@
+{
+  "lados": {
+    "Persona": {"niveles": ["persona_agregada"]},
+    "Producto": {"niveles": ["producto"]}
+  },
+  "escala": {"familias": ["tamano"]},
+  "componentes": {
+    "conjunto": {"Persona": "todas", "Producto": "producto"},
+    "enfoque": "ajustado",
+    "umbral_bootstrap": 0.85,
+    "umbral_canary": 0.70
+  }
+}
