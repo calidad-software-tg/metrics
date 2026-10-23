@@ -152,6 +152,10 @@ def partial_spearman(x_vals, y_vals, pnums, durs, extra_controls=None):
     n = len(x_vals)
     if n < 5:
         return nan_r
+    # una variable constante no tiene correlación: sin esto, dos variables constantes
+    # en un período (ej. Wiki Presence y README Completeness en 2025–26) daban ρ = 1,00
+    if len(set(x_vals)) < 2 or len(set(y_vals)) < 2:
+        return nan_r
 
     n_extra = len(extra_controls) if extra_controls else 0
     K_SPL = K_CONTROLS_SPL + n_extra
@@ -231,6 +235,8 @@ def parcial_df(x_vals, y_vals, pnums, durs, df_spline):
     n = len(x_vals)
     if n < 5:
         return nan
+    if len(set(x_vals)) < 2 or len(set(y_vals)) < 2:
+        return nan  # variable constante: sin correlación
     rx = rankdata(x_vals, method="average")
     ry = rankdata(y_vals, method="average")
     rp = rankdata(pnums, method="average")
@@ -1181,6 +1187,11 @@ def main():
     # Estimate MB: ~240 bytes/row
     est_mb = n_vals_total * 240 / 1e6
     split = est_mb > 90
+
+    # Se borra la forma que no corresponde, para que no quede un archivo viejo que los
+    # lectores (reporte_cruce.leer_valores) tomen en lugar del nuevo.
+    for viejo in ((OUT_VALS_P, OUT_VALS_R) if not split else (OUT_VALS,)):
+        viejo.unlink(missing_ok=True)
 
     if not split:
         with open(OUT_VALS, "w", newline="", encoding="utf-8") as f:

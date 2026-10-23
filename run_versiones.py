@@ -599,7 +599,7 @@ def _es_error_dimension(exc) -> bool:
 
 def _meta(v: dict) -> dict:
     return {"n": v["n"], "version": v["version"], "inicio": v["inicio"],
-            "fin": v["fin"], "abierta": v["abierta"]}
+            "fin": v["fin"], "abierta": v["abierta"], "absorbidas": v.get("absorbidas", [])}
 
 
 # Ya corridas por separado; 'todas' las saltea.

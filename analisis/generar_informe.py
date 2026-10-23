@@ -37,6 +37,9 @@ Marcas (cada una sola en su línea):
                                         ficha, gráficos y las notas de ese par
     [[nota x_id y_id; x2 y2]] ... [[/nota]]
         texto (con marcas) que se muestra en el análisis particular al elegir alguno de esos pares
+    [[antes mapa]]                mapa de calor del análisis original (analisis/salidas_originales)
+    [[comparar serie dloc_producto]]   serie de una variable antes y después de los fixes
+    [[pca_antes cargas producto estable ajustado]]   igual que [[pca ...]], con el PCA original
     [[pca cargas producto estable ajustado]]   piezas del PCA de la dimensión (generar_pca.py):
         cargas, scree, solidez y puntajes (conjunto serie enfoque), criterios y comparacion (conjunto)
     [[par x_id y_id: periodos, sensibilidad, movil, dispersion, temporal]]
@@ -56,6 +59,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reporte_cruce as rc  # noqa: E402
 import reporte_pca as rpca  # noqa: E402
+import piezas_comparacion as pcomp  # noqa: E402
 
 SALIDA = rc.SALIDA
 GRAFICOS = {
@@ -199,10 +203,17 @@ def markdown(texto: str, inserto) -> tuple[str, list]:
 
 
 # ── Marcas → HTML ────────────────────────────────────────────────────────────
-def hacer_inserto(piezas: dict, pca: dict | None = None):
+def hacer_inserto(piezas: dict, pca: dict | None = None, pca_antes: dict | None = None, cruce: str = ""):
     def inserto(marca: str) -> str:
         tipo, _, resto = marca.partition(" ")
         resto = resto.strip()
+        if tipo in ("antes", "comparar"):
+            return pcomp.pieza(marca, cruce)
+        if tipo == "pca_antes":
+            if pca_antes is None:
+                return '<p class="error-marca">No está el PCA original (analisis/salidas_originales/pca/).</p>'
+            pieza = rpca.pieza(pca_antes, *resto.split()[:4])
+            return pieza.replace('<h4>', '<h4>Antes de los fixes · ', 1).replace('class="panel inserto', 'class="panel inserto antes', 1)
         if tipo == "pca":
             if pca is None:
                 return '<p class="error-marca">No hay resultados de PCA: corré analisis/generar_pca.py para esta dimensión.</p>'
@@ -331,6 +342,8 @@ ESTILO_INFORME = """
 .indice li.n3 { margin-left: 18px; font-size: 14px; }
 .indice li.n4 { margin-left: 36px; font-size: 13.5px; }
 .informe h4[id] { font-size: 15px; margin: 26px 0 6px; }
+.panel.antes { border-style: dashed; background: var(--fondo); }
+.panel.antes h4 { color: var(--texto2); }
 .anexo { border-top: 2px solid var(--borde); margin-top: 56px; padding-top: 8px; }
 """
 
@@ -517,8 +530,12 @@ def main():
                   if pca and pca.exists() else "")
 
     datos_pca = rpca.cargar(lados[0]) if len(set(lados)) == 1 else None
-    cuerpo, indice = markdown(texto, hacer_inserto(piezas, datos_pca))
+    archivo_antes = pcomp.ORIGINAL / "pca" / f"pca_{lados[0].lower()}.json"
+    pca_antes = json.loads(archivo_antes.read_text(encoding="utf-8")) if len(set(lados)) == 1 and archivo_antes.exists() else None
+    cuerpo, indice = markdown(texto, hacer_inserto(piezas, datos_pca, pca_antes, cruce))
     titulo = meta.get("titulo", f"Análisis {cruce}")
+    # publicados: reporte.html=https://…, otro.html=https://… (links de los reportes publicados aparte)
+    publicados = dict(par.strip().split("=", 1) for par in meta.get("publicados", "").split(",") if "=" in par)
     nav = ("<nav class='indice'><b>Contenido</b><ol>"
            + "".join(f'<li class="n{n}"><a href="#{a}">{html.escape(t)}</a></li>' for n, a, t in indice)
            + '<li><a href="#anexo">Anexo: reporte interactivo</a></li></ol></nav>')
@@ -547,7 +564,32 @@ y el explorador de pares, está en <a href="{html.escape(reporte.name)}" target=
 {piezas["explorador"]}
 </div>
 {piezas["scripts"]}
-<script>abrirPar = id => window.open({json.dumps(reporte.name)} + '#par=' + encodeURIComponent(id), '_blank');</script>
+<script>
+// Dentro de un marco (por ejemplo, publicado como Artifact) los reportes enlazados solo se ven en el
+// mismo marco: abiertos en otra pestaña el sitio los bloquea.
+// Además, la página publicada puede servirse en una dirección sin barra final (…/frame/<id>), y ahí
+// un enlace relativo pierde el <id>: se prueba primero junto a la página y después dentro de <id>/.
+const enMarco = window.top !== window;
+async function irA(archivo, hash) {{
+  const ruta = location.pathname, cands = [new URL(archivo, location.href).href];
+  if (!ruta.endsWith('/') && !/\.[a-z0-9]+$/i.test(ruta)) cands.unshift(location.origin + ruta + '/' + archivo);
+  for (const u of cands) {{
+    try {{ const r = await fetch(u, {{method: 'HEAD', credentials: 'include'}}); if (r.ok) {{ location.href = u + (hash || ''); return; }} }} catch (e) {{}}
+  }}
+  location.href = cands[cands.length - 1] + (hash || '');
+}}
+// Reportes publicados aparte (clave `publicados` del encabezado): dentro del marco se abren en su propio
+// link, en una pestaña nueva.
+const publicados = {json.dumps(publicados)};
+if (enMarco) document.querySelectorAll('a[href$=".html"]').forEach(a => {{
+  const pub = publicados[a.getAttribute('href')];
+  if (pub) {{ a.href = pub; a.target = '_blank'; a.rel = 'noopener'; return; }}
+  a.removeAttribute('target');
+  a.addEventListener('click', ev => {{ ev.preventDefault(); irA(a.getAttribute('href')); }});
+}});
+abrirPar = id => {{ const h = '#par=' + encodeURIComponent(id), u = {json.dumps(reporte.name)};
+  if (enMarco) irA(u, h); else if (!window.open(u + h, '_blank')) location.href = u + h; }};
+</script>
 <script>{SCRIPT_INSERTOS}</script>
 {rc.NOTA_FINAL}
 </main></body></html>

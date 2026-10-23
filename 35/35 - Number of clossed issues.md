@@ -7,7 +7,7 @@
 | **Consigna** | 21 - Tiempo promedio de resolución de issues                                                                                                                                |
 | **Métrica Original (ISL)** | Issue Resolution Time                                                                                                                                                       |
 | **Métrica Adoptada** | Number of Closed Issues (NCI)                                                                                                                                               |
-| **Dimensiones Asociadas** | Persona, Proceso                                                                                                                                                            |
+| **Dimensiones Asociadas** | Proceso                                                                                                                                                                     |
 | **Fuente** | [Catálogo canónico 2022 (Google Docs)](https://docs.google.com/document/d/1DCmKuqtu7s9BhdJQdVVzbGx6h0tM-TE7/edit?usp=sharing&ouid=117949578369504995298&rtpof=true&sd=true) |
 
 ---
@@ -34,7 +34,8 @@ La métrica más cercana disponible en dicho catálogo es **Number of Closed Iss
 | Dimensión | Justificación |
 |---|---|
 | **Proceso** | Mide productividad y rendimiento del equipo (*throughput*) durante el flujo de trabajo. |
-| **Persona** | Refleja el desempeño de los integradores/colaboradores que cierran los ítems. |
+
+> NCI se asigna solo a Proceso, igual que en la planilla combinada y en las fichas 40 y 43. Sus resúmenes por colaborador (p90 y share del top 10 %) entran además en Persona por la regla general del análisis: toda variable agregada por persona cuenta como Persona (`analisis/generar_diccionario.py`).
 
 ### 2.2 Fundamento Teórico
 

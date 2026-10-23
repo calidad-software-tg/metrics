@@ -92,9 +92,9 @@ DIMS: dict[str, tuple[int, int, int]] = {
     "mttr_con_bots":         (0, 1, 1),
     "nci_con_bots":          (0, 1, 0),
     # ahora varían por ventana (antes eran constantes)
-    "wp":                    (0, 0, 1),
+    "wp":                    (0, 1, 1),  # Producto y Proceso, como en la ficha 16, el listado final y la planilla combinada
     "nob_42":                (0, 1, 1),
-    "nci":                   (0, 1, 0),  # PENDIENTE — tratada como Proceso
+    "nci":                   (0, 1, 0),  # Proceso, como en la planilla combinada y las fichas 35, 40 y 43
     # activos/nuevos: Persona
     "activos_commits":       (1, 0, 0),
     "activos_interaccion":   (1, 0, 0),

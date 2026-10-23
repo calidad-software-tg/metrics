@@ -37,6 +37,21 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 PARES = ROOT / "analisis" / "salidas" / "pares_correlacion.csv"
 VALORES = ROOT / "analisis" / "salidas" / "pares_valores.csv"
+
+
+def archivos_valores(carpeta: Path = VALORES.parent) -> list:
+    """pares_valores.csv, o sus dos mitades (_persona / _resto) si generar_correlaciones lo partió."""
+    entero = carpeta / "pares_valores.csv"
+    if entero.exists():
+        return [entero]
+    return [a for a in (carpeta / "pares_valores_persona.csv", carpeta / "pares_valores_resto.csv") if a.exists()]
+
+
+def leer_valores(columnas: list, carpeta: Path = VALORES.parent) -> pd.DataFrame:
+    archivos = archivos_valores(carpeta)
+    if not archivos:
+        return pd.DataFrame(columns=columnas)
+    return pd.concat([pd.read_csv(a, usecols=columnas) for a in archivos], ignore_index=True)
 DICCIONARIO = ROOT / "analisis" / "salidas" / "diccionario_variables.csv"
 SALIDA = ROOT / "analisis" / "salidas" / "reportes"
 
@@ -51,6 +66,10 @@ NOMBRES_CORTOS = {
     "exprev": "EXPRev", "rexprev": "REXPRev", "rexp": "REXP", "fexp": "FEXP",
     "ss": "Skill Similarity", "nc": "NC", "sc": "Social Contributions",
     "dev_exp": "Development Experience", "disc_centrality": "Discussion Centrality",
+    # agregadas en la branch de fixes
+    "dloc_flujo": "Flujo de documentación", "commits_doc": "Commits que tocan doc",
+    "mttr_p50": "MTTR (mediana de issues)", "mttr_bugs": "MTTR de bugs", "mttr_con_bots": "MTTR con bots",
+    "nci_con_bots": "NCI con bots", "wp": "Wiki Presence", "nob_42": "NOB",
 }
 SUFIJOS = {"valor": "", "mediana": " (mediana)", "p90": " (p90)", "share_top10pct": " (share top 10%)"}
 
@@ -116,8 +135,8 @@ def datos_reporte(p: pd.DataFrame, nombres: dict) -> dict:
     valores por release (los originales una vez por variable; por par, solo los ajustados)."""
     columnas = ["par_id", "periodo_num", "version", "fecha_hora", "anio", "etapa", "duracion_dias",
                 "x_valor", "y_valor", "x_ajustado", "y_ajustado"]
-    con_valores = VALORES.exists()
-    v = pd.read_csv(VALORES, usecols=columnas) if con_valores else pd.DataFrame(columns=columnas)
+    con_valores = bool(archivos_valores())
+    v = leer_valores(columnas)
     v = v[v.par_id.isin(set(p.par_id))]
     releases = (v.drop_duplicates("periodo_num").set_index("periodo_num")[["version", "anio", "etapa", "duracion_dias", "fecha_hora"]]
                 .sort_index())
@@ -1157,7 +1176,7 @@ También podés hacer clic en una fila de la tabla de pares.</p>
         script_explorador = f"<script>{SCRIPT}</script>"
     else:
         script_explorador = ""
-        explorador = (f'<p class="nota">No se encontró {VALORES.name}: corré generar_correlaciones.py '
+        explorador = (f'<p class="nota">No se encontró {VALORES.name} (ni sus mitades _persona / _resto): corré generar_correlaciones.py '
                       f'para generar los valores por release y ver el explorador de pares.</p>')
 
     tabla_pares = f"""
