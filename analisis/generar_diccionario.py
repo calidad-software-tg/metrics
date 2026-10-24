@@ -148,7 +148,7 @@ NOMBRES = {
     "dis":                 "DIS (Doc Issue Survival)",
     "disc_centrality":     "Disc. Centrality (Discussion Centrality)",
     "dloc":                "DLOC (Documentation Lines of Code)",
-    "dloc_flujo":          "DLOC flujo (líneas de documentación cambiadas en la ventana)",
+    "dloc_flujo":          "DLOC 2.0 (líneas de documentación agregadas o eliminadas en la ventana)",
     "commits_doc":         "Commits que tocan documentación (proporción)",
     "mttr_p50":            "MTTR mediana de issues (sin bots)",
     "mttr_bugs":           "MTTR de bugs (sin bots)",

@@ -67,7 +67,7 @@ NOMBRES_CORTOS = {
     "ss": "Skill Similarity", "nc": "NC", "sc": "Social Contributions",
     "dev_exp": "Development Experience", "disc_centrality": "Discussion Centrality",
     # agregadas en la branch de fixes
-    "dloc_flujo": "Flujo de documentación", "commits_doc": "Commits que tocan doc",
+    "dloc_flujo": "DLOC 2.0", "commits_doc": "Commits que tocan doc",
     "mttr_p50": "MTTR (mediana de issues)", "mttr_bugs": "MTTR de bugs", "mttr_con_bots": "MTTR con bots",
     "nci_con_bots": "NCI con bots", "wp": "Wiki Presence", "nob_42": "NOB",
 }
