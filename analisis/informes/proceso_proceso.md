@@ -307,9 +307,7 @@ En los releases donde las issues en general tardan más en cerrarse, las de docu
 
 ## 5. Componentes principales
 
-Se usó el mismo método que en Producto: rangos estandarizados, enfoque ajustado por tiempo y duración como principal, análisis paralelo de Horn para elegir cuántos componentes, rotación varimax y bootstrap de bloques. Las variantes de MTTR y NCI no entran, y DIS queda afuera porque tiene valor en menos de la mitad de los releases. Con las métricas a nivel proyecto se usan **185 releases estables**, desde mediados de 2019, cuando empiezan CFDR y NUB.
-
-**Wiki Presence no entra al PCA.** En esos 185 releases vale 0 en 184 y 1 solo en el primero (v9.0.0). Incluida, arma un componente propio formado por ese único release (puntaje 9,8, contra menos de 2,1 en todos los demás). Se excluye con el mismo criterio que usa el diccionario para las correlaciones: una variable sale si su valor más repetido ocupa más del 80 % de los releases, medido acá sobre los releases del PCA. README Completeness queda en 52 %, así que se mantiene. Sin Wiki Presence, el PCA da exactamente lo mismo que antes de sumarla.
+Se usó el mismo método que en Producto: rangos estandarizados, enfoque ajustado por tiempo y duración como principal, análisis paralelo de Horn para elegir cuántos componentes, rotación varimax y bootstrap de bloques. Las variantes de MTTR y NCI no entran, y DIS queda afuera porque tiene valor en menos de la mitad de los releases. Con las **11 métricas a nivel proyecto** se usan **185 releases estables**, desde mediados de 2019, cuando empiezan CFDR y NUB.
 
 ### 5.1 Cuántos componentes se retienen
 
@@ -317,19 +315,20 @@ Se usó el mismo método que en Producto: rangos estandarizados, enfoque ajustad
 
 [[pca criterios producto]]
 
-- Con las **10 variables a nivel proyecto**, Horn retiene **4 componentes**, que explican el **70 %** de la variación (antes 3 componentes y 67 % con 9 variables). Los cuatro primeros autovalores (2,51, 1,74, 1,45 y 1,27) superan lo que da el azar (1,49, 1,34, 1,24 y 1,15); el quinto (1,06) queda por debajo (1,08).
-- Con las **27 variables** (sumando las versiones por colaborador, 139 releases), retiene 6 y explican el 62 %.
+- Con las 11 variables a nivel proyecto, Horn retiene **5 componentes**, que explican el **76 %** de la variación (antes 3 componentes y 67 % con 9 variables). Los cinco primeros autovalores (2,52, 1,76, 1,58, 1,27 y 1,21) superan lo que da el azar (1,54, 1,37, 1,26, 1,18 y 1,10); el sexto (0,84) queda por debajo (1,03).
+- Con las 28 variables (sumando las versiones por colaborador, 139 releases), retiene 7 y explican el 66 %.
 
 ### 5.2 Componentes identificados
 
 [[pca cargas producto estable ajustado]]
 
-1. **CP1 · Bugs de usuarios (22 %):** CFDR y NUB (+0,98). Es el mismo componente del análisis original y el mismo que en Producto.
-2. **CP2 · Resolución de lo nuevo (20 %):** Jarczyk y Process Performance (+0,93), con NCI en parte (+0,36).
-3. **CP3 · README y backlog (15 %):** README Completeness (+0,81) y NOI (+0,72), con ANMCC en contra (−0,49). No se interpreta: README es casi un escalón, de a pares su relación con NOI es débil (+0,18), y el componente se arma porque los saltos de README coinciden en el tiempo con cambios en el backlog. Producto encuentra el mismo agrupamiento.
-4. **CP4 · Cierre de lo viejo (13 %):** MTTR (+0,86) y NCI (+0,74). Es el Patrón 1.
+1. **CP1 · Bugs de usuarios (20 %):** CFDR y NUB (+0,98). Es el mismo componente del análisis original y el mismo que en Producto.
+2. **CP2 · Resolución de lo nuevo (18 %):** Jarczyk (+0,93) y Process Performance (+0,92), con NCI en parte (+0,34).
+3. **CP3 · README y backlog (13 %):** NOI (+0,80) y README Completeness (+0,65), con ANMCC en contra (−0,61). No se interpreta como patrón: README es casi un escalón y de a pares su relación con NOI es débil (+0,18). Producto encuentra el mismo agrupamiento.
+4. **CP4 · Wiki y branches (13 %):** Wiki Presence (+0,76), NOB (+0,73) y README Completeness (+0,53). **No se interpreta:** lo arma el escalón de Wiki Presence. En los 185 releases del PCA, Wiki Presence vale 1 en uno solo, el primero (v9.0.0), y ese release tiene un puntaje de 9,8 en este componente contra menos de 2,1 en todos los demás. Es el componente menos estable en el bootstrap (0,51 en el 5 % de los peores remuestreos). Es el mismo caso que el componente "Wiki y documentación temprana" de Producto.
+5. **CP5 · Cierre de lo viejo (12 %):** MTTR (+0,85) y NCI (+0,74). Es el Patrón 1.
 
-NCI carga en CP2 y en CP4 a la vez: el volumen de cierre se reparte entre resolver lo nuevo y cerrar lo viejo, que son componentes separados. NOB casi no queda representada y ANMCC solo en parte.
+NCI carga en CP2 y en CP5 a la vez: el volumen de cierre se reparte entre resolver lo nuevo y cerrar lo viejo, que son componentes separados. Sin Wiki Presence, el PCA da 4 componentes iguales a CP1, CP2, CP3 y CP5: sumarla agrega un componente pero no cambia los demás.
 
 **Cambio respecto del análisis original:**
 
@@ -337,13 +336,15 @@ NCI carga en CP2 y en CP4 a la vez: el volumen de cierre se reparte entre resolv
 
 | Antes | Ahora | Congruencia |
 |---|---|---|
-| CP1 · Bugs: CFDR y NUB | CP1 · Bugs: CFDR y NUB | 0,97 (el mismo) |
-| CP2 · Resolución: Jarczyk, Process Performance y NCI | CP2 · Resolución de lo nuevo | 0,88 (parecido) |
-| CP3 · Limpieza del backlog: MTTR (+0,82), NOI (−0,66), NCI (+0,62), README (−0,45) | CP4 · Cierre de lo viejo: MTTR y NCI | 0,76 (distinto) |
+| CP1 · Bugs: CFDR y NUB | CP1 · Bugs: CFDR y NUB | 0,96 (el mismo) |
+| CP2 · Resolución: Jarczyk, Process Performance y NCI | CP2 · Resolución de lo nuevo | 0,89 (parecido) |
+| CP3 · Limpieza del backlog: MTTR (+0,82), NOI (−0,66), NCI (+0,62), README (−0,45) | CP5 · Cierre de lo viejo: MTTR y NCI | 0,78 (distinto) |
 | — | CP3 · README y backlog | nuevo, no se interpreta |
+| — | CP4 · Wiki y branches | nuevo, no se interpreta |
 
 - **La "limpieza del backlog" pasa a ser "cierre de lo viejo":** NOI salía con signo contrario porque el bot cerraba issues viejas y bajaba el backlog en el mismo release. Sin sus cierres, NOI deja ese componente.
 - **El componente de resolución de lo nuevo se mantiene,** y NCI pasa a repartirse entre resolución y cierre de lo viejo.
+- **Los dos componentes nuevos los arman escalones** (README y Wiki Presence), que entran ahora porque antes eran constantes o se medían de otra forma.
 
 [[pca puntajes producto estable ajustado]]
 
@@ -351,25 +352,23 @@ NCI carga en CP2 y en CP4 a la vez: el volumen de cierre se reparte entre resolv
 
 [[pca solidez producto estable ajustado]]
 
-- Bugs y resolución de lo nuevo son muy estables en el bootstrap (congruencia mediana 0,98). README y backlog (0,96) y cierre de lo viejo (0,90, con 0,56 en el 5 % de los peores remuestreos) lo son menos: cierre de lo viejo es el componente más débil.
+- Bugs (0,96) y resolución de lo nuevo (0,98) son muy estables en el bootstrap, y cierre de lo viejo (0,95, con 0,80 en el 5 % de los peores remuestreos) también. README y backlog (0,89) y Wiki y branches (0,88, con 0,51 en el peor 5 %) lo son menos.
 
 [[pca comparacion producto]]
 
-- **Canary repite los cuatro componentes** (0,97, 0,98, 0,93 y 0,96).
-- **Sin el efecto del tamaño**, Horn retiene 3: bugs, resolución de lo nuevo y cierre de lo viejo son los mismos; README y backlog se pierde.
+- **Canary repite los cinco componentes** (0,97, 0,99, 0,96, 0,97 y 0,97).
+- **Sin el efecto del tamaño**, Horn retiene 4, y los cinco componentes de referencia se reconocen (0,92 a 1,00).
 - **El crudo da solo 2 componentes**, que reflejan cómo crecieron las métricas con los años y no cómo se mueven de un release a otro.
 
-### 5.4 Con las 27 variables
+### 5.4 Con las 28 variables
 
 [[pca cargas todas estable ajustado]]
 
-Aparecen seis grupos: concentración de la participación (Contribution Diversity p90, EXPRev, SC y NC share del top 10 %), amplitud de los cambios (ANMCC y Contribution Diversity por colaborador), resolución de lo nuevo (con SC mediana, como en el Patrón 3), bugs (con EXPRev, REXPRev y NC en contra, el efecto de tamaño de la sección 4.1), cierre de lo viejo (MTTR, NCI y sus versiones por colaborador) y README. Son menos estables (congruencia mediana entre 0,86 y 0,93). Para los cruces conviene usar los componentes de las 10 métricas a nivel proyecto.
-
-En canary, además de Wiki Presence queda afuera la mediana de REXPRev, que en las ventanas de horas vale lo mismo en más del 80 % de los releases.
+Aparecen siete grupos: concentración de la participación (EXPRev, NC y SC share del top 10 %, SC p90), bugs (con EXPRev, NC y REXPRev en contra, el efecto de tamaño de la sección 4.1), cierre de lo viejo (MTTR, NCI y sus versiones por colaborador), resolución de lo nuevo (con SC mediana, como en el Patrón 3), amplitud de los cambios (ANMCC y Contribution Diversity por colaborador), README y wiki (README Completeness y su mediana, Wiki Presence y NOB), y ANMCC con NOI en contra. Son menos estables (congruencia mediana entre 0,78 y 0,95). Para los cruces conviene usar los componentes de las 11 métricas a nivel proyecto, sin interpretar los dos de escalones.
 
 ## 6. Advertencias sobre los datos de Proceso
 
-- **README Completeness y Wiki Presence son escalones** (4.4). Sus relaciones y el componente de README no se interpretan.
+- **README Completeness y Wiki Presence son escalones** (4.4). Sus relaciones y los dos componentes que arman en el PCA (README y backlog, Wiki y branches) no se interpretan.
 - **DIS tiene datos solo desde 2022,** y CFDR y NUB desde mediados de 2019.
 - **SC incluye los cierres propios** de cada persona, que también cuentan en Jarczyk: el Patrón 3 está en verificación.
 - **Rol del autor en NUB.** NUB decide quién es del equipo con el rol que GitHub informa hoy, no el que tenía la persona cuando abrió la issue. CFDR sí usa el top 10 de contribuidores hasta el cierre de cada ventana.
