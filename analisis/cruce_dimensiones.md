@@ -188,3 +188,15 @@ Todo lo que puede cambiar entre un cruce y otro se define en un JSON. Hay ejempl
 | **Regresiones multivariables** | Predecir una métrica de una dimensión con varias de la otra | Con tantas variables correlacionadas entre sí, los coeficientes son inestables y cambian de signo según qué variables entren. Los releases no son independientes, así que los errores estándar quedan subestimados. La correlación parcial ya controla tiempo, duración y tamaño |
 | **Información mutua** | Dependencias no lineales | Con unos 185 releases autocorrelacionados, su estimación es ruidosa y difícil de testear. Spearman ya capta las relaciones monótonas, aunque no sean lineales |
 | **Random forest y otros modelos de machine learning** | Importancia de cada métrica para predecir otra | Con pocos datos se ajusta al ruido, y la importancia de una variable no es una prueba estadística: no dice si la relación es real ni en qué dirección va. Tampoco respeta el orden en el tiempo |
+
+### Comprobación con los datos
+
+`analisis/cruce_alternativos.py` corre estas alternativas sobre un cruce ya hecho, para que el descarte no dependa solo del argumento:
+
+```bash
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/cruce_alternativos.py Persona Producto --config analisis/cruces/persona_producto.json
+```
+
+Necesita scikit-learn (`python3 -m pip install scikit-learn`) y que antes se haya corrido `cruce_dimensiones.py` para el mismo par, porque compara con sus resultados. Usa los mismos releases y la misma transformación que el PCA ajustado. Cada método se compara con una nula que corre un lado en forma circular respecto del otro, tiene que repetirse en canary y no cuenta lo que se explica por el tamaño, por definiciones superpuestas, por la misma métrica en los dos lados o por variables con menos de 10 valores distintos. Deja en `analisis/salidas/cruces/<a>_<b>/alternativos/` un `resumen.md` con el veredicto por método y un CSV por método.
+
+En Persona–Producto ninguno encuentra un patrón nuevo: la CCA sobre todas las variables, sin escala ni definiciones superpuestas, vuelve a encontrar la relación entre la concentración del núcleo y los bugs de usuarios (y le agrega una réplica débil en canary), y random forest vuelve a encontrar la de ANMCC y los commits de documentación, con forma no lineal. El resto se explica por relaciones ya encontradas, por el tamaño o por variables escalón.

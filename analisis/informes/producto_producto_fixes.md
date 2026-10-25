@@ -22,7 +22,7 @@ Este análisis repite el de la dimensión Producto con las métricas recalculada
 | README Completeness | producto | Proporción de las 7 categorías de Prana et al. que cubre el README | Corregida: solo el README de la raíz (siguiendo el enlace simbólico) |
 | Wiki Presence | producto | 1 si el repositorio tenía wiki en ese momento | Corregida: antes era constante; ahora sale del historial de la wiki |
 | NOB | producto | Branches del repositorio principal con un PR abierto al cierre de la ventana | Corregida: antes era constante (las 2.706 branches de hoy) |
-| Flujo de documentación | producto | Líneas de documentación agregadas o eliminadas en la ventana | Nueva |
+| DLOC 2.0 | producto | Líneas de documentación agregadas o eliminadas en la ventana (DLOC por ventana, en lugar del total acumulado) | Nueva |
 | Commits que tocan doc | producto | Proporción de commits de la ventana que modifican documentación | Nueva |
 | MTTR (mediana de issues) | producto | MTTR con la mediana de las issues en vez del promedio | Variante de MTTR (control) |
 | MTTR de bugs | producto | MTTR solo de las issues clasificadas como bug | Variante de MTTR (control) |
@@ -203,7 +203,7 @@ Se usó el mismo método que en el primer análisis: rangos estandarizados, enfo
 1. **CP1 · Bugs reportados por usuarios (16 %):** CFDR y NUB (+0,97). Es el mismo componente del análisis original.
 2. **CP2 · Wiki y documentación temprana (14 %):** Wiki Presence (+0,82), CD (+0,76) y NOB (+0,62). Lo arma sobre todo el escalón de Wiki Presence en 2020, y es el componente menos estable en el bootstrap (congruencia mediana de 0,69): conviene no interpretarlo como un patrón.
 3. **CP3 · Issues abiertas y README (13 %):** README Completeness (+0,73), NOI (+0,70) y ANMCC (−0,54).
-4. **CP4 · Flujo de documentación (12 %):** flujo de documentación (+0,82), commits que tocan documentación (+0,77) y LE (−0,41). Es un componente nuevo, que aparece con las métricas de flujo.
+4. **CP4 · Flujo de documentación (12 %):** DLOC 2.0 (+0,82), commits que tocan documentación (+0,77) y LE (−0,41). Es un componente nuevo, que aparece con las métricas de flujo.
 
 MTTR (comunalidad 0,21) y DLOC (0,14) casi no quedan representadas: con las métricas corregidas se mueven por su cuenta.
 
