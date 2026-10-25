@@ -58,7 +58,6 @@ N_BOOTSTRAP = 500         # bootstrap de bloques
 PERCENTIL_HORN = 95
 UMBRALES_VARIANZA = (0.70, 0.80)
 MIN_COBERTURA = 0.5       # una variable entra en una serie si tiene dato en al menos la mitad de sus ventanas
-MAX_PCT_MODA = 0.8        # se excluye si el valor más repetido ocupa más del 80 % de los releases (como el diccionario)
 SEMILLA = 20261011
 
 
@@ -82,12 +81,6 @@ def cargar_datos():
     # misma regla y mismos releases que las correlaciones (generar_correlaciones.main)
     datos["__backports__"] = gc.excluir_backports(datos)
     return var_dict, datos
-
-
-def pct_moda_filas(filas, j):
-    """Proporción de releases que tienen el valor más repetido de la variable j."""
-    vals = [f["valores"][j] for f in filas.values()]
-    return max(vals.count(x) for x in set(vals)) / len(vals) if vals else 1.0
 
 
 def es_backport(versiones):
@@ -337,15 +330,12 @@ def main():
                     print(f"  {conj}/{serie}/{enf}: menos de 3 variables")
                     continue
                 filas, n_bp = tabla(vars_enf, datos, serie_db)
-                # variables (casi) constantes en los releases elegidos: mismo criterio que el
-                # diccionario (pct_moda > 80 %), pero medido sobre los releases del PCA. Ej.: Wiki
-                # Presence vale 0 en 184 de los 185 releases desde 2019 y arma un componente de un
-                # solo release (v9.0.0). Las totalmente constantes además rompen la matriz.
+                # variables constantes en los releases elegidos (ej. Wiki Presence vale 0 en todas
+                # las ventanas desde 2020): no aportan al PCA y rompen la matriz de correlaciones
                 constantes = [v for j, v in enumerate(vars_enf)
-                              if pct_moda_filas(filas, j) > MAX_PCT_MODA]
+                              if len({f["valores"][j] for f in filas.values()}) < 2]
                 if constantes:
-                    print(f"  {conj}/{serie}/{enf}: casi constantes en estos releases (moda > {MAX_PCT_MODA:.0%}), "
-                          f"se excluyen {', '.join(constantes)}")
+                    print(f"  {conj}/{serie}/{enf}: constantes en estos releases, se excluyen {', '.join(constantes)}")
                     excluidas = excluidas + [v for v in constantes if v not in excluidas]
                     vars_enf = [v for v in vars_enf if v not in constantes]
                     filas, n_bp = tabla(vars_enf, datos, serie_db)
