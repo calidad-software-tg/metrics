@@ -3,15 +3,15 @@ dis_mediana__jarczyk_success_rate_producto,DIS (Doc Issue Survival) [mediana],Ja
 exprev_p90__cfdr_producto,EXPRev (Code Review Experience) [p90],CFDR (Customer Found Defects & Regressions) [producto],-0.2786,,CP1,,False
 exprev_p90__nub_producto,EXPRev (Code Review Experience) [p90],NUB (Bugs Detected by Users) [producto],-0.274,,CP1,,False
 exprev_p90__process_performance_producto,EXPRev (Code Review Experience) [p90],Process Performance [producto],0.2206,,CP2,,False
-exprev_share_top10pct__mttr_producto,EXPRev (Code Review Experience) [share_top10pct],MTTR (Mean Time to Repair) [producto],0.2002,CP3,CP4,,False
+exprev_share_top10pct__mttr_producto,EXPRev (Code Review Experience) [share_top10pct],MTTR (Mean Time to Repair) [producto],0.2002,CP3,CP5,,False
 mttr_mediana__dis_producto,MTTR (Mean Time to Repair) [mediana],DIS (Doc Issue Survival) [producto],0.3235,,,,False
-mttr_mediana__nci_producto,MTTR (Mean Time to Repair) [mediana],NCI (Number of Closed Issues) [producto],0.1841,,CP4,,False
+mttr_mediana__nci_producto,MTTR (Mean Time to Repair) [mediana],NCI (Number of Closed Issues) [producto],0.1841,,CP5,,False
 mttr_mediana__process_performance_producto,MTTR (Mean Time to Repair) [mediana],Process Performance [producto],-0.1786,,CP2,,False
 nci_p90__dis_producto,NCI (Number of Closed Issues) [p90],DIS (Doc Issue Survival) [producto],0.2655,CP3,,,False
 nci_p90__jarczyk_success_rate_producto,NCI (Number of Closed Issues) [p90],Jarczyk Success Rate [producto],0.1899,CP3,CP2,,False
 prop_cierran_ratio__jarczyk_success_rate_producto,Proporción que cierra issues [ratio],Jarczyk Success Rate [producto],0.2266,,CP2,,False
 prop_cierran_ratio__process_performance_producto,Proporción que cierra issues [ratio],Process Performance [producto],0.2273,,CP2,,False
-prop_comentan_ratio__anmcc_producto,Proporción que comenta [ratio],ANMCC (Avg Modified Components per Commit) [producto],0.1721,CP2,CP3,,False
+prop_comentan_ratio__anmcc_producto,Proporción que comenta [ratio],ANMCC (Avg Modified Components per Commit) [producto],0.1721,CP2,,,False
 rexprev_mediana__cfdr_producto,REXPRev (Recent Review Experience) [mediana],CFDR (Customer Found Defects & Regressions) [producto],-0.3138,,CP1,,False
 rexprev_mediana__nub_producto,REXPRev (Recent Review Experience) [mediana],NUB (Bugs Detected by Users) [producto],-0.3107,,CP1,,False
 sc_mediana__jarczyk_success_rate_producto,SC (Social Contribution) [mediana],Jarczyk Success Rate [producto],0.3282,,CP2,,False

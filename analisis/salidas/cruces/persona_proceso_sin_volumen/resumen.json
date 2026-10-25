@@ -34,6 +34,11 @@
     "Persona": [
      1,
      3
+    ],
+    "Proceso": [
+     1,
+     2,
+     5
     ]
    },
    "umbral_bootstrap": 0.85,
@@ -99,7 +104,8 @@
    "noi_producto",
    "nub_producto",
    "process_performance_producto",
-   "rc_producto"
+   "rc_producto",
+   "wp_producto"
   ]
  },
  "compartidas": {},
@@ -195,72 +201,51 @@
    {
     "n": 1,
     "conjunto": "producto",
-    "varianza": 0.2513,
-    "bootstrap": 0.977,
-    "canary": 0.968,
+    "varianza": 0.2288,
+    "bootstrap": 0.963,
+    "canary": 0.966,
     "cargas": [
      [
       "cfdr_producto",
-      0.981
+      0.984
      ],
      [
       "nub_producto",
-      0.981
+      0.984
      ]
     ]
    },
    {
     "n": 2,
     "conjunto": "producto",
-    "varianza": 0.1737,
+    "varianza": 0.1597,
     "bootstrap": 0.978,
-    "canary": 0.979,
+    "canary": 0.994,
     "cargas": [
      [
       "jarczyk_success_rate_producto",
-      0.927
+      0.932
      ],
      [
       "process_performance_producto",
-      0.925
+      0.923
      ]
     ]
    },
    {
-    "n": 3,
+    "n": 5,
     "conjunto": "producto",
-    "varianza": 0.1454,
-    "bootstrap": 0.962,
-    "canary": 0.925,
-    "cargas": [
-     [
-      "rc_producto",
-      0.811
-     ],
-     [
-      "noi_producto",
-      0.719
-     ],
-     [
-      "anmcc_producto",
-      -0.489
-     ]
-    ]
-   },
-   {
-    "n": 4,
-    "conjunto": "producto",
-    "varianza": 0.1267,
-    "bootstrap": 0.902,
-    "canary": 0.96,
+    "varianza": 0.1097,
+    "bootstrap": 0.95,
+    "canary": 0.974,
     "cargas": [
      [
       "mttr_producto",
-      0.86
+      0.852
      ],
      [
       "nci_producto",
-      0.741
+      0.745
      ]
     ]
    }
@@ -458,21 +443,21 @@
      "id": "proceso_cp2",
      "tipo": "componente",
      "componente": "proceso_cp2",
-     "nombre": "CP2 Proceso: jarczyk_success_rate_producto (+0.93), process_performance_producto (+0.93)",
+     "nombre": "CP2 Proceso: jarczyk_success_rate_producto (+0.93), process_performance_producto (+0.92)",
      "escala": false
     },
     {
-     "id": "proceso_cp3",
+     "id": "proceso_cp5",
      "tipo": "componente",
-     "componente": "proceso_cp3",
-     "nombre": "CP3 Proceso: rc_producto (+0.81), noi_producto (+0.72), anmcc_producto (-0.49)",
+     "componente": "proceso_cp5",
+     "nombre": "CP5 Proceso: mttr_producto (+0.85), nci_producto (+0.74)",
      "escala": false
     },
     {
-     "id": "proceso_cp4",
-     "tipo": "componente",
-     "componente": "proceso_cp4",
-     "nombre": "CP4 Proceso: mttr_producto (+0.86), nci_producto (+0.74)",
+     "id": "anmcc_producto",
+     "tipo": "variable",
+     "componente": "",
+     "nombre": "ANMCC (Avg Modified Components per Commit) [producto]",
      "escala": false
     },
     {
@@ -488,43 +473,64 @@
      "componente": "",
      "nombre": "NOB (branches activas con PR abierto) [producto]",
      "escala": false
+    },
+    {
+     "id": "noi_producto",
+     "tipo": "variable",
+     "componente": "",
+     "nombre": "NOI (Number of Open Issues) [producto]",
+     "escala": false
+    },
+    {
+     "id": "rc_producto",
+     "tipo": "variable",
+     "componente": "",
+     "nombre": "RC (Readme Completeness) [producto]",
+     "escala": false
+    },
+    {
+     "id": "wp_producto",
+     "tipo": "variable",
+     "componente": "",
+     "nombre": "WP (Wiki Presence) [producto]",
+     "escala": false
     }
    ]
   },
   "conteo": {
-   "patrón": 13,
+   "patrón": 8,
    "escala": 6,
-   "mecánico": 2,
+   "mecánico": 3,
    "no resiste tamaño": 0,
-   "control": 1
+   "control": 2
   }
  },
  "cca": {
   "n": 184,
   "correlaciones": [
-   0.4332,
-   0.3132
+   0.4229,
+   0.2871
   ],
   "p_primera": 0.001,
-  "nula_p95": 0.3321
+  "nula_p95": 0.3039
  },
  "pca_conjunto": {
-  "n": 185,
-  "variables": 23,
+  "n": 189,
+  "variables": 20,
   "excluidas": [],
-  "k": 6,
+  "k": 5,
   "criterios": {
-   "kaiser": 7,
-   "codo": 4,
-   "varianza_70": 6,
-   "varianza_80": 8,
-   "horn": 6
+   "kaiser": 5,
+   "codo": 6,
+   "varianza_70": 5,
+   "varianza_80": 7,
+   "horn": 5
   },
   "componentes": [
    {
     "n": 1,
-    "varianza": 0.2391,
-    "bootstrap": 0.9893,
+    "varianza": 0.2699,
+    "bootstrap": 0.9924,
     "mixto": false,
     "dimensiones": [
      "Persona"
@@ -532,7 +538,7 @@
     "cargas": [
      [
       "nuevos_commits_conteo",
-      0.946
+      0.941
      ],
      [
       "tasa_nuevos_commits_ratio",
@@ -540,78 +546,73 @@
      ],
      [
       "activos_commits_conteo",
-      0.829
-     ],
-     [
-      "dev_exp_mediana",
-      -0.815
+      0.821
      ],
      [
       "le_mediana",
-      -0.803
+      -0.812
+     ],
+     [
+      "dev_exp_mediana",
+      -0.796
      ],
      [
       "cdiv_mediana",
-      -0.651
+      -0.674
      ],
      [
       "anmcc_mediana",
-      -0.619
+      -0.633
      ],
      [
       "prop_commitean_ratio",
-      0.611
+      0.613
      ]
     ]
    },
    {
     "n": 2,
-    "varianza": 0.1797,
-    "bootstrap": 0.9368,
-    "mixto": true,
+    "varianza": 0.2038,
+    "bootstrap": 0.9843,
+    "mixto": false,
     "dimensiones": [
-     "Persona",
-     "Proceso"
+     "Persona"
     ],
     "cargas": [
      [
       "exprev_share_top10pct",
-      0.745
+      0.78
      ],
      [
       "sc_share_top10pct",
-      0.699
-     ],
-     [
-      "nc_share_top10pct",
-      0.698
-     ],
-     [
-      "cdiv_p90",
-      0.684
+      0.755
      ],
      [
       "sc_p90",
-      0.678
+      0.739
+     ],
+     [
+      "nc_share_top10pct",
+      0.719
+     ],
+     [
+      "cdiv_p90",
+      0.631
      ],
      [
       "anmcc_mediana",
-      0.435
+      0.415
      ],
      [
       "cdiv_mediana",
-      0.435
-     ],
-     [
-      "anmcc_producto",
-      0.433
+      0.415
      ]
     ]
    },
    {
     "n": 3,
-    "varianza": 0.0965,
-    "bootstrap": 0.9621,
+    "varianza": 0.1084,
+    "bootstrap": 0.9756,
     "mixto": true,
     "dimensiones": [
      "Persona",
@@ -620,22 +621,22 @@
     "cargas": [
      [
       "cfdr_producto",
-      0.946
+      0.935
      ],
      [
       "nub_producto",
-      0.945
+      0.934
      ],
      [
       "prop_commitean_ratio",
-      -0.506
+      -0.504
      ]
     ]
    },
    {
     "n": 4,
-    "varianza": 0.076,
-    "bootstrap": 0.9579,
+    "varianza": 0.0785,
+    "bootstrap": 0.9702,
     "mixto": false,
     "dimensiones": [
      "Proceso"
@@ -643,41 +644,18 @@
     "cargas": [
      [
       "process_performance_producto",
-      0.917
+      0.927
      ],
      [
       "jarczyk_success_rate_producto",
-      0.909
+      0.916
      ]
     ]
    },
    {
     "n": 5,
-    "varianza": 0.0684,
-    "bootstrap": 0.8916,
-    "mixto": false,
-    "dimensiones": [
-     "Proceso"
-    ],
-    "cargas": [
-     [
-      "noi_producto",
-      0.745
-     ],
-     [
-      "rc_producto",
-      0.709
-     ],
-     [
-      "anmcc_producto",
-      -0.552
-     ]
-    ]
-   },
-   {
-    "n": 6,
-    "varianza": 0.0587,
-    "bootstrap": 0.82,
+    "varianza": 0.0692,
+    "bootstrap": 0.8931,
     "mixto": true,
     "dimensiones": [
      "Persona",
@@ -686,15 +664,15 @@
     "cargas": [
      [
       "mttr_producto",
-      0.735
+      0.77
      ],
      [
       "nci_producto",
-      0.706
+      0.68
      ],
      [
       "nci_p90",
-      0.622
+      0.6
      ]
     ]
    }
