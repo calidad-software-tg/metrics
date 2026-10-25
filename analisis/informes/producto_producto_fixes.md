@@ -128,7 +128,7 @@ Al hacer clic en una fila, su análisis particular se muestra en 4.5.
 |---|---|---|---|
 | CFDR ↔ NUB | +1,00 robusta | +1,00 robusta | Se mantiene: es la misma medida con dos definiciones de equipo |
 | CD ↔ DLOC | −0,66 robusta | −0,53, no robusta | Sigue negativa, pero ya no en todos los períodos (+0,03 en 2016–19): la fuerza que tenía en 2023–24 venía de los cambios de estructura del repositorio |
-| DLOC ↔ README Completeness (las tres versiones) | −0,33 a −0,44 robustas | +0,22 a +0,46 | Cambian de signo: las armaban los ejemplos, el `.mdx` y los backports. README Completeness ahora mide solo el README principal |
+| DLOC ↔ README Completeness (las tres versiones) | −0,33 a −0,44 robustas | +0,01 a +0,46 | Cambian de signo: las armaban los ejemplos, el `.mdx` y los backports. README Completeness ahora mide solo el README principal |
 | CFDR y NUB ↔ MTTR (mediana) | −0,22 robustas | −0,06, sin relación | Las armaban los cierres de bots y la mezcla de quienes cierran issues |
 
 ### 4.5 Análisis particular
@@ -142,7 +142,7 @@ Al hacer clic en una fila, su análisis particular se muestra en 4.5.
 [[nota anmcc_mediana le_mediana]]
 **Qué muestran los datos:**
 
-- Es la relación robusta más fuerte entre métricas distintas (+0,48), y se fortalece respecto del análisis original (+0,39). Resiste el control por tamaño (+0,46) y se repite en canary (+0,22).
+- Es la relación robusta más fuerte entre métricas distintas (+0,48), y se fortalece respecto del análisis original (+0,39). Resiste el control por tamaño (+0,45) y se repite en canary (+0,21).
 - Existe entre 2020 y 2024, con su máximo en 2023–24 (+0,67).
 - Como en el análisis original, parte de la relación la explica la llegada de gente nueva: quien recién llega tiene LE cercano a 0 y hace cambios chicos, así que en los releases con muchos nuevos las dos medianas bajan juntas.
 [[/nota]]
@@ -150,7 +150,7 @@ Al hacer clic en una fila, su análisis particular se muestra en 4.5.
 [[nota anmcc_mediana commits_doc_producto]]
 **Qué muestran los datos:**
 
-- Es una relación nueva (−0,46): en los releases donde el colaborador típico hace cambios más amplios, una parte menor de los commits toca documentación.
+- Es una relación nueva (−0,45): en los releases donde el colaborador típico hace cambios más amplios, una parte menor de los commits toca documentación.
 - Resiste el control por tamaño (−0,41) y se repite en canary (−0,25). Existe entre 2020 y 2024 (−0,71 en 2023–24) y es casi nula en 2025–26.
 - Una lectura posible: los releases con más trabajo de código amplio (refactors, features grandes) son distintos de los releases donde se trabaja la documentación.
 [[/nota]]
@@ -244,7 +244,7 @@ Aparecen los mismos grupos (bugs, flujo de documentación, Wiki Presence con CD 
 ## 6. Síntesis
 
 - **El análisis corregido es más confiable, pero encuentra menos patrones.** De las 7 relaciones robustas del análisis original, solo se mantiene CFDR ↔ NUB, que es la misma medida. Las relaciones de documentación y las de MTTR eran efectos de cómo se medía.
-- **Lo que queda con contenido gira alrededor de ANMCC por colaborador:** se relaciona con LE por colaborador (+0,48) y, en sentido contrario, con la proporción de commits que tocan documentación (−0,46).
+- **Lo que queda con contenido gira alrededor de ANMCC por colaborador:** se relaciona con LE por colaborador (+0,48) y, en sentido contrario, con la proporción de commits que tocan documentación (−0,45).
 - **En el PCA se mantiene el componente de bugs** y aparece uno nuevo de flujo de documentación. El de documentación de antes desaparece, y el que aparece en su lugar lo arma el escalón de Wiki Presence.
 - **Con la medición corregida, las métricas de Producto son bastante independientes entre sí.** Para la tesis, eso tiene dos lecturas: que cada métrica aporta información propia al cruce con Persona y Proceso, y que el proceso de corrección es un resultado en sí mismo, porque muestra cuánto pueden engañar las métricas de repositorio si no se controlan los bots, los backports, el formato de los archivos y las ventanas de tiempo.
 
