@@ -32,7 +32,14 @@ Necesitan la base corregida cargada, el clon de Next.js y los CSV de persona agr
 | Issues abiertas y README (README, NOI, ANMCC) | El mismo (0,89) | 0,84 → 0,83 | No se replica (0,57) |
 | Flujo de documentación (DLOC 2.0, commits que tocan documentación, LE) | El mismo (0,95) | 0,92 → 0,94 | Se replica (0,90) |
 
-Con toda la historia no aparece ningún componente nuevo, y sacar CFDR y NUB no cambia los otros tres (congruencia 1,00 entre A y C). El de Wiki se vuelve estable porque con toda la historia Wiki Presence cambia en muchos releases y no en uno solo, pero sigue siendo un escalón (la etapa con wiki, 2016–2020) y no se interpreta como patrón.
+Comentarios:
+
+- **Se mantiene todo lo que puede comprobarse.** Los tres componentes que no dependen de CFDR y NUB aparecen con toda la historia con las mismas variables (congruencia 0,89 a 0,95), y no aparece ningún componente nuevo. Sacar CFDR y NUB no cambia los otros tres: con los mismos releases, la congruencia entre A y C es de 0,99 a 1,00.
+- **El de bugs no se puede comprobar,** porque sus dos variables solo existen desde 2019. No es que no se mantenga: no hay datos para calcularlo antes.
+- **Se refuerza el flujo de documentación:** es el mismo en todas las versiones, gana estabilidad y se replica en canary. Es el componente más sólido de Producto.
+- **El de Wiki gana estabilidad, pero no contenido.** Desde 2019, Wiki Presence vale 1 en un solo release (la v9.0.0) y 0 en los otros 189, por eso el componente era inestable. Con toda la historia cambia en muchos releases y el componente se estabiliza, pero sigue siendo un escalón que separa la etapa con wiki (2016–2020) del resto, y no se interpreta como patrón.
+- **El de issues abiertas y README no se refuerza:** se mantiene en la serie estable, pero con toda la historia no se replica en canary.
+- **Conclusión:** usar el período desde 2019 no condiciona el PCA de Producto, y los dos componentes que entran en los cruces con otras dimensiones (bugs y flujo de documentación) se sostienen.
 
 Definiciones usadas:
 

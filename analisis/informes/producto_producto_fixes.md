@@ -198,7 +198,7 @@ Las dos relaciones robustas que se podían interpretar (ANMCC por colaborador co
 
 ## 5. Componentes principales
 
-Se usó el mismo método que en el primer análisis: rangos estandarizados, enfoque ajustado por tiempo y duración como principal, análisis paralelo de Horn para elegir cuántos componentes, rotación varimax y bootstrap de bloques. Con las métricas a nivel producto (13 variables, sin las variantes de MTTR) se usan 185 releases estables, desde fines de 2020, porque CFDR y NUB solo tienen datos desde entonces.
+Se usó el mismo método que en el primer análisis: rangos estandarizados, enfoque ajustado por tiempo y duración como principal, análisis paralelo de Horn para elegir cuántos componentes, rotación varimax y bootstrap de bloques. Con las métricas a nivel producto (13 variables, sin las variantes de MTTR) se usan 185 releases estables, desde julio de 2019 (v9.0.0), porque CFDR y NUB solo tienen datos desde entonces y el PCA necesita dato en todas las variables a la vez. La sección 5.5 comprueba que ese período no condiciona los componentes.
 
 ### 5.1 Cuántos componentes se retienen
 
@@ -213,10 +213,10 @@ Se usó el mismo método que en el primer análisis: rangos estandarizados, enfo
 
 [[pca cargas producto estable ajustado]]
 
-1. **CP1 · Bugs reportados por usuarios (16 %):** CFDR y NUB (+0,97). Es el mismo componente del análisis original.
-2. **CP2 · Wiki y documentación temprana (14 %):** Wiki Presence (+0,82), CD (+0,76) y NOB (+0,62). Lo arma sobre todo el escalón de Wiki Presence en 2020, y es el componente menos estable en el bootstrap (congruencia mediana de 0,69): conviene no interpretarlo como un patrón.
-3. **CP3 · Issues abiertas y README (13 %):** README Completeness (+0,73), NOI (+0,70) y ANMCC (−0,54).
-4. **CP4 · Flujo de documentación (12 %):** DLOC 2.0 (+0,82), commits que tocan documentación (+0,77) y LE (−0,41). Es un componente nuevo, que aparece con las métricas de flujo.
+1. **CP1 · Bugs reportados por usuarios (16 %):** CFDR y NUB (+0,97). Es el mismo componente del análisis original. Es el único que no puede comprobarse con toda la historia, porque sus dos variables empiezan en 2019 (sección 5.5).
+2. **CP2 · Wiki y documentación temprana (14 %):** Wiki Presence (+0,82), CD (+0,76) y NOB (+0,62). Lo arma sobre todo el escalón de Wiki Presence en 2020, y es el componente menos estable en el bootstrap (congruencia mediana de 0,69): conviene no interpretarlo como un patrón. En el período del PCA, Wiki Presence vale 1 en un solo release (la v9.0.0) y 0 en los otros 189, por eso es tan inestable. Con toda la historia se vuelve estable (0,96), porque la wiki existió en muchos más releases, pero sigue siendo un escalón (sección 5.5).
+3. **CP3 · Issues abiertas y README (13 %):** README Completeness (+0,73), NOI (+0,70) y ANMCC (−0,54). Con toda la historia se mantiene (congruencia 0,89), pero ahí no se replica en canary (0,57), así que no se refuerza.
+4. **CP4 · Flujo de documentación (12 %):** DLOC 2.0 (+0,82), commits que tocan documentación (+0,77) y LE (−0,41). Es un componente nuevo, que aparece con las métricas de flujo. Es el que mejor resiste todas las comprobaciones: con toda la historia es el mismo componente (0,95), se vuelve un poco más estable (0,94) y se replica en canary (0,90) (sección 5.5).
 
 MTTR (comunalidad 0,21) y DLOC (0,14) casi no quedan representadas: con las métricas corregidas se mueven por su cuenta.
 
@@ -254,11 +254,29 @@ MTTR (comunalidad 0,21) y DLOC (0,14) casi no quedan representadas: con las mét
 
 Aparecen los mismos grupos (bugs, flujo de documentación, Wiki Presence con CD y DLOC p90), y las variables por colaborador forman los suyos: README Completeness por colaborador con README e issues abiertas, LE y ANMCC por colaborador, y MTTR con su versión por colaborador.
 
+### 5.5 Validación con toda la historia
+
+El PCA de Producto usa solo los releases desde julio de 2019 porque CFDR y NUB empiezan ahí. Para comprobar que ese período no condiciona los componentes, se repitió el PCA con el mismo método sobre toda la historia (266 releases, de 2016 a 2026), sin CFDR ni NUB, y se comparó con el de esta sección. Para separar los dos cambios, también se calculó con las mismas variables pero solo desde 2019. El script es `analisis/validaciones/pca_producto_historia_completa.py`.
+
+| Componente de esta sección | Con toda la historia | Bootstrap: desde 2019 → toda la historia | Canary con toda la historia |
+|---|---|---|---|
+| CP1 · Bugs de usuarios | No puede calcularse: CFDR y NUB solo tienen datos desde 2019 | — | — |
+| CP2 · Wiki y documentación temprana | El mismo (0,94), ahora también con README Completeness | 0,69–0,71 → **0,96** | Parecido (0,80) |
+| CP3 · Issues abiertas y README | El mismo (0,89) | 0,84 → 0,83 | No se replica (0,57) |
+| CP4 · Flujo de documentación | El mismo (0,95) | 0,92 → 0,94 | Se replica (0,90) |
+
+- **Se mantienen los tres componentes que pueden calcularse con toda la historia**, con las mismas variables, y **no aparece ningún componente nuevo**. Sacar CFDR y NUB no cambia los otros tres: con los mismos releases, la congruencia es de 0,99 a 1,00.
+- **Se refuerza el flujo de documentación:** es el mismo en todas las versiones, gana estabilidad y se replica en canary.
+- **El de Wiki gana estabilidad, pero no contenido:** con toda la historia Wiki Presence cambia en muchos releases y no en uno solo, pero sigue separando la etapa con wiki (2016–2020) del resto. Sigue sin interpretarse como patrón.
+- **El de issues abiertas y README no se refuerza:** se mantiene en la serie estable, pero no se replica en canary.
+
+En resumen, usar el período desde 2019 no condiciona los resultados del PCA de Producto, y los componentes que entran en el cruce con otras dimensiones (bugs y flujo de documentación) se sostienen.
+
 ## 6. Síntesis
 
 - **El análisis corregido es más confiable, pero encuentra menos patrones.** De las 7 relaciones robustas del análisis original, solo se mantiene CFDR ↔ NUB, que es la misma medida. Las relaciones de documentación y las de MTTR eran efectos de cómo se medía.
 - **Las dos relaciones que parecían tener contenido se descartan al validar.** ANMCC por colaborador ↔ LE por colaborador (+0,48) la arma la llegada de gente nueva, y ANMCC por colaborador ↔ commits que tocan documentación (−0,45), los commits chicos que solo tocan documentación (sección 4.7). Dentro de Producto no queda ningún patrón propio: solo relaciones esperables.
-- **En el PCA se mantiene el componente de bugs** y aparece uno nuevo de flujo de documentación. El de documentación de antes desaparece, y el que aparece en su lugar lo arma el escalón de Wiki Presence.
+- **En el PCA se mantiene el componente de bugs** y aparece uno nuevo de flujo de documentación. El de documentación de antes desaparece, y el que aparece en su lugar lo arma el escalón de Wiki Presence. Con toda la historia (sin CFDR ni NUB) se obtienen los mismos componentes, y el de flujo de documentación sale reforzado (sección 5.5).
 - **Con la medición corregida, las métricas de Producto son bastante independientes entre sí.** Para la tesis, eso tiene dos lecturas: que cada métrica aporta información propia al cruce con Persona y Proceso, y que el proceso de corrección es un resultado en sí mismo, porque muestra cuánto pueden engañar las métricas de repositorio si no se controlan los bots, los backports, el formato de los archivos y las ventanas de tiempo.
 
 El análisis original está en analisis/salidas_originales/reportes/informe_producto_producto.html.

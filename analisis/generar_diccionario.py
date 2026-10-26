@@ -116,8 +116,8 @@ DIM_NAMES = {(1,0,0): "Persona", (1,1,0): "Persona+Proceso",
 
 ADVERTENCIAS = {
     "nub": ("NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs "
-            "(substring match en _KEYWORDS_BUG); solo releases desde mediados de 2020 — antes el repo no clasificaba bugs"),
-    "cfdr": "Solo releases desde mediados de 2020 — antes el repo no clasificaba bugs",
+            "(substring match en _KEYWORDS_BUG); solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs"),
+    "cfdr": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
     "dis": "DIS: posible falso positivo por etiquetas que contienen 'doc' (ej. 'Docker') debido a match de subcadena en _DOC_KEYWORDS",
     "ss": ("Lenguajes del usuario tomados hoy (snapshot actual de repos propios), no en cada release; "
            "tope de 15 contribuyentes activos por ventana (bots excluidos del tope)"),
