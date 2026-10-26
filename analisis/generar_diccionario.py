@@ -373,9 +373,12 @@ def build_rows(prod_data, agg_data) -> list[dict]:
             dp_eff, dpr_eff, dpo_eff = 0, dpr, dpo
             dp_por_nivel = False
         else:
-            dp_eff = 1          # persona_agregada siempre tiene Persona
+            # Anexo E (decisión del equipo, 25/10/2026): el resumen por colaborador conserva las
+            # dimensiones de su métrica. Si la métrica no es de Persona, la variable no entra en
+            # Persona (sigue en Proceso o Producto, como su métrica).
+            dp_eff = dp
             dpr_eff, dpo_eff = dpr, dpo
-            dp_por_nivel = (dp == 0)  # True cuando la métrica no tenía dim_persona
+            dp_por_nivel = False
 
         dt = dims_texto(dp_eff, dpr_eff, dpo_eff)
 
@@ -412,7 +415,7 @@ def build_rows(prod_data, agg_data) -> list[dict]:
             dim_producto=dpo_eff,
             dim_persona_por_nivel=int(dp_por_nivel) if nivel == "persona_agregada" else 0,
             dims_texto=dt,
-            familia=get_familia(metrica_id, estadistico, dp_eff),
+            familia=get_familia(metrica_id, estadistico, 1 if nivel == "persona_agregada" else dp_eff),
             n_estable=n_e,
             n_canary=n_c,
             pct_moda=f"{pm:.1f}",
