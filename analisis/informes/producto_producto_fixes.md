@@ -144,7 +144,7 @@ Al hacer clic en una fila, su análisis particular se muestra en 4.5.
 
 - Es la relación robusta más fuerte entre métricas distintas (+0,48), y se fortalece respecto del análisis original (+0,39). Resiste el control por tamaño (+0,45) y se repite en canary (+0,21).
 - Existe entre 2020 y 2024, con su máximo en 2023–24 (+0,67).
-- Como en el análisis original, parte de la relación la explica la llegada de gente nueva: quien recién llega tiene LE cercano a 0 y hace cambios chicos, así que en los releases con muchos nuevos las dos medianas bajan juntas.
+- **Se descarta al validar (sección 4.7).** La explica la llegada de gente nueva: quien recién llega tiene LE cercano a 0 y hace cambios chicos, así que en los releases con muchos nuevos las dos medianas bajan juntas. Sin los recién llegados, la relación pasa a +0,08 y deja de ser robusta.
 [[/nota]]
 
 [[nota anmcc_mediana commits_doc_producto]]
@@ -152,7 +152,7 @@ Al hacer clic en una fila, su análisis particular se muestra en 4.5.
 
 - Es una relación nueva (−0,45): en los releases donde el colaborador típico hace cambios más amplios, una parte menor de los commits toca documentación.
 - Resiste el control por tamaño (−0,41) y se repite en canary (−0,25). Existe entre 2020 y 2024 (−0,71 en 2023–24) y es casi nula en 2025–26.
-- Una lectura posible: los releases con más trabajo de código amplio (refactors, features grandes) son distintos de los releases donde se trabaja la documentación.
+- **Se descarta al validar (sección 4.7).** La lectura posible era que los releases con más trabajo de código amplio son distintos de los releases donde se trabaja la documentación. Pero la arma la forma en que se calculan las dos métricas: los commits que solo tocan documentación cambian pocos archivos, así que suben la proporción de commits de documentación y bajan ANMCC a la vez. Sin esos commits, la relación pasa a −0,07.
 [[/nota]]
 
 [[nota commits_doc_producto dloc_flujo_producto]]
@@ -182,6 +182,19 @@ Al hacer clic en una fila, su análisis particular se muestra en 4.5.
 - **DLOC p90 ↔ README Completeness** pasa de negativa a positiva (+0,46): con README Completeness medido solo en el README principal, la relación cambia de sentido, y no es estable.
 
 [[explorador significativas detalle]]
+
+### 4.7 Validación de las relaciones con contenido
+
+Las dos relaciones robustas que se podían interpretar (ANMCC por colaborador con LE por colaborador y con la proporción de commits que tocan documentación) tenían una explicación alternativa que no dice nada de la calidad. Para probarla se recalcularon las variables sin lo que podía estar armando la relación y se repitió la misma correlación. Los scripts están en `analisis/validaciones/` y no modifican la base.
+
+| Relación | Como en el análisis | Sin commits que solo tocan documentación | Sin recién llegados | Las dos cosas |
+|---|---|---|---|---|
+| ANMCC (mediana) ↔ LE (mediana) | +0,48 (canary +0,21) | +0,28 (canary +0,14) | **+0,08** (canary +0,06) | +0,07 |
+| ANMCC (mediana) ↔ commits que tocan documentación | −0,45 (canary −0,25) | **−0,07** (canary +0,02) | −0,24 (canary −0,15) | 0,00 |
+
+- **ANMCC ↔ LE es composición del equipo.** En la ventana mediana, el 37 % de quienes commitean lo hace por primera vez. Esas personas tienen LE cercano a 0 y hacen commits chicos, así que en los releases donde entra más gente nueva las dos medianas bajan juntas. Entre quienes ya estaban en el proyecto, la experiencia en los componentes no se relaciona con la amplitud de los commits.
+- **ANMCC ↔ commits que tocan documentación es construcción.** De los 35.959 commits de la rama, 3.881 (el 10,8 %) solo tocan documentación y cambian un archivo de mediana, contra cuatro en el resto. Cuando hay más commits de ese tipo, sube la proporción de commits de documentación y baja ANMCC por colaborador, aunque no haya relación entre los dos tipos de trabajo.
+- Lo que sí muestran los datos es cómo se documenta en Next.js: en commits aparte y chicos, no junto con cambios grandes de código. 1.253 de los 4.010 colaboradores nunca hicieron un commit que no fuera de documentación, y suman el 37 % de esos commits.
 
 ## 5. Componentes principales
 
@@ -244,7 +257,7 @@ Aparecen los mismos grupos (bugs, flujo de documentación, Wiki Presence con CD 
 ## 6. Síntesis
 
 - **El análisis corregido es más confiable, pero encuentra menos patrones.** De las 7 relaciones robustas del análisis original, solo se mantiene CFDR ↔ NUB, que es la misma medida. Las relaciones de documentación y las de MTTR eran efectos de cómo se medía.
-- **Lo que queda con contenido gira alrededor de ANMCC por colaborador:** se relaciona con LE por colaborador (+0,48) y, en sentido contrario, con la proporción de commits que tocan documentación (−0,45).
+- **Las dos relaciones que parecían tener contenido se descartan al validar.** ANMCC por colaborador ↔ LE por colaborador (+0,48) la arma la llegada de gente nueva, y ANMCC por colaborador ↔ commits que tocan documentación (−0,45), los commits chicos que solo tocan documentación (sección 4.7). Dentro de Producto no queda ningún patrón propio: solo relaciones esperables.
 - **En el PCA se mantiene el componente de bugs** y aparece uno nuevo de flujo de documentación. El de documentación de antes desaparece, y el que aparece en su lugar lo arma el escalón de Wiki Presence.
 - **Con la medición corregida, las métricas de Producto son bastante independientes entre sí.** Para la tesis, eso tiene dos lecturas: que cada métrica aporta información propia al cruce con Persona y Proceso, y que el proceso de corrección es un resultado en sí mismo, porque muestra cuánto pueden engañar las métricas de repositorio si no se controlan los bots, los backports, el formato de los archivos y las ventanas de tiempo.
 
