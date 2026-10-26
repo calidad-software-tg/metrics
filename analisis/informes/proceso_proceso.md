@@ -1,7 +1,7 @@
 ---
 cruce: Proceso-Proceso
 titulo: Análisis de la dimensión Proceso · métricas corregidas
-subtitulo: Correlaciones y componentes principales con las métricas recalculadas (branch ine/fixes-metricas) · next.js
+subtitulo: Correlaciones y componentes principales con las métricas recalculadas y las identidades unificadas (branch analisis) · next.js
 ---
 
 El análisis Proceso–Proceso busca entender cómo se relacionan entre sí las métricas del proceso de desarrollo: cómo se reportan y se resuelven las issues, cuánto se discute y se revisa, y cómo se reparte el trabajo. Igual que en Persona y Producto, es un paso previo a cruzar Proceso con las otras dos dimensiones, y responde dos preguntas:
@@ -29,9 +29,9 @@ Este análisis repite el de la dimensión Proceso con las métricas recalculadas
 | Wiki Presence | proyecto | 1 si el repositorio tenía wiki en ese momento | **Nueva en Proceso.** Antes era constante; ahora sale del historial de la wiki |
 | MTTR con bots, NCI con bots | proyecto | MTTR y NCI con los cierres de bots, como en la versión original | Variantes (control) |
 | MTTR (mediana de issues), MTTR de bugs | proyecto | MTTR con la mediana en vez del promedio, y solo de las issues de bug | Variantes (control) |
-| ANMCC (mediana) | por colaborador | Mediana entre colaboradores de sus archivos por commit | Corregida: sin bots ni merges |
-| Contribution Diversity (mediana, p90, share top 10%) | por colaborador | Archivos distintos que toca cada persona en la ventana | Mismo cálculo, sobre las ventanas nuevas |
-| Development Experience (mediana) | por colaborador | Experiencia de cada persona en el proyecto, en meses | Mismo cálculo, sobre las ventanas nuevas |
+| ANMCC (mediana) | por colaborador | Mediana entre colaboradores de sus archivos por commit | Corregida: sin bots ni merges; identidades unificadas |
+| Contribution Diversity (mediana, p90, share top 10%) | por colaborador | Archivos distintos que toca cada persona en la ventana | Corregida: identidades unificadas |
+| Development Experience (mediana) | por colaborador | Experiencia de cada persona en el proyecto, en meses | Corregida: identidades unificadas |
 | DIS (mediana) | por colaborador | DIS de las issues de documentación que cierra cada persona | Corregida: igual que DIS |
 | EXPRev (p90, share top 10%) | por colaborador | Acciones de revisión de cada persona en issues y pull requests | Mismo cálculo, sobre las ventanas nuevas |
 | REXPRev (mediana) | por colaborador | Acciones de revisión recientes de cada persona | Mismo cálculo, sobre las ventanas nuevas |
@@ -85,6 +85,7 @@ En el primer análisis varias relaciones resultaron ser efectos de cómo se med�
 | SC con la fecha real de cierre | Tomaba el estado de hoy de cada issue o pull request | Cierres posteriores a la ventana contados dentro de ella |
 | README Completeness solo de la raíz | Promediaba todos los README del árbol, casi todos de ejemplos | Cambios por agregar o borrar ejemplos |
 | NOB y Wiki Presence por ventana | Eran constantes (las branches y el estado de la wiki de hoy) | No se podían analizar |
+| Identidades unificadas | Las métricas de commits usan el nombre de git y las de la API el login de GitHub, y una misma persona podía aparecer como dos | Experiencia y archivos por persona mal medidos (afecta Development Experience, Contribution Diversity y ANMCC por colaborador) |
 
 El efecto del bot se ve en las series. Sin sus cierres, NCI baja a menos de la mitad en 2025–26 (mediana de 42 a 18,5 issues por release):
 
@@ -110,13 +111,13 @@ Los indicadores incluyen los pares con variantes de MTTR y NCI. Esos 112 pares s
 | Pares | 351 | 561 | — |
 | Pares de control | 27 | 45 | — |
 | Pares evaluados | 324 | 516 | **404** |
-| Con relación positiva | 55 | 77 | **51** |
-| Con relación negativa | 20 | 29 | **22** |
-| Robustas | 35 | 67 | **44** |
-| Hallazgos candidatos | 21 | 46 | **25** |
-| **Robustas originales que se mantienen** | — | **24 de 35** | |
+| Con relación positiva | 55 | 76 | **50** |
+| Con relación negativa | 20 | 29 | **21** |
+| Robustas | 35 | 70 | **46** |
+| Hallazgos candidatos | 21 | 49 | **27** |
+| **Robustas originales que se mantienen** | — | **25 de 35** | |
 
-De los 404 pares evaluados, 195 son no concluyentes y 136 no tienen relación: igual que antes, en cuatro de cada cinco pares no hay evidencia de relación.
+De los 404 pares evaluados, 200 son no concluyentes y 133 no tienen relación: igual que antes, en cuatro de cada cinco pares no hay evidencia de relación.
 
 [[grafico categorias]]
 
@@ -125,17 +126,17 @@ De los 404 pares evaluados, 195 son no concluyentes y 136 no tienen relación: i
 | Paso | Pares (sin variantes) |
 |---|---|
 | Pares evaluados | 404 |
-| Con relación significativa | 73 |
-| Robustas: estables en el tiempo y se repiten en canary | 44 |
-| Se mantienen al descontar la cantidad de personas activas | 37 |
-| Sin solapamiento de definición | 32 |
-| Entre métricas de distinta familia | **25** |
+| Con relación significativa | 71 |
+| Robustas: estables en el tiempo y se repiten en canary | 46 |
+| Se mantienen al descontar la cantidad de personas activas | 39 |
+| Sin solapamiento de definición | 34 |
+| Entre métricas de distinta familia | **27** |
 
 - **Cantidad de personas activas:** dejan de ser robustas las relaciones de CFDR y NUB con NCI, con ANMCC (mediana) y con Contribution Diversity (mediana), y Contribution Diversity ↔ NCI. En los releases con más gente se reportan más bugs, se cierran más issues y las medianas por colaborador bajan, sin que una cosa tenga que ver con la otra.
 - **Solapamiento de definición:** 5 pares entre ANMCC y Contribution Diversity, que cuentan los dos archivos modificados.
 - **Misma familia:** 7 pares entre NC, SC, EXPRev, REXPRev y NCI por colaborador, que miden la participación en discusiones.
 
-El embudo del gráfico incluye las variantes (516 pares evaluados y 46 al final):
+El embudo del gráfico incluye las variantes (516 pares evaluados y 49 al final):
 
 [[grafico embudo]]
 
@@ -149,7 +150,7 @@ Azul: negativa; naranja: positiva; gris: cerca de 0. El mapa del análisis origi
 
 [[antes mapa]]
 
-- **Hay más relaciones moderadas que antes:** 25 pares significativos con |ρ| ≥ 0,3 (sin variantes), contra 17 en el análisis original, con una cantidad parecida de significativos (73 y 75). Las correcciones sacaron ruido (ventanas vacías, cierres de bots) que debilitaba relaciones release a release.
+- **Hay más relaciones moderadas que antes:** 27 pares significativos con |ρ| ≥ 0,3 (sin variantes), contra 17 en el análisis original, con una cantidad parecida de significativos (71 y 75). Las correcciones sacaron ruido (ventanas vacías, cierres de bots) que debilitaba relaciones release a release.
 - **Desaparecen las que armaban las ventanas vacías y los bots:** ANMCC ↔ MTTR pasa de +0,42 a +0,08, porque en las ventanas de minutos las dos valían 0 a la vez; CFDR y NUB ↔ MTTR (mediana) pasan de −0,22 a −0,06.
 - **Las relaciones con README Completeness se debilitan** (por ejemplo, con NC share del top 10 %, de +0,18 a −0,09): ahora mide solo el README principal, que casi no cambia.
 
@@ -163,7 +164,7 @@ Para la primera pregunta se buscan pares de métricas distintas que se mueven pr
 
 - **CFDR y NUB (+1,00).** Las dos cuentan los bugs reportados por personas externas al equipo; solo cambia cómo se define el equipo.
 - **Tasa de Éxito de Jarczyk y Process Performance (+0,83).** Las dos se calculan sobre las issues creadas en la ventana: Jarczyk mide qué parte se cerró antes del fin de la ventana, y Process Performance qué parte se cerró en menos de tres días, que es un subconjunto de la anterior.
-- **ANMCC y Contribution Diversity (+0,84, en la mediana por colaborador).** Las dos cuentan archivos modificados. Es el mismo caso que en Persona.
+- **ANMCC y Contribution Diversity (+0,84, en la mediana por colaborador).** Las dos cuentan archivos modificados. La misma relación aparece como mecánica en Persona–Producto.
 
 EXPRev y NC también se mueven casi igual (0,72 en el p90 y 0,94 en el share del top 10 %), pero se tratan como pares de control: EXPRev suma las acciones de cada persona en issues y pull requests, que son mayormente comentarios.
 
@@ -183,15 +184,15 @@ Con este criterio, la dimensión Proceso queda reducida a **once métricas princ
 | Documentación (README y wiki) | README Completeness | Qué tan completo está el README principal (casi constante; Wiki Presence, también escalón, no suma información) |
 | Reparto del trabajo | Contribution Diversity (mediana) | Cuántos archivos distintos toca el colaborador típico |
 | Discusión | NC (share del top 10 %) | Si unos pocos escriben la mayoría de los comentarios |
-| Participación | SC (mediana) | Cuántas issues y pull requests abre y cierra el colaborador típico |
+| Participación | SC (mediana) | Cuántas issues y pull requests abre el colaborador típico, y cuántas de ellas se cerraron en el release. Lo que la hace variar entre releases es sobre todo esto último (ver 4.6) |
 
 ### 4.5 Relaciones robustas
 
-Las 46 relaciones que pasan todos los filtros (25 sin variantes). Al hacer clic en una fila, su análisis particular se muestra en 4.6.
+Las 49 relaciones que pasan todos los filtros (27 sin variantes). Al hacer clic en una fila, su análisis particular se muestra en 4.6.
 
 [[explorador hallazgos tabla]]
 
-**Qué pasó con las robustas del análisis original:** se mantienen 24 de las 35.
+**Qué pasó con las robustas del análisis original:** se mantienen 25 de las 35.
 
 | Relación | Antes | Ahora | Por qué cambió |
 |---|---|---|---|
@@ -202,20 +203,22 @@ Las 46 relaciones que pasan todos los filtros (25 sin variantes). Al hacer clic 
 | EXPRev (p90) ↔ MTTR, MTTR (mediana) ↔ NCI (p90) | +0,21 y +0,16 robustas | +0,02 y +0,06, sin relación | Las armaban los cierres de bots |
 | DIS y DIS (mediana) ↔ MTTR (mediana) | +0,38 y +0,41 robustas | +0,32 y +0,27, no robustas | Siguen positivas, pero ya no en todos los períodos; DIS ahora compara etiquetas exactas |
 | NC (share del top 10 %) ↔ README Completeness | +0,18 robusta | −0,09 | README ahora mide solo el README principal |
-| Otras cuatro débiles (por ejemplo, NC p90 ↔ SC p90) | −0,20 a +0,36 robustas | −0,18 a +0,30, no robustas | Ya no pasan alguno de los filtros de estabilidad o réplica |
+| Contribution Diversity ↔ Development Experience (medianas) | +0,36 robusta | +0,41 robusta | Se mantiene y se fortalece con las identidades unificadas |
+| Otras tres débiles (por ejemplo, NC p90 ↔ SC p90) | −0,20 a +0,31 robustas | −0,18 a +0,30, no robustas | Ya no pasan alguno de los filtros de estabilidad o réplica |
 
 ### 4.6 Análisis particular
 
 [[explorador hallazgos detalle]]
 
-Al revisar las 25 relaciones, varias no son un hallazgo:
+Al revisar las 27 relaciones, varias no son un hallazgo:
 
 - **Miden lo mismo:** CFDR ↔ NUB y Jarczyk ↔ Process Performance (4.4).
-- **Evidencia baja:** CFDR / NUB ↔ REXPRev, CFDR / NUB ↔ EXPRev (p90), DIS ↔ REXPRev y ANMCC ↔ Development Experience (medianas). No se repiten en canary (entre −0,07 y +0,09) y no existen en ningún período por separado. En las de CFDR, además, el control por tamaño las deja casi en el límite: reflejan que en los releases con más gente hay más bugs y medianas por colaborador más bajas.
+- **Evidencia baja:** CFDR / NUB ↔ REXPRev, CFDR / NUB ↔ EXPRev (p90) y DIS ↔ REXPRev. No se repiten en canary (entre −0,07 y +0,03) y no existen en ningún período por separado. En las de CFDR, además, el control por tamaño las deja casi en el límite: reflejan que en los releases con más gente hay más bugs y medianas por colaborador más bajas.
 - **No se repiten en canary:** Contribution Diversity (p90) ↔ SC (share del top 10 %) (+0,47 en estables y +0,04 en canary) y NC (share del top 10 %) ↔ SC (mediana) (+0,31 y +0,13).
-- **Ya están en Persona:** Contribution Diversity (p90) ↔ SC (p90), entre dos variables por colaborador, solo en 2023–2024.
+- **Ya están en otros cruces:** relaciones entre dos variables por colaborador. Contribution Diversity (p90) ↔ SC (p90), solo en 2023–2024, y Development Experience ↔ Contribution Diversity (+0,41) son de Persona–Persona. Development Experience ↔ ANMCC por colaborador (+0,38) y ↔ MTTR por colaborador (−0,23, que no se repite en canary) son de Persona–Proceso: con la regla del Anexo E, ANMCC y MTTR por colaborador conservan la dimensión de su métrica y ya no son de Persona. Development Experience ↔ ANMCC también aparece en Persona–Producto, donde se validó que la arman los recién llegados.
+- **Por construcción:** SC (mediana) ↔ Jarczyk, que antes se presentaba como Patrón 3 (ver abajo).
 
-Las relaciones restantes forman tres patrones.
+Las relaciones restantes forman dos patrones.
 
 #### Patrón 1: resolver lo nuevo y limpiar lo viejo son actividades distintas
 
@@ -266,20 +269,25 @@ En los releases donde las issues en general tardan más en cerrarse, las de docu
 **Qué muestran los datos:** el proyecto no trata la documentación aparte: ni la prioriza ni la posterga. En parte es esperable, porque las issues de documentación también cuentan en el tiempo de cierre general. DIS tiene dato solo desde 2022 (132 releases), así que el patrón describe la etapa reciente, y se fortalece en 2025–26.
 [[/nota]]
 
-#### Patrón 3 (en verificación): más participación del colaborador típico, más resolución de lo nuevo
+#### Descartado por construcción: participación del colaborador típico ↔ resolución de lo nuevo
 
 [[par jarczyk_success_rate_producto sc_mediana: periodos, dispersion]]
 
-| Par | Corregida | 2016–19 | 2020–22 | 2023–24 | 2025–26 | Canary | Sin tamaño |
-|---|---|---|---|---|---|---|---|
-| SC (mediana) ↔ Jarczyk | +0,33 | +0,20 | +0,56 | +0,56 | +0,16 | +0,30 | +0,35 |
-| EXPRev (p90) ↔ Process Performance | +0,22 | +0,37 | +0,27 | +0,11 | +0,18 | +0,03 | +0,22 |
-| EXPRev (p90) ↔ Jarczyk | +0,18 | +0,24 | +0,32 | +0,11 | +0,08 | +0,10 | +0,20 |
+En el informe anterior se presentaba como Patrón 3, en verificación: en los releases donde el colaborador típico participa más (SC mediana), se resuelve una parte mayor de las issues nuevas (+0,33, positiva en los cuatro períodos y en canary). **Al verificarlo, la relación resulta ser por construcción.**
+
+SC de cada persona suma cinco partes: issues abiertas, pull requests abiertos, pull requests abiertos que se cerraron, pull requests abiertos que se mergearon e **issues abiertas que se cerraron en la misma ventana**. Esa última parte son justamente las issues que cuenta Jarczyk: creadas y cerradas en la ventana. Se recalculó SC por release sin esa parte, con las mismas reglas de identidades y bots (la versión completa coincide exactamente con la del análisis en los 271 releases), y se correlacionó con Jarczyk con el mismo método. Como sin esa parte la mediana vale 1 en casi todos los releases, la comparación se hizo con el promedio por persona:
+
+| Versión de SC (promedio por persona) | ρ con Jarczyk | Canary | ¿Significativa? |
+|---|---|---|---|
+| SC completa | +0,21 | +0,24 | Sí |
+| Sin las issues propias cerradas en la ventana | +0,09 | +0,03 | No |
+| Solo lo que la persona abre (issues y pull requests) | +0,07 | +0,03 | No |
+| Solo las issues propias cerradas en la ventana | +0,56 | +0,66 | Sí |
+
+Con la mediana pasa lo mismo: la parte de las issues propias cerradas sola da +0,31, casi lo mismo que SC completa (+0,33). **Toda la relación está en la parte que comparten las dos métricas**: lo que las personas abren no se relaciona con la resolución de lo nuevo. Las relaciones de EXPRev (p90) con Jarczyk (+0,18) y con Process Performance (+0,22), que iban en la misma dirección, son débiles y no se repiten en canary.
 
 [[nota jarczyk_success_rate_producto sc_mediana]]
-**Qué muestran los datos:** en los releases donde el colaborador típico participa más, se resuelve una parte mayor de las issues nuevas. Es positiva en los cuatro períodos, se repite en canary y no depende de cuánta gente participa. Las de EXPRev van en la misma dirección pero son débiles y no se repiten bien en canary.
-
-**Falta verificar cuánto pesa una superposición:** SC cuenta las issues que una persona abre y además cierra ella misma en la ventana, y esas issues también suman en Jarczyk. Hasta medirlo, el patrón se presenta como tentativo.
+**Qué muestran los datos:** la relación es real en los números, pero sale de contar el mismo hecho dos veces: una issue que alguien abre y se cierra en el mismo release suma en la SC de esa persona y en Jarczyk. Sin esa parte, SC no se relaciona con la resolución de lo nuevo. No es un hallazgo. Las relaciones de SC con Jarczyk, Process Performance o NCI en otros cruces tienen el mismo problema.
 [[/nota]]
 
 #### Lo que no se mantiene
@@ -300,7 +308,6 @@ En los releases donde las issues en general tardan más en cerrarse, las de docu
 
 - **El Patrón 1** está presente en todos los períodos. NCI ↔ MTTR es más fuerte en 2016–19 (+0,50) y en 2025–26 (+0,58); NCI ↔ Jarczyk, en 2016–19 (+0,56) y 2023–24 (+0,61).
 - **El Patrón 2** solo se puede evaluar desde 2022 y se fortalece en 2025–26.
-- **El Patrón 3** es más fuerte en 2020–2024 (+0,56) y más débil en los extremos.
 - **Las relaciones de Wiki Presence con README Completeness** no tienen barras por período: dentro de cada período Wiki Presence es constante.
 
 [[explorador significativas detalle]]
@@ -316,7 +323,7 @@ Se usó el mismo método que en Producto: rangos estandarizados, enfoque ajustad
 [[pca criterios producto]]
 
 - Con las 11 variables a nivel proyecto, Horn retiene **5 componentes**, que explican el **76 %** de la variación (antes 3 componentes y 67 % con 9 variables). Los cinco primeros autovalores (2,52, 1,76, 1,58, 1,27 y 1,21) superan lo que da el azar (1,54, 1,37, 1,26, 1,18 y 1,10); el sexto (0,84) queda por debajo (1,03).
-- Con las 28 variables (sumando las versiones por colaborador, 139 releases), retiene 7 y explican el 66 %.
+- Con las 28 variables (sumando las versiones por colaborador, 184 releases), retiene 8 y explican el 70 %.
 
 ### 5.2 Componentes identificados
 
@@ -364,13 +371,13 @@ NCI carga en CP2 y en CP5 a la vez: el volumen de cierre se reparte entre resolv
 
 [[pca cargas todas estable ajustado]]
 
-Aparecen siete grupos: concentración de la participación (EXPRev, NC y SC share del top 10 %, SC p90), bugs (con EXPRev, NC y REXPRev en contra, el efecto de tamaño de la sección 4.1), cierre de lo viejo (MTTR, NCI y sus versiones por colaborador), resolución de lo nuevo (con SC mediana, como en el Patrón 3), amplitud de los cambios (ANMCC y Contribution Diversity por colaborador), README y wiki (README Completeness y su mediana, Wiki Presence y NOB), y ANMCC con NOI en contra. Son menos estables (congruencia mediana entre 0,78 y 0,95). Para los cruces conviene usar los componentes de las 11 métricas a nivel proyecto, sin interpretar los dos de escalones.
+Aparecen ocho grupos: concentración de la participación (EXPRev, NC y SC share del top 10 %, SC p90), bugs (con EXPRev, NC y REXPRev en contra, el efecto de tamaño de la sección 4.1), veteranía y amplitud de los cambios (Contribution Diversity y ANMCC por colaborador con Development Experience; en Persona, el componente de veteranía), resolución de lo nuevo (con SC mediana, por la superposición de 4.6), README (con su mediana y NOI), cierre de lo viejo (MTTR, NCI y sus versiones por colaborador), ANMCC del proyecto con la concentración de Contribution Diversity, y Wiki Presence con NOB. Son menos estables (congruencia mediana entre 0,84 y 0,96, y 0,55 el de la wiki). Para los cruces conviene usar los componentes de las 11 métricas a nivel proyecto, sin interpretar los dos de escalones.
 
 ## 6. Advertencias sobre los datos de Proceso
 
 - **README Completeness y Wiki Presence son escalones** (4.4). Sus relaciones y los dos componentes que arman en el PCA (README y backlog, Wiki y branches) no se interpretan.
 - **DIS tiene datos solo desde 2022,** y CFDR y NUB desde mediados de 2019.
-- **SC incluye los cierres propios** de cada persona, que también cuentan en Jarczyk: el Patrón 3 está en verificación.
+- **SC incluye las issues propias que se cierran en la ventana,** que también cuentan en Jarczyk. Sus relaciones con Jarczyk, Process Performance o NCI son por construcción (4.6). Lo que hace variar a SC mediana entre releases es sobre todo esa parte, no cuánto abre el colaborador típico.
 - **Rol del autor en NUB.** NUB decide quién es del equipo con el rol que GitHub informa hoy, no el que tenía la persona cuando abrió la issue. CFDR sí usa el top 10 de contribuidores hasta el cierre de cada ventana.
 - **Clasificación de cuentas.** `kodiakhq` está clasificado como humano. Sus cierres a nivel proyecto son pull requests mergeados, así que no afecta a NCI ni a MTTR, pero conviene revisarlo.
 - **Métricas compartidas con Producto** (CFDR, NUB, MTTR, NOI, NOB, README Completeness, Wiki Presence y ANMCC): antes de cruzar Proceso con Producto hay que acordar en cuál de las dos cuenta cada una.
@@ -381,7 +388,7 @@ Aparecen siete grupos: concentración de la participación (EXPRev, NC y SC shar
 - **Las métricas se reducen a once.** CFDR y NUB, y Jarczyk y Process Performance, miden prácticamente lo mismo, y README Completeness y Wiki Presence casi no varían.
 - **El hallazgo más firme es que cerrar muchas issues puede significar dos cosas distintas:** atender lo nuevo o limpiar lo viejo, que casi nunca pasan en el mismo release. Para la calidad, "issues cerradas" no sirve como indicador único.
 - **La cantidad de bugs no depende de la velocidad del equipo.** La relación entre bugs y tiempo de resolución del análisis original desaparece con las correcciones. Lo mismo la "limpieza del backlog": la armaba el bot de issues inactivas.
-- **Las demás relaciones son débiles:** la documentación sigue el ritmo general del proyecto, y la participación del colaborador típico va con más resolución de lo nuevo (en verificación).
+- **Las demás relaciones son débiles:** la documentación sigue el ritmo general del proyecto. La que parecía unir la participación del colaborador típico con la resolución de lo nuevo era por construcción: las dos métricas cuentan las mismas issues.
 - **Las correcciones son un resultado en sí mismo:** sin filtrar bots, backports y ventanas vacías, varias de las relaciones del análisis original se habrían leído como patrones del proceso.
 
 El análisis original está en analisis/salidas_originales/reportes/.
