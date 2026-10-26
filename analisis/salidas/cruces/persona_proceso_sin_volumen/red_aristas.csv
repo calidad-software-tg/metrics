@@ -10,24 +10,16 @@ activos_commits_conteo,nci_producto,0.4187,escala
 activos_interaccion_conteo,cfdr_producto,0.6495,escala
 activos_interaccion_conteo,nci_producto,0.5004,escala
 activos_interaccion_conteo,nub_producto,0.6483,escala
-anmcc_mediana,cfdr_producto,-0.2588,no resiste tamaño
-anmcc_mediana,nub_producto,-0.259,no resiste tamaño
 cdiv_mediana,anmcc_producto,0.3329,mecánico
 cdiv_mediana,cfdr_producto,-0.2209,no resiste tamaño
 cdiv_mediana,nci_producto,-0.1949,no resiste tamaño
 cdiv_mediana,nub_producto,-0.2235,no resiste tamaño
 cdiv_p90,anmcc_producto,0.5608,mecánico
 cdiv_share_top10pct,anmcc_producto,0.4285,mecánico
-dis_mediana,jarczyk_success_rate_producto,-0.2703,patrón
 exprev_p90,cfdr_producto,-0.2786,patrón
 exprev_p90,nub_producto,-0.274,patrón
 exprev_p90,process_performance_producto,0.2206,patrón
 exprev_share_top10pct,mttr_producto,0.2002,patrón
-mttr_mediana,dis_producto,0.3235,patrón
-mttr_mediana,nci_producto,0.1841,patrón
-mttr_mediana,process_performance_producto,-0.1786,patrón
-nci_p90,dis_producto,0.2655,patrón
-nci_p90,jarczyk_success_rate_producto,0.1899,patrón
 nuevos_commits_conteo,nci_producto,0.3771,escala
 nuevos_interaccion_conteo,cfdr_producto,0.6114,escala
 nuevos_interaccion_conteo,nci_producto,0.4443,escala

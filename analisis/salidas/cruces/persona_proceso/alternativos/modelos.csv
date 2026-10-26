@@ -1,12 +1,12 @@
 variable,r2_cv_regresion,r2_cv_regresion_tamano,r2_cv_rf_tamano,nula_p95_regresion,r2_canary_regresion,coeficientes_signo_estable,r2_cv_rf,nula_p95_rf,r2_canary_rf,rf_top3_canary,top3_ya_significativos
-anmcc_producto,-0.2316,-0.0878,-0.0449,-0.1698,-0.2738,5/36,-0.0314,0.0012,-0.0159,"prop_comentan_ratio, le_mediana, tasa_nuevos_interaccion_ratio",1
-cfdr_producto,0.3219,-0.1355,-0.0029,-0.0663,0.235,13/36,0.3256,0.0886,0.3175,"activos_interaccion_conteo, nuevos_interaccion_conteo, activos_comentarios_conteo",3
-jarczyk_success_rate_producto,0.0403,0.0508,0.1443,-0.221,-0.0925,14/36,0.1526,0.0094,0.1529,"activos_cierre_conteo, sc_mediana, prop_cierran_ratio",3
-mttr_producto,-0.274,-0.1865,-0.0111,-0.1218,-0.2963,9/36,-0.0043,0.0302,0.0218,"nci_p90, exprev_share_top10pct, nc_share_top10pct",1
-nci_producto,0.1627,0.063,0.2203,-0.2519,0.4641,8/36,0.3633,0.0099,0.4777,"activos_cierre_conteo, activos_interaccion_conteo, prop_cierran_ratio",2
-nob_42_producto,-0.1416,-0.0913,-0.0559,-0.1927,-0.1067,12/36,-0.0647,0.0227,0.1101,"dloc_mediana, dloc_share_top10pct, ss_mediana",0
-noi_producto,-0.1127,-0.1537,0.0553,-0.1514,-0.3594,12/36,0.1876,-0.0034,0.1415,"rc_mediana, ss_mediana, tasa_nuevos_interaccion_ratio",0
-nub_producto,0.3228,-0.1314,-0.0002,-0.0723,0.2426,10/36,0.3242,0.0273,0.3187,"activos_interaccion_conteo, nuevos_interaccion_conteo, activos_comentarios_conteo",3
-process_performance_producto,-0.3665,-0.2123,0.0368,-0.1655,-0.1947,10/36,0.0399,0.0074,0.046,"prop_cierran_ratio, mttr_mediana, activos_cierre_conteo",2
-rc_producto,-0.0234,-0.0038,0.0292,-0.1783,-0.5285,17/36,-0.0043,0.0224,-0.0228,"cd_mediana, prop_comentan_ratio, ss_mediana",0
-wp_producto,-0.7522,-0.5766,-0.0378,-0.2394,-0.2448,1/36,-0.066,-0.0113,0.0083,"rc_mediana, dloc_p90, dloc_mediana",2
+anmcc_producto,-0.1576,-0.0398,-0.0329,-0.1054,-0.2246,4/28,-0.0078,-0.0083,-0.019,"prop_comentan_ratio, tasa_nuevos_commits_ratio, nuevos_commits_conteo",1
+cfdr_producto,0.3546,-0.0926,0.0031,-0.0748,0.2832,8/28,0.3291,-0.0015,0.3405,"activos_interaccion_conteo, nuevos_interaccion_conteo, activos_comentarios_conteo",3
+jarczyk_success_rate_producto,-0.0542,0.0107,0.1209,-0.1042,-0.0581,9/28,0.1276,-0.0106,0.1218,"sc_mediana, activos_cierre_conteo, prop_cierran_ratio",3
+mttr_producto,-0.212,-0.1211,-0.0264,-0.1349,-0.1691,2/28,-0.0165,0.0014,0.0099,"exprev_share_top10pct, ss_mediana, cd_mediana",1
+nci_producto,0.2035,0.076,0.2108,-0.1071,0.4227,7/28,0.351,0.0154,0.5101,"activos_cierre_conteo, activos_interaccion_conteo, prop_cierran_ratio",2
+nob_42_producto,-0.1951,-0.1215,-0.0989,-0.1363,-0.2086,11/28,-0.1213,-0.0023,0.0121,"ss_mediana, cdiv_share_top10pct, sc_share_top10pct",0
+noi_producto,-0.0513,-0.0096,0.053,-0.0156,-0.2253,9/28,0.1363,0.122,0.0606,"ss_mediana, prop_comentan_ratio, tasa_nuevos_interaccion_ratio",0
+nub_producto,0.3606,-0.0777,0.0066,-0.08,0.2926,9/28,0.332,0.0116,0.3406,"activos_interaccion_conteo, nuevos_interaccion_conteo, activos_comentarios_conteo",3
+process_performance_producto,-0.1676,-0.0783,0.0626,-0.135,-0.194,6/28,0.0698,0.0022,0.0241,"prop_cierran_ratio, activos_cierre_conteo, ss_mediana",1
+rc_producto,0.0243,0.0377,0.0192,-0.1667,-0.4222,15/28,0.004,0.0122,-0.0185,"prop_comentan_ratio, cd_mediana, ss_mediana",0
+wp_producto,-0.372,-0.3351,-0.0333,-0.1279,-0.384,2/28,-0.0376,-0.0101,-0.013,"ss_mediana, nc_p90, prop_commitean_ratio",0

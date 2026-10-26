@@ -3,25 +3,20 @@ activos_cierre_conteo,Persona,Activos (cierre de issues) [conteo],0
 activos_comentarios_conteo,Persona,Activos (comentarios) [conteo],0
 activos_commits_conteo,Persona,Activos (commits) [conteo],0
 activos_interaccion_conteo,Persona,Activos (interacción) [conteo],0
-anmcc_mediana,Persona,ANMCC (Avg Modified Components per Commit) [mediana],0
 anmcc_producto,Proceso,ANMCC (Avg Modified Components per Commit) [producto],1
 cdiv_mediana,Persona,CDIV (Contribution Diversity) [mediana],0
 cdiv_p90,Persona,CDIV (Contribution Diversity) [p90],0
 cdiv_share_top10pct,Persona,CDIV (Contribution Diversity) [share_top10pct],0
 cfdr_producto,Proceso,CFDR (Customer Found Defects & Regressions) [producto],3
-dis_mediana,Persona,DIS (Doc Issue Survival) [mediana],1
-dis_producto,Proceso,DIS (Doc Issue Survival) [producto],2
 exprev_p90,Persona,EXPRev (Code Review Experience) [p90],3
 exprev_share_top10pct,Persona,EXPRev (Code Review Experience) [share_top10pct],1
-jarczyk_success_rate_producto,Proceso,Jarczyk Success Rate [producto],4
-mttr_mediana,Persona,MTTR (Mean Time to Repair) [mediana],3
+jarczyk_success_rate_producto,Proceso,Jarczyk Success Rate [producto],2
 mttr_producto,Proceso,MTTR (Mean Time to Repair) [producto],1
-nci_p90,Persona,NCI (Number of Closed Issues) [p90],2
-nci_producto,Proceso,NCI (Number of Closed Issues) [producto],1
+nci_producto,Proceso,NCI (Number of Closed Issues) [producto],0
 nub_producto,Proceso,NUB (Bugs Detected by Users) [producto],3
 nuevos_commits_conteo,Persona,Nuevos contribuyentes (commits) [conteo],0
 nuevos_interaccion_conteo,Persona,Nuevos contribuyentes (interacción) [conteo],0
-process_performance_producto,Proceso,Process Performance [producto],3
+process_performance_producto,Proceso,Process Performance [producto],2
 prop_cierran_ratio,Persona,Proporción que cierra issues [ratio],2
 prop_comentan_ratio,Persona,Proporción que comenta [ratio],1
 rexprev_mediana,Persona,REXPRev (Recent Review Experience) [mediana],2

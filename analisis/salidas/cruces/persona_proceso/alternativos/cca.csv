@@ -1,4 +1,4 @@
 conjunto,variables_a,variables_b,n,r1,r2,nula_p50,nula_p95,p,canary_r1,arman_a,arman_b
-todas las variables,31,11,184,0.8719,0.8368,0.6667,0.7214,0.005,0.7085,,
-sin escala ni definiciones superpuestas,19,11,184,0.7147,0.6502,0.5878,0.6405,0.005,0.3806,"exprev_share_top10pct (0.76), nc_share_top10pct (0.69), prop_cierran_ratio (0.69), sc_mediana (0.58), exprev_p90 (0.51)","nci_producto (0.50), jarczyk_success_rate_producto (0.48), process_performance_producto (0.40), rc_producto (0.39)"
-componentes firmes,3,3,184,0.5946,0.4228,0.2283,0.3344,0.005,nan,,
+todas las variables,28,11,185,0.8638,0.8278,0.6332,0.6869,0.005,0.7505,,
+sin escala ni definiciones superpuestas,19,11,185,0.7158,0.646,0.5869,0.6364,0.005,0.396,"exprev_share_top10pct (0.75), prop_cierran_ratio (0.69), nc_share_top10pct (0.68), sc_mediana (0.60), exprev_p90 (0.51)","jarczyk_success_rate_producto (0.49), nci_producto (0.48), rc_producto (0.42), process_performance_producto (0.41)"
+componentes firmes,3,3,185,0.586,0.329,0.2256,0.3293,0.005,0.51,,

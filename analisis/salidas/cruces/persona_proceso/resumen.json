@@ -55,31 +55,22 @@
    "activos_comentarios_conteo",
    "activos_commits_conteo",
    "activos_interaccion_conteo",
-   "anmcc_mediana",
    "cd_mediana",
    "cdiv_mediana",
    "cdiv_p90",
    "cdiv_share_top10pct",
    "dev_exp_mediana",
-   "dis_mediana",
    "disc_centrality_mediana",
-   "dloc_mediana",
-   "dloc_p90",
-   "dloc_share_top10pct",
    "exprev_p90",
    "exprev_share_top10pct",
    "le_mediana",
-   "mttr_mediana",
    "nc_p90",
    "nc_share_top10pct",
-   "nci_p90",
-   "nci_share_top10pct",
    "nuevos_commits_conteo",
    "nuevos_interaccion_conteo",
    "prop_cierran_ratio",
    "prop_comentan_ratio",
    "prop_commitean_ratio",
-   "rc_mediana",
    "rexp_mediana",
    "rexprev_mediana",
    "sc_mediana",
@@ -106,126 +97,122 @@
  },
  "compartidas": {},
  "conteo_variables": {
-  "patrón": 18,
+  "patrón": 12,
   "escala": 15,
   "mecánico": 3,
-  "no resiste tamaño": 6,
-  "control": 8
+  "no resiste tamaño": 4,
+  "control": 2
  },
  "componentes": {
   "Persona": [
    {
     "n": 1,
     "conjunto": "todas",
-    "varianza": 0.1667,
-    "bootstrap": 0.974,
-    "canary": 0.872,
+    "varianza": 0.1973,
+    "bootstrap": 0.986,
+    "canary": 0.959,
     "cargas": [
      [
-      "le_mediana",
-      0.855
+      "nuevos_commits_conteo",
+      0.877
      ],
      [
-      "nuevos_commits_conteo",
-      -0.842
+      "le_mediana",
+      -0.847
      ],
      [
       "tasa_nuevos_commits_ratio",
-      -0.836
+      0.836
      ],
      [
       "dev_exp_mediana",
-      0.775
-     ],
-     [
-      "cdiv_mediana",
-      0.654
-     ],
-     [
-      "anmcc_mediana",
-      0.636
+      -0.777
      ],
      [
       "activos_commits_conteo",
-      -0.621
+      0.664
+     ],
+     [
+      "cdiv_mediana",
+      -0.65
      ],
      [
       "prop_commitean_ratio",
-      -0.468
+      0.5
      ],
      [
-      "cdiv_p90",
-      0.428
+      "rexp_mediana",
+      -0.492
      ]
     ]
    },
    {
     "n": 2,
     "conjunto": "todas",
-    "varianza": 0.1341,
-    "bootstrap": 0.971,
-    "canary": 0.763,
+    "varianza": 0.1674,
+    "bootstrap": 0.978,
+    "canary": 0.856,
     "cargas": [
      [
       "activos_comentarios_conteo",
-      0.919
+      0.91
      ],
      [
       "activos_interaccion_conteo",
-      0.906
+      0.889
      ],
      [
       "nuevos_interaccion_conteo",
-      0.882
+      0.867
      ],
      [
       "activos_cierre_conteo",
-      0.806
-     ],
-     [
-      "activos_commits_conteo",
-      0.46
+      0.812
      ],
      [
       "disc_centrality_mediana",
-      0.414
+      0.478
      ],
      [
       "prop_comentan_ratio",
-      0.401
+      0.444
+     ],
+     [
+      "activos_commits_conteo",
+      0.42
      ]
     ]
    },
    {
     "n": 3,
     "conjunto": "todas",
-    "varianza": 0.0872,
-    "bootstrap": 0.959,
-    "canary": 0.757,
+    "varianza": 0.106,
+    "bootstrap": 0.975,
+    "canary": 0.823,
     "cargas": [
      [
       "exprev_share_top10pct",
-      0.885
+      0.881
      ],
      [
       "nc_share_top10pct",
-      0.801
+      0.798
      ],
      [
       "sc_share_top10pct",
-      0.749
+      0.762
      ],
      [
       "sc_p90",
-      0.609
+      0.655
      ],
      [
       "cdiv_p90",
       0.514
      ],
      [
-      "nci_p90",
-      0.457
+      "prop_commitean_ratio",
+      0.427
      ]
     ]
    }
@@ -292,21 +279,21 @@
      "id": "persona_cp1",
      "tipo": "componente",
      "componente": "persona_cp1",
-     "nombre": "CP1 Persona: le_mediana (+0.85), nuevos_commits_conteo (-0.84), tasa_nuevos_commits_ratio (-0.84), dev_exp_mediana (+0.78)",
+     "nombre": "CP1 Persona: nuevos_commits_conteo (+0.88), le_mediana (-0.85), tasa_nuevos_commits_ratio (+0.84), dev_exp_mediana (-0.78)",
      "escala": false
     },
     {
      "id": "persona_cp2",
      "tipo": "componente",
      "componente": "persona_cp2",
-     "nombre": "CP2 Persona: activos_comentarios_conteo (+0.92), activos_interaccion_conteo (+0.91), nuevos_interaccion_conteo (+0.88), activos_cierre_conteo (+0.81)",
+     "nombre": "CP2 Persona: activos_comentarios_conteo (+0.91), activos_interaccion_conteo (+0.89), nuevos_interaccion_conteo (+0.87), activos_cierre_conteo (+0.81)",
      "escala": true
     },
     {
      "id": "persona_cp3",
      "tipo": "componente",
      "componente": "persona_cp3",
-     "nombre": "CP3 Persona: exprev_share_top10pct (+0.89), nc_share_top10pct (+0.80), sc_share_top10pct (+0.75), sc_p90 (+0.61)",
+     "nombre": "CP3 Persona: exprev_share_top10pct (+0.88), nc_share_top10pct (+0.80), sc_share_top10pct (+0.76), sc_p90 (+0.66)",
      "escala": false
     },
     {
@@ -324,45 +311,10 @@
      "escala": false
     },
     {
-     "id": "dis_mediana",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "DIS (Doc Issue Survival) [mediana]",
-     "escala": false
-    },
-    {
-     "id": "dloc_mediana",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "DLOC (Documentation Lines of Code) [mediana]",
-     "escala": false
-    },
-    {
-     "id": "dloc_p90",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "DLOC (Documentation Lines of Code) [p90]",
-     "escala": false
-    },
-    {
-     "id": "dloc_share_top10pct",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "DLOC (Documentation Lines of Code) [share_top10pct]",
-     "escala": false
-    },
-    {
      "id": "exprev_p90",
      "tipo": "variable",
      "componente": "",
      "nombre": "EXPRev (Code Review Experience) [p90]",
-     "escala": false
-    },
-    {
-     "id": "mttr_mediana",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "MTTR (Mean Time to Repair) [mediana]",
      "escala": false
     },
     {
@@ -373,31 +325,10 @@
      "escala": false
     },
     {
-     "id": "nci_share_top10pct",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "NCI (Number of Closed Issues) [share_top10pct]",
-     "escala": false
-    },
-    {
      "id": "prop_cierran_ratio",
      "tipo": "variable",
      "componente": "",
      "nombre": "Proporción que cierra issues [ratio]",
-     "escala": false
-    },
-    {
-     "id": "rc_mediana",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "RC (Readme Completeness) [mediana]",
-     "escala": false
-    },
-    {
-     "id": "rexp_mediana",
-     "tipo": "variable",
-     "componente": "",
-     "nombre": "REXP (Recent Experience) [mediana]",
      "escala": false
     },
     {
@@ -496,30 +427,30 @@
    ]
   },
   "conteo": {
-   "patrón": 7,
+   "patrón": 4,
    "escala": 1,
-   "mecánico": 3,
+   "mecánico": 1,
    "no resiste tamaño": 0,
-   "control": 2
+   "control": 0
   }
  },
  "cca": {
-  "n": 184,
+  "n": 185,
   "correlaciones": [
-   0.5946,
-   0.4228,
-   0.0024
+   0.586,
+   0.329,
+   0.0244
   ],
   "p_primera": 0.001,
-  "nula_p95": 0.3344
+  "nula_p95": 0.3341
  },
  "pca_conjunto": {
   "n": 189,
-  "variables": 26,
+  "variables": 25,
   "excluidas": [],
   "k": 4,
   "criterios": {
-   "kaiser": 7,
+   "kaiser": 6,
    "codo": 5,
    "varianza_70": 6,
    "varianza_80": 8,
@@ -528,8 +459,8 @@
   "componentes": [
    {
     "n": 1,
-    "varianza": 0.2527,
-    "bootstrap": 0.9888,
+    "varianza": 0.2573,
+    "bootstrap": 0.9899,
     "mixto": true,
     "dimensiones": [
      "Persona",
@@ -538,7 +469,7 @@
     "cargas": [
      [
       "activos_interaccion_conteo",
-      0.951
+      0.953
      ],
      [
       "activos_comentarios_conteo",
@@ -546,38 +477,38 @@
      ],
      [
       "nuevos_interaccion_conteo",
-      0.914
+      0.919
      ],
      [
       "activos_cierre_conteo",
-      0.764
+      0.75
      ],
      [
       "cfdr_producto",
-      0.715
+      0.719
      ],
      [
       "nub_producto",
-      0.714
+      0.718
      ],
      [
       "nci_producto",
-      0.484
+      0.489
      ],
      [
       "prop_commitean_ratio",
-      -0.461
+      -0.476
      ],
      [
       "disc_centrality_mediana",
-      0.407
+      0.41
      ]
     ]
    },
    {
     "n": 2,
-    "varianza": 0.1935,
-    "bootstrap": 0.9906,
+    "varianza": 0.1951,
+    "bootstrap": 0.9905,
     "mixto": false,
     "dimensiones": [
      "Persona"
@@ -585,46 +516,42 @@
     "cargas": [
      [
       "nuevos_commits_conteo",
-      0.913
+      0.928
      ],
      [
       "tasa_nuevos_commits_ratio",
-      0.836
+      0.843
      ],
      [
       "le_mediana",
-      -0.805
+      -0.812
      ],
      [
       "dev_exp_mediana",
-      -0.781
+      -0.811
      ],
      [
       "activos_commits_conteo",
-      0.772
+      0.789
      ],
      [
       "cdiv_mediana",
-      -0.73
-     ],
-     [
-      "anmcc_mediana",
-      -0.691
+      -0.687
      ],
      [
       "prop_commitean_ratio",
-      0.574
+      0.597
      ],
      [
-      "cdiv_p90",
-      -0.413
+      "rexp_mediana",
+      -0.529
      ]
     ]
    },
    {
     "n": 3,
-    "varianza": 0.1136,
-    "bootstrap": 0.9782,
+    "varianza": 0.1148,
+    "bootstrap": 0.9806,
     "mixto": false,
     "dimensiones": [
      "Persona"
@@ -632,46 +559,46 @@
     "cargas": [
      [
       "exprev_share_top10pct",
-      0.856
+      0.865
      ],
      [
       "nc_share_top10pct",
-      0.785
-     ],
-     [
-      "sc_share_top10pct",
-      0.731
+      0.793
      ],
      [
       "sc_p90",
-      0.707
+      0.725
+     ],
+     [
+      "sc_share_top10pct",
+      0.72
      ],
      [
       "cdiv_p90",
-      0.526
+      0.514
      ],
      [
       "prop_commitean_ratio",
-      0.452
+      0.431
      ]
     ]
    },
    {
     "n": 4,
-    "varianza": 0.0705,
-    "bootstrap": 0.9402,
+    "varianza": 0.0726,
+    "bootstrap": 0.932,
     "mixto": false,
     "dimensiones": [
      "Proceso"
     ],
     "cargas": [
      [
-      "jarczyk_success_rate_producto",
-      0.898
+      "process_performance_producto",
+      0.914
      ],
      [
-      "process_performance_producto",
-      0.892
+      "jarczyk_success_rate_producto",
+      0.896
      ]
     ]
    }
