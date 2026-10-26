@@ -40,10 +40,11 @@ Queda en `analisis/salidas/reportes/reporte_cruce_<dima>_<dimb>.html`, con un ma
 
 **Por defecto:**
 - **Persona** aporta todas sus variables, que son resúmenes por colaborador.
-- **Las otras dimensiones** aportan solo sus variables del proyecto. Sus resúmenes por colaborador (por ejemplo, ANMCC mediana) cuentan como Persona, porque miden cómo se reparte la métrica entre las personas.
+- **Las otras dimensiones** aportan solo sus variables del proyecto.
+- Desde la decisión del Anexo E (25/10/2026), cada resumen por colaborador conserva las dimensiones de su métrica: ANMCC mediana, por ejemplo, ya no es de Persona sino de Proceso y Producto. Para que esos resúmenes entren en el cruce del lado de su dimensión, hay que agregar `persona_agregada` a los `niveles` de ese lado. Así se corre Persona–Producto (`analisis/cruces/persona_producto.json`): Producto aporta sus 13 variables del proyecto y 6 resúmenes por colaborador (ANMCC, DLOC mediana, p90 y 10 % más activo, MTTR y README Completeness).
 - **Las variantes de una misma métrica** (MTTR con bots, MTTR de bugs, etc.) quedan afuera, igual que en el PCA de cada dimensión.
 
-Cuando una variable del proyecto está asignada a las dos dimensiones, hay que decidir a cuál pertenece. Por defecto se excluye de los dos lados, y en el JSON se puede asignar una por una con `"asignar"`.
+Cuando una variable del proyecto está asignada a las dos dimensiones, hay que decidir a cuál pertenece. Por defecto se excluye de los dos lados, y en el JSON se puede asignar una por una con `"asignar"`. En Persona–Producto, Comment Density y LE por colaborador, que son de Persona y de Producto en el Anexo E, se asignan a Persona.
 
 ## 1. Cruce de variables
 
@@ -199,4 +200,4 @@ POSTGRES_DB=resultados_metricas_fixes python3 analisis/cruce_alternativos.py Per
 
 Necesita scikit-learn (`python3 -m pip install scikit-learn`) y que antes se haya corrido `cruce_dimensiones.py` para el mismo par, porque compara con sus resultados. Usa los mismos releases y la misma transformación que el PCA ajustado. Cada método se compara con una nula que corre un lado en forma circular respecto del otro, tiene que repetirse en canary y no cuenta lo que se explica por el tamaño, por definiciones superpuestas, por la misma métrica en los dos lados o por variables con menos de 10 valores distintos. Deja en `analisis/salidas/cruces/<a>_<b>/alternativos/` un `resumen.md` con el veredicto por método y un CSV por método.
 
-En Persona–Producto ninguno encuentra un patrón nuevo: la CCA sobre todas las variables, sin escala ni definiciones superpuestas, vuelve a encontrar la relación entre la concentración del núcleo y los bugs de usuarios (y le agrega una réplica débil en canary), y random forest vuelve a encontrar la de ANMCC y los commits de documentación, con forma no lineal. El resto se explica por relaciones ya encontradas, por el tamaño o por variables escalón.
+En Persona–Producto ninguno encuentra un patrón nuevo. La CCA sobre todas las variables, sin escala ni definiciones superpuestas (r₁ = 0,79, canary 0,34), junta lo que ya encontró el cruce: la tasa de ingreso y la concentración del núcleo de un lado, y ANMCC por colaborador, los commits que tocan documentación y los bugs de usuarios del otro. Random forest predice ANMCC por colaborador y los commits que tocan documentación con control de tamaño, pero no mejor que la regresión lineal, así que no agrega relaciones no lineales. El resto se explica por relaciones ya encontradas, por el tamaño, por variables escalón o por Skill Similarity, que se toma del perfil actual de cada persona.
