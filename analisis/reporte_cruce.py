@@ -1099,6 +1099,7 @@ def construir(cruce: str) -> dict:
     tam = robustas.apply(control_tamano, axis=1)
     sin_solap = ev[~ev.solapamiento_definicion.map(es_verdadero)]
     hallazgos = ev[ev.hallazgo_candidato.map(es_verdadero)]
+    rel_tamano = ev[ev.relacion_tamano.map(es_verdadero)] if "relacion_tamano" in ev else ev.iloc[0:0]
     pos = ev[ev.categoria == "positiva"].sort_values("rho_corregida", ascending=False)
     neg = ev[ev.categoria == "negativa"].sort_values("rho_corregida", ascending=True)
 
@@ -1110,7 +1111,8 @@ def construir(cruce: str) -> dict:
         (int((tam == "pasa").sum()), "Robustos que pasan el control por tamaño",
          f"{int((tam == 'no pasa').sum())} no pasan · {int((tam == 'no aplica').sum())} no aplica"),
         (len(sin_solap), "Sin solapamiento de definición", "entre los evaluados"),
-        (len(hallazgos), "Hallazgos candidatos", "robustos, sin solapamiento ni misma familia"),
+        (len(hallazgos), "Hallazgos candidatos", "robustos, sin solapamiento, misma familia ni variable de tamaño"),
+        (len(rel_tamano), "Relaciones con el tamaño", "pasarían como hallazgo, pero incluyen una variable de tamaño (escala)"),
     ]
     kpi_html = "".join(f'<div class="kpi"><div class="v">{v}</div><div class="l">{esc(l)}</div>'
                        f'<div class="d">{esc(d)}</div></div>' for v, l, d in kpis)

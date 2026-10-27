@@ -11,7 +11,7 @@ Genera:
 Además de la correlación corregida, cada par incluye chequeos de sensibilidad:
 sin ventanas de menos de 1 día, con tendencia local (escala de la relación),
 fuerza por período (alcance temporal) y control por tamaño; y un resumen
-(hallazgo_candidato, nivel_evidencia, motivo_descarte). Ver metodo_correlaciones.md.
+(hallazgo_candidato, relacion_tamano, nivel_evidencia, motivo_descarte). Ver metodo_correlaciones.md.
 """
 import csv
 import math
@@ -839,13 +839,21 @@ AND NOT depende_ventanas_cortas.
 ## hallazgo_candidato y nivel_evidencia
 
 `hallazgo_candidato` = robusta AND NOT solapamiento_definicion AND NOT misma_familia
-AND (resiste el control por tamaño, o el control no aplica).
+AND (resiste el control por tamaño, o el control no aplica) AND ninguna de las dos
+variables es de la familia tamaño.
 
-`nivel_evidencia` (solo hallazgos): **alta** si `alcance_temporal` = toda la historia y
+`relacion_tamano` = cumple todo lo anterior salvo la última condición: el par incluye una
+variable de la familia tamaño, a la que no se le puede aplicar el control por tamaño. Es
+la categoría "escala" de cruce_dimensiones.py: se informa aparte y no cuenta como hallazgo,
+dentro de cada dimensión y entre dimensiones. Dentro de Persona describe cómo cambia el
+equipo cuando crece o se achica; entre dimensiones no es evidencia de relación.
+
+`nivel_evidencia` (hallazgos y relaciones con el tamaño): **alta** si `alcance_temporal` = toda la historia y
 `escala_relacion` = release a release; **baja** si no tiene fuerza en ningún período o
 es un cambio de etapa; **media** en el resto.
 
-`motivo_descarte` lista por qué un par no es hallazgo.
+`motivo_descarte` lista por qué un par no es hallazgo ("escala (variable de tamaño)" en
+las relaciones con el tamaño).
 
 ## Unión en Looker
 
@@ -1025,7 +1033,7 @@ def main():
         "ic_2016_2019", "ic_2020_2022", "ic_2023_2024", "ic_2025_2026",
         "estado_2016_2019", "estado_2020_2022", "estado_2023_2024", "estado_2025_2026",
         "alcance_temporal", "tamano_aplica",
-        "hallazgo_candidato", "nivel_evidencia", "motivo_descarte",
+        "hallazgo_candidato", "relacion_tamano", "nivel_evidencia", "motivo_descarte",
     ]
     COLS_CHEQUEOS = ["anio_desde", "anio_hasta", "n_sin_cortas", "df_tendencia_local",
                      "ic_2016_2019", "ic_2020_2022", "ic_2023_2024", "ic_2025_2026",
@@ -1061,12 +1069,18 @@ def main():
                             and excluye_cero(pr.get("ic_local_inf", np.nan), pr.get("ic_local_sup", np.nan)))
                 escala = "" if not significativa else ("release a release" if local_ok else "cambio de etapa")
 
-                # Hallazgo candidato y motivo de descarte
-                hallazgo = bool(robusta and not pr["solapamiento_definicion"]
-                                and not pr["misma_familia"] and tamano_ok is not False)
+                # Hallazgo candidato y motivo de descarte. Los pares con una variable de la familia
+                # tamaño no admiten el control por tamaño: como en cruce_dimensiones.py, cuentan como
+                # escala (relacion_tamano) y no como hallazgo, en todos los cruces
+                con_tamano = (not pr["por_construccion"]
+                              and "tamano" in (pr["x_familia"], pr["y_familia"]))
+                pasa_filtros = bool(robusta and not pr["solapamiento_definicion"]
+                                    and not pr["misma_familia"] and tamano_ok is not False)
+                hallazgo = pasa_filtros and not con_tamano
+                relacion_tam = pasa_filtros and con_tamano
                 alcance = pr.get("alcance_temporal", "")
                 nivel = ""
-                if hallazgo:
+                if pasa_filtros:
                     if alcance == "toda la historia" and escala == "release a release":
                         nivel = "alta"
                     elif alcance.startswith("sin relación") or escala == "cambio de etapa":
@@ -1091,6 +1105,8 @@ def main():
                         motivos.append("misma familia")
                     if tamano_ok is False:
                         motivos.append("no resiste el control por tamaño")
+                    if con_tamano:
+                        motivos.append("escala (variable de tamaño)")
 
                 chequeos = {c: pr.get(c, "") for c in COLS_CHEQUEOS}
                 chequeos.update({c: fmt(pr.get(c, np.nan)) for c in COLS_CHEQUEOS_NUM})
@@ -1100,6 +1116,7 @@ def main():
                     "escala_relacion":  escala,
                     "tamano_aplica":    pr["tamano_aplica"],
                     "hallazgo_candidato": hallazgo,
+                    "relacion_tamano":  relacion_tam,
                     "nivel_evidencia":  nivel,
                     "motivo_descarte":  "" if hallazgo else "; ".join(motivos),
                     "par_id":   par_id, "cruce":   cruce,
@@ -1224,7 +1241,7 @@ def main():
         "ic_inf", "ic_sup",
         "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026",
         "rho_canary", "categoria", "robusta", "robusta_tamano",
-        "alcance_temporal", "escala_relacion", "hallazgo_candidato", "nivel_evidencia",
+        "alcance_temporal", "escala_relacion", "hallazgo_candidato", "relacion_tamano", "nivel_evidencia",
         "motivo_descarte",
     ]
     all_par_rows = []

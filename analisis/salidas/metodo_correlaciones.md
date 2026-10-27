@@ -95,13 +95,21 @@ AND NOT depende_ventanas_cortas.
 ## hallazgo_candidato y nivel_evidencia
 
 `hallazgo_candidato` = robusta AND NOT solapamiento_definicion AND NOT misma_familia
-AND (resiste el control por tamaño, o el control no aplica).
+AND (resiste el control por tamaño, o el control no aplica) AND ninguna de las dos
+variables es de la familia tamaño.
 
-`nivel_evidencia` (solo hallazgos): **alta** si `alcance_temporal` = toda la historia y
+`relacion_tamano` = cumple todo lo anterior salvo la última condición: el par incluye una
+variable de la familia tamaño, a la que no se le puede aplicar el control por tamaño. Es
+la categoría "escala" de cruce_dimensiones.py: se informa aparte y no cuenta como hallazgo,
+dentro de cada dimensión y entre dimensiones. Dentro de Persona describe cómo cambia el
+equipo cuando crece o se achica; entre dimensiones no es evidencia de relación.
+
+`nivel_evidencia` (hallazgos y relaciones con el tamaño): **alta** si `alcance_temporal` = toda la historia y
 `escala_relacion` = release a release; **baja** si no tiene fuerza en ningún período o
 es un cambio de etapa; **media** en el resto.
 
-`motivo_descarte` lista por qué un par no es hallazgo.
+`motivo_descarte` lista por qué un par no es hallazgo ("escala (variable de tamaño)" en
+las relaciones con el tamaño).
 
 ## Unión en Looker
 
