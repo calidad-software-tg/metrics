@@ -85,7 +85,7 @@ Cuando una variable del proyecto está asignada a las dos dimensiones, hay que d
 | Tipo | Cuándo |
 |---|---|
 | **escala** | Uno de los dos componentes está hecho sobre todo de conteos de participantes: la mitad o más de sus variables fuertes son de escala, como en "Volumen de participación" |
-| **mecánico** | Los dos componentes comparten una métrica entre las que los definen. Por ejemplo, la Veteranía de Persona incluye Learning Ease (mediana) y el Flujo de documentación de Producto incluye Learning Ease (proyecto): parte de su relación es esa métrica compartida |
+| **mecánico** | Los dos componentes comparten una métrica entre las que los definen. Por ejemplo, la Veteranía de Persona incluye Learning Ease (mediana) y el Flujo de documentación de Producto incluye Learning Ease (proyecto): parte de su relación es esa métrica compartida. También es mecánico si una métrica de un componente tiene una definición superpuesta con una del otro (ANMCC y Contribution Diversity, Learning Ease y Development Experience, etc.), con la misma regla que entre variables |
 | **no resiste tamaño** | Es robusto, pero desaparece al controlar por la cantidad de personas |
 | **patrón** | Es robusto y no cae en ninguno de los casos anteriores |
 
@@ -99,7 +99,7 @@ Cuando una variable del proyecto está asignada a las dos dimensiones, hay que d
 
 **Cómo.**
 - Se cruzan todos los elementos de un lado con todos los del otro, con el mismo cálculo que en los puntos 1 y 2: correlación parcial, muestra efectiva, Benjamini–Hochberg sobre los pares de este conjunto, estabilidad, canary y control por tamaño.
-- Se usan los mismos tipos que en el cruce de variables. Además, un par es **mecánico** si el componente de un lado contiene la misma métrica que la variable o el componente del otro. Por ejemplo, la Veteranía de Persona, que incluye ANMCC por colaborador, frente a ANMCC del proyecto.
+- Se usan los mismos tipos que en el cruce de variables. Además, un par es **mecánico** si el componente de un lado contiene la misma métrica que la variable o el componente del otro. Por ejemplo, la Veteranía de Persona, que incluye ANMCC por colaborador, frente a ANMCC del proyecto. O si alguna de sus métricas tiene una definición superpuesta con la del otro lado.
 - Un componente cuenta como **escala** con la misma regla que en el punto 2.
 
 **Por qué.**

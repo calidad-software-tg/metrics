@@ -1,0 +1,19 @@
+metrica_id,nombre,grupo,familia_identidad,agregacion,unidad,advertencia
+anmcc,ANMCC (Número Promedio de Componentes Modificados por Commit),Actividad: commits,login (mayormente),mediana,componentes/commit,~75% de los IDs son logins GitHub; resto nombres git (fallback sin cuenta vinculada)
+cdiv,CDIV (Contribution Diversity),Actividad: commits,login o nombre git,mediana,archivos únicos,"~75% nombres git. Sin cap de commits (run_versiones_local, git log --numstat completo)"
+fexp,FEXP (Experiencia en Archivos),Actividad: commits,login o nombre git,mediana,commits previos en mismos archivos,~75% nombres git. Sin cap de commits. Experiencia intra-ventana únicamente
+rexp,REXP (Experiencia Reciente),Actividad: commits,login o nombre git,mediana,score ponderado (sum 1/(días+1)),~75% nombres git. Sin cap de commits. Ponderación exponencial por recencia
+le,LE (Learning Ease),Actividad: commits,login o nombre git,mediana,días,"~75% nombres git. Primera contribución histórica al componente (run_versiones_local). Componente = sub-proyecto en monorepos (packages/X, apps/X, etc.)"
+nc,NC (Number of Comments),Actividad: issues/PRs/comentarios,login,suma,comentarios,IssueCommentEvent + CommitCommentEvent + PullRequestReviewCommentEvent. Sin tope
+exprev,EXPRev (Experiencia en Revisión de Código),Actividad: issues/PRs/comentarios,login,suma,eventos,issues abiertos+cerrados + PRs abiertos+cerrados + comentarios. Sin tope
+rexprev,REXPRev (Experiencia Reciente en Revisión),Actividad: issues/PRs/comentarios,login,mediana,score ponderado,Versión de EXPRev ponderada por 1/(días+1). Sin tope
+disc_centrality,Disc. Centrality (Discussion Centrality),Actividad: issues/PRs/comentarios,login,mediana,co-comentaristas únicos,Grado en la MBSN (red social de discusión). Sin tope
+sc,SC (Social Contribution),Actividad: issues/PRs/comentarios,login,suma,issues+PRs abiertos,issues_opened + issues_closed + prs_opened + prs_closed + prs_merged (por autor)
+nci,NCI (Number of Closed Issues),Actividad: issues/PRs/comentarios,login,suma,issues cerrados,"Atribuido a ClosedEvent.actor.login (quien cerró, no quien abrió)"
+mttr,MTTR (Mean Time to Repair),Actividad: issues/PRs/comentarios,login,mediana,horas,Atribuido a quien cerró. Compartido con NCI (misma corrida de fetch)
+dis,DIS (Doc Issue Survival),Actividad: issues/PRs/comentarios,login,mediana,días,Issues con label de documentación. Atribuido a quien cerró
+dev_exp,dev_exp (Development Experience),Acumulada,login,mediana (solo activos),meses,Meses desde el primer commit histórico hasta fecha_fin. Solo incluye contribuyentes con anmcc en el mismo periodo. Cálculo acumulativo: no refleja actividad en la ventana
+cd,CD (Comment Density),Foto por último autor (500 archivos alfabéticos),login,mediana,ratio comentarios/líneas,Último autor por archivo al cierre de la ventana (blame snapshot). Solo primeros 500 archivos del árbol ordenados alfabéticamente
+dloc,DLOC (Documentation Lines of Code),Foto por último autor (500 archivos alfabéticos),login,suma,líneas documentación,Mismo criterio de atribución y tope que CD
+rc,RC (Readme Completeness),Foto por último autor (500 archivos alfabéticos),login,mediana,"ratio [0,1]",7 categorías Prana et al. (2018). Atribución por último autor del README
+ss,SS (Skill Similarity),Perfil externo,login,mediana,"ratio [0,1]","max_contributors=15 humanos por ventana (bots excluidos del tope). user_languages = snapshot actual de repos propios del colaborador (no histórico). Cuentas con sufijo -bot y ≤12 filas clasificadas humano por regla, sin verificación individual"

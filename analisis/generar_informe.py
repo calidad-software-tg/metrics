@@ -42,6 +42,8 @@ Marcas (cada una sola en su línea):
     [[pca_antes cargas producto estable ajustado]]   igual que [[pca ...]], con el PCA original
     [[pca cargas producto estable ajustado]]   piezas del PCA de la dimensión (generar_pca.py):
         cargas, scree, solidez y puntajes (conjunto serie enfoque), criterios y comparacion (conjunto)
+    [[clustering dendrograma producto estable ajustado]]   clustering de métricas (generar_clustering.py):
+        dendrograma, silueta, grupos (corte propio), grupos_pca (corte con k del PCA) y clustering (todo)
     [[par x_id y_id: periodos, sensibilidad, movil, dispersion, temporal]]
         gráficos de un par; opciones después de "|":  periodo=2023-2024  modo=ajustado
         (dispersion = ajustada y original; también dispersion_ajustada, dispersion_original)
@@ -221,6 +223,13 @@ def hacer_inserto(piezas: dict, pca: dict | None = None, pca_antes: dict | None 
             if len(args) < 2:
                 return f'<p class="error-marca">Marca de PCA incompleta: [[{html.escape(marca)}]]</p>'
             return rpca.pieza(pca, *args[:4])
+        if tipo == "clustering":
+            if pca is None:
+                return '<p class="error-marca">No hay resultados de PCA: corré analisis/generar_pca.py para esta dimensión.</p>'
+            args = resto.split()
+            if len(args) < 2:
+                return f'<p class="error-marca">Marca de clustering incompleta: [[{html.escape(marca)}]]</p>'
+            return rpca.pieza_clustering(pca, *args[:4])
         if tipo == "grafico":
             resto, _, opcion = resto.partition("|")
             resto, opcion = resto.strip(), opcion.strip()

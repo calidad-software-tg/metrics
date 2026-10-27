@@ -45,6 +45,17 @@ svg .linea-cp { stroke: var(--serie); stroke-width: 1.4; fill: none; }
 svg .ic { stroke: var(--texto2); stroke-width: 1.5; }
 svg .pt { fill: var(--serie); }
 svg .pt.debil { fill: var(--tenue); }
+:root { --cp1:#2a78d6; --cp2:#eb6834; --cp3:#1f9d74; --cp4:#9b59b6; --cp5:#c9a227; --cp6:#d6457a; --cp7:#4aa3b5; --cp8:#7a6f5c; --cp9:#5c7a29; }
+@media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) {
+  --cp1:#3987e5; --cp2:#d95926; --cp3:#2fb88a; --cp4:#b27ad0; --cp5:#d9b63e; --cp6:#e0628f; --cp7:#5cb8ca; --cp8:#a3987f; --cp9:#82a548; } }
+:root[data-theme="dark"] { --cp1:#3987e5; --cp2:#d95926; --cp3:#2fb88a; --cp4:#b27ad0; --cp5:#d9b63e; --cp6:#e0628f; --cp7:#5cb8ca; --cp8:#a3987f; --cp9:#82a548; }
+svg .rama { stroke: var(--texto2); stroke-width: 1.3; fill: none; }
+svg .corte { stroke: var(--serie2); stroke-width: 1.3; stroke-dasharray: 5 4; }
+svg .corte.pca { stroke: var(--serie); }
+svg .nula { stroke: var(--texto2); stroke-width: 1.5; stroke-dasharray: 4 4; fill: none; }
+.chip { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+.lista-vars { line-height: 1.7; }
+.lista-vars span { white-space: nowrap; margin-right: 10px; }
 """
 
 ESTILO_PCA = ESTILO_PIEZAS + """
@@ -339,6 +350,21 @@ def escribir(dim: str) -> Path:
     secciones = [("s-datos", "1. Datos"), ("s-cuantos", "2. Cuántos componentes"), ("s-cargas", "3. Cargas"),
                  ("s-puntajes", "4. Puntajes en el tiempo"), ("s-solidez", "5. Solidez (bootstrap de bloques)"),
                  ("s-comparacion", "6. Comparación entre enfoques y series")]
+    C = cargar_clustering(d["dimension"])
+    seccion_clus = ""
+    if C:
+        secciones.append(("s-clustering", "7. Clustering de métricas"))
+        bloques = "".join(f'<div class="clus" data-clave="{html.escape(cl)}" style="display:none">{_bloque_clustering(d, C, cl)}</div>'
+                          for cl in C["resultados"])
+        pc = C["parametros"]
+        seccion_clus = f"""
+<h2 id="s-clustering">7. Clustering de métricas</h2>
+<p class="sub">Mostrando: <span class="cfg-actual"></span>. Agrupamiento jerárquico de las mismas variables y releases que el PCA,
+calculado por separado: distancia {html.escape(pc['distancia'])} entre métricas y enlace {html.escape(pc['enlace'])}. La cantidad de grupos se
+elige con la silueta frente a {pc['permutaciones']} conjuntos de datos permutados al azar; también se muestra el corte con tantos
+grupos como componentes retiene el PCA, para compararlos.</p>
+{bloques}
+<p class="vacio" id="clusVacio" style="display:none">No hay clustering para esta combinación.</p>"""
     conjuntos = "".join(f"<li><b>{html.escape(NOMBRE_CONJUNTO.get(c, c))}</b> ({len(v)} variables)</li>"
                         for c, v in d["conjuntos"].items())
     doc = f"""<!doctype html>
@@ -409,9 +435,11 @@ ella por la congruencia de Tucker, después de emparejar los componentes.</p>
 <div class="panel tabla" id="comparacion"></div>
 <div class="leyenda"><span><i class="cuadro" style="background:var(--div-neg)"></i>≥ 0,95: el mismo componente</span><span><i class="cuadro" style="background:color-mix(in srgb, var(--div-neg) 45%, var(--superficie))"></i>0,85–0,95: parecido</span><span><i class="cuadro" style="background:var(--div-mid)"></i>&lt; 0,85: distinto</span></div>
 <div class="mini" id="miniCargas" style="margin-top:12px"></div>
+{seccion_clus}
 
 <script type="application/json" id="datosPca">{json.dumps(d, ensure_ascii=False).replace("</", "<\\/")}</script>
 <script>{SCRIPT}</script>
+<script>{SCRIPT_CLUSTERING if C else ""}</script>
 <p class="nota">Semilla {p['semilla']} · {p['permutaciones']} permutaciones (Horn) · {p['bootstrap']} remuestreos bootstrap.</p>
 </main></body></html>
 """
@@ -429,15 +457,210 @@ def main():
     print(f"Reporte: {destino} ({destino.stat().st_size / 1e6:.1f} MB)")
 
 
-if __name__ == "__main__":
-    main()
-
 
 # ── Piezas estáticas para el informe (generar_informe.py: marcas [[pca ...]]) ─────────────────
 
 def cargar(dim: str) -> dict | None:
     entrada = ENTRADA / f"pca_{dim.lower()}.json"
+    if not entrada.exists():
+        return None
+    d = json.loads(entrada.read_text(encoding="utf-8"))
+    d["clustering"] = cargar_clustering(dim)
+    return d
+
+
+# ── Clustering de métricas (generar_clustering.py) ───────────────────────────
+
+SCRIPT_CLUSTERING = r"""
+function mostrarClustering() {
+  let hay = false;
+  document.querySelectorAll('.clus').forEach(e => { const ok = e.dataset.clave === clave(); e.style.display = ok ? '' : 'none'; hay = hay || ok; });
+  const v = document.getElementById('clusVacio'); if (v) v.style.display = hay ? 'none' : '';
+}
+const _todoPca = todo;
+todo = function () { _todoPca(); mostrarClustering(); };
+mostrarClustering();
+"""
+
+NOMBRE_SOLUCION = {"propio": "Corte elegido por el clustering", "pca": "Corte con tantos grupos como componentes del PCA"}
+
+
+def cargar_clustering(dim: str) -> dict | None:
+    entrada = ENTRADA / f"clustering_{dim.lower()}.json"
     return json.loads(entrada.read_text(encoding="utf-8")) if entrada.exists() else None
+
+
+def _cp_color(c):
+    return f"var(--cp{(c - 1) % 9 + 1})" if c else "var(--tenue)"
+
+
+def _corto(d, v):
+    n = _nombre(d, v)
+    base, _, resto = n.partition(" (")
+    # sigla con su nombre largo entre paréntesis: alcanza la sigla; si no, el texto sin el paréntesis
+    return base if len(base) <= 28 else base[:26] + "…"
+
+
+def _chip_var(d, v, c):
+    return (f'<span title="{html.escape(_nombre(d, v))}"><i class="chip" style="background:{_cp_color(c)}"></i>'
+            f'{html.escape(_corto(d, v))}</span>')
+
+
+def _leyenda_cp(Ck):
+    cps = sorted({c for c in Ck["referencia_pca"] if c})
+    items = "".join(f'<span><i class="cuadro" style="background:{_cp_color(c)}"></i>CP{c}</span>' for c in cps)
+    return f'<div class="leyenda">{items}<span><i class="cuadro" style="background:var(--tenue)"></i>sin componente</span></div>'
+
+
+def _altura_corte(dn, k, p):
+    hs = sorted(dc[1] for dc in dn["dcoord"])
+    i = p - k - 1
+    if i < 0 or i + 1 >= len(hs) + 1:
+        return None
+    alto = hs[i + 1] if i + 1 < len(hs) else hs[-1] * 1.04
+    return (hs[i] + alto) / 2
+
+
+def _dendro_svg(d, Ck, W=720):
+    p, dn, vs, ref = Ck["p"], Ck["dendrograma"], Ck["variables"], Ck["referencia_pca"]
+    fila, m = 22, dict(l=190, r=24, t=10, b=40)
+    H = m["t"] + p * fila + m["b"]
+    dmax = max(max(x) for x in dn["dcoord"]) * 1.05 or 1
+    sx = lambda dist: m["l"] + dist / dmax * (W - m["l"] - m["r"])
+    sy = lambda ic: m["t"] + (ic - 5) / 10 * fila + fila / 2
+    s = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Dendrograma de las métricas">']
+    paso = 0.25 if dmax > 0.6 else 0.1
+    v = 0.0
+    while v <= dmax + 1e-9:
+        x = sx(v)
+        s.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{m["t"]}" y2="{H - m["b"]}" class="grid"/>'
+                 f'<text x="{x:.1f}" y="{H - m["b"] + 6}" class="tick">{_f(v, 2)}</text>')
+        v += paso
+    s.append(f'<text x="{(m["l"] + W - m["r"]) / 2}" y="{H - 6}" class="eje">distancia (1 − |correlación|) a la que se unen</text>')
+    for ic, dc in zip(dn["icoord"], dn["dcoord"]):
+        s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(dc[i]):.1f},{sy(ic[i]):.1f}' for i in range(4)) + '" class="rama"/>')
+    for nombre, clase in (("pca", "corte pca"), ("propio", "corte")):
+        sol = Ck["soluciones"].get(nombre)
+        if not sol:
+            continue
+        h = _altura_corte(dn, sol["k"], p)
+        if h is None:
+            continue
+        x = sx(h)
+        s.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="{m["t"]}" y2="{H - m["b"]}" class="{clase}"><title>Corte en {sol["k"]} grupos</title></line>')
+    for pos, i in enumerate(dn["hojas"]):
+        y = m["t"] + pos * fila + fila / 2
+        s.append(f'<rect x="{m["l"] - 14}" y="{y - 5}" width="10" height="10" rx="2" style="fill:{_cp_color(ref[i])}"/>'
+                 f'<text x="{m["l"] - 20}" y="{y}" class="ticky">{html.escape(_corto(d, vs[i]))}<title>{html.escape(_nombre(d, vs[i]))}</title></text>')
+    s.append("</svg>")
+    return "".join(s)
+
+
+def _silueta_svg(Ck, W=420, H=230):
+    ks = Ck["ks"]
+    sil = [Ck["silueta"][str(k)] for k in ks]
+    nul = [Ck["nula_p95"][str(k)] for k in ks]
+    m = dict(l=44, r=14, t=12, b=36)
+    ymax = max([x for x in sil + nul if x is not None] + [0.1]) * 1.15
+    sx = lambda k: m["l"] + (k - ks[0]) / max(1, ks[-1] - ks[0]) * (W - m["l"] - m["r"])
+    sy = lambda v: m["t"] + (1 - v / ymax) * (H - m["t"] - m["b"])
+    s = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Silueta según la cantidad de grupos">']
+    paso = 0.1 if ymax > 0.3 else 0.05
+    v = 0.0
+    while v <= ymax + 1e-9:
+        s.append(f'<line x1="{m["l"]}" x2="{W - m["r"]}" y1="{sy(v):.1f}" y2="{sy(v):.1f}" class="grid"/>'
+                 f'<text x="{m["l"] - 6}" y="{sy(v):.1f}" class="ticky">{_f(v, 2)}</text>')
+        v += paso
+    for k in ks:
+        s.append(f'<text x="{sx(k):.1f}" y="{H - m["b"] + 6}" class="tick">{k}</text>')
+    s.append(f'<text x="{(m["l"] + W - m["r"]) / 2}" y="{H - 6}" class="eje">cantidad de grupos</text>')
+    s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(k):.1f},{sy(v):.1f}' for i, (k, v) in enumerate(zip(ks, nul))) + '" class="nula"/>')
+    s.append('<path d="' + "".join(f'{"L" if i else "M"}{sx(k):.1f},{sy(v):.1f}' for i, (k, v) in enumerate(zip(ks, sil))) + '" class="scree"/>')
+    for k, v in zip(ks, sil):
+        grande = k in (Ck["k_propio"], Ck["k_pca"])
+        s.append(f'<circle cx="{sx(k):.1f}" cy="{sy(v):.1f}" r="{5 if grande else 3}" class="scree-pt" '
+                 f'style="fill:{"var(--serie2)" if k == Ck["k_propio"] else "var(--serie)"}"><title>{k} grupos: silueta {_f(v)} · azar p95 {_f(Ck["nula_p95"][str(k)])}</title></circle>')
+    s.append("</svg>")
+    return "".join(s)
+
+
+def _tablas_solucion(d, Ck, R, nombre):
+    sol = Ck["soluciones"][nombre]
+    vs, ref = Ck["variables"], Ck["referencia_pca"]
+    boot = R["boot"]["congruencia_mediana"]
+    filas = []
+    for g in sol["grupos"]:
+        chips = "".join(_chip_var(d, v, ref[vs.index(v)]) for v in g["variables"])
+        if g["componente"]:
+            comp = (f'CP{g["componente"]} · comparte {len(g["compartidas"])} de {len(g["variables"])} variables '
+                    f'(Jaccard {_f(g["jaccard"])})')
+        else:
+            comp = "ninguno: sus variables no cargan en ningún componente"
+        filas.append(f'<tr><td class="lista-vars">{chips}</td><td>{comp}</td></tr>')
+    t1 = (f'<table><thead><tr><th>Grupo del clustering</th><th>Componente del PCA más parecido</th></tr></thead>'
+          f'<tbody>{"".join(filas)}</tbody></table>')
+    filas = []
+    for c in sol["por_componente"]:
+        chips = "".join(_chip_var(d, v, c["componente"]) for v in c["variables"]) or "—"
+        n = len(c["grupos"])
+        destino = ("todas en el mismo grupo" if c["completo"] else
+                   f'repartidas en {n} grupos' if n > 1 else "—")
+        firme = boot[c["componente"] - 1]
+        filas.append(f'<tr><td><b>CP{c["componente"]}</b><br><span class="cuenta">bootstrap {_f(firme)}</span></td>'
+                     f'<td class="lista-vars">{chips}</td><td>{destino}</td></tr>')
+    t2 = (f'<table><thead><tr><th>Componente</th><th>Variables con |carga| ≥ 0,4</th><th>En el clustering</th></tr></thead>'
+          f'<tbody>{"".join(filas)}</tbody></table>')
+    sin = [v for v, c in zip(vs, ref) if c is None]
+    nota = (f'<p class="nota">Sin componente en el PCA (ninguna carga llega a 0,4): '
+            f'{", ".join(html.escape(_nombre(d, v)) for v in sin)}. El clustering, en cambio, asigna cada variable a un grupo.</p>'
+            if sin else "")
+    est = sol["estabilidad"]
+    kp = (f'<p class="etiqueta-cp">{sol["k"]} grupos · silueta {_f(sol["silueta"])} (azar p95 {_f(sol["nula_p95"])}) · '
+          f'estabilidad en el bootstrap {_f(est["mediana"])} (p5 {_f(est["p05"])}) · '
+          f'réplica en canary {_f(sol.get("ari_canary"))} · coincidencia con el PCA (ARI) {_f(sol["ari_pca"])}</p>')
+    return (f'<div class="panel inserto tabla"><h4>{NOMBRE_SOLUCION[nombre]}</h4>{kp}{t1}'
+            f'<h4 style="margin-top:12px">Dónde quedan los componentes del PCA</h4>{t2}{nota}</div>')
+
+
+def _bloque_clustering(d, C, clave):
+    Ck, R = C["resultados"][clave], d["resultados"].get(clave)
+    if R is None:
+        return ""
+    kp = Ck["k_propio"]
+    elegido = (f'El clustering elige <b>{kp} grupos</b>: es el corte cuya silueta más supera la de datos al azar.'
+               if kp else 'Ningún corte supera la silueta de datos al azar: el clustering no encuentra grupos.')
+    graf = (f'<div class="dos"><div class="panel"><h4>Silueta según la cantidad de grupos</h4>{_silueta_svg(Ck)}'
+            '<div class="leyenda"><span><i class="lin"></i>silueta</span><span><i class="lin kaiser"></i>percentil 95 con datos al azar</span></div>'
+            f'<p class="nota">{elegido} Punto naranja: corte elegido; azul: {Ck["k_pca"]} grupos, como el PCA. La silueta mide '
+            'cuánto más se parece cada métrica a su grupo que al grupo más cercano (de −1 a 1).</p></div>'
+            f'<div class="panel"><h4>Dendrograma</h4>{_dendro_svg(d, Ck, 560)}{_leyenda_cp(Ck)}'
+            '<div class="leyenda"><span><i class="lin" style="border-top-color:var(--serie2);border-top-style:dashed"></i>corte elegido</span>'
+            f'<span><i class="lin" style="border-top-style:dashed"></i>corte en {Ck["k_pca"]} grupos</span></div>'
+            '<p class="nota">El color de cada métrica es el componente del PCA donde más carga (gris: ninguno). '
+            'Cuanto más a la izquierda se unen dos ramas, más correlacionadas están.</p></div></div>')
+    tablas = "".join(_tablas_solucion(d, Ck, R, n) for n in ("propio", "pca") if n in Ck["soluciones"])
+    return graf + tablas
+
+
+def pieza_clustering(d: dict, tipo: str, conjunto: str, serie: str = "estable", enfoque: str = "ajustado") -> str:
+    C, clave = d.get("clustering"), f"{conjunto}|{serie}|{enfoque}"
+    if not C or clave not in C["resultados"]:
+        return f'<p class="error-marca">No hay clustering para {html.escape(clave)}: corré analisis/generar_clustering.py.</p>'
+    Ck, R = C["resultados"][clave], d["resultados"][clave]
+    cfg = f'{d["series"][serie]} · {d["enfoques"][enfoque]} · {Ck["p"]} variables'
+    if tipo == "dendrograma":
+        return (f'<div class="panel inserto"><h4>Dendrograma de las métricas · {cfg}</h4>{_dendro_svg(d, Ck)}{_leyenda_cp(Ck)}'
+                '<div class="leyenda"><span><i class="lin" style="border-top-color:var(--serie2);border-top-style:dashed"></i>corte elegido por el clustering</span>'
+                f'<span><i class="lin" style="border-top-style:dashed"></i>corte en {Ck["k_pca"]} grupos, como el PCA</span></div>'
+                '<p class="nota">Color: componente del PCA donde más carga cada métrica (gris: ninguno). Cuanto más a la izquierda '
+                'se unen dos ramas, más correlacionadas están las métricas.</p></div>')
+    if tipo == "silueta":
+        return f'<div class="panel inserto"><h4>Silueta según la cantidad de grupos · {cfg}</h4>{_silueta_svg(Ck, 560, 250)}</div>'
+    if tipo in ("grupos", "grupos_pca"):
+        return _tablas_solucion(d, Ck, R, "propio" if tipo == "grupos" else "pca")
+    if tipo == "clustering":
+        return _bloque_clustering(d, C, clave)
+    return f'<p class="error-marca">Marca de clustering desconocida: {html.escape(tipo)}</p>'
 
 
 def _f(v, d=2):
@@ -589,3 +812,7 @@ def pieza(d: dict, tipo: str, conjunto: str, serie: str = "estable", enfoque: st
         return (f'<div class="panel inserto"><h4>Puntajes por release · {cfg}</h4>{"".join(s)}'
                 '<p class="nota">Valor de cada componente (varimax, estandarizado: media 0 y desvío 1) en cada release.</p></div>')
     return f'<p class="error-marca">Marca de PCA desconocida: {html.escape(tipo)}</p>'
+
+
+if __name__ == "__main__":
+    main()

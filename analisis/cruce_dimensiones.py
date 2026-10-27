@@ -268,6 +268,18 @@ def metricas_cp(c, carga_min, var_dict):
     return {gc.metrica_base(var_dict[v]["metrica_id"]) for v, x in c["cargas"] if abs(x) >= carga_min and v in var_dict}
 
 
+def vars_cp(c, carga_min, var_dict):
+    """Variables que definen un componente (|carga| >= carga_min)."""
+    return [v for v, x in c["cargas"] if abs(x) >= carga_min and v in var_dict]
+
+
+def solapan(vars_a, vars_b, var_dict):
+    """True si alguna variable de un lado tiene una definición superpuesta con alguna del otro
+    (la misma regla que entre variables: ANMCC y Contribution Diversity, LE y Development Experience, etc.)."""
+    return any(gc.es_solapamiento_definicion(x, y, (var_dict[x]["metrica_id"], var_dict[y]["metrica_id"]))
+               for x in vars_a for y in vars_b)
+
+
 def es_escala_cp(c, carga_min, var_dict, cfg):
     """Un componente cuenta como escala si al menos reducido.escala_si de sus variables fuertes son de escala."""
     fuertes = [v for v, x in c["cargas"] if abs(x) >= carga_min and v in var_dict]
@@ -418,12 +430,13 @@ def main():
             comunes = metricas_cp(ca, cfg["carga_minima"], var_dict) & metricas_cp(cb, cfg["carga_minima"], var_dict)
             pr.update(par_id=k, x_id=ca["id"], y_id=cb["id"], x_nombre=nombre_cp(ca, cfg["carga_minima"]),
                       y_nombre=nombre_cp(cb, cfg["carga_minima"]), comparten=", ".join(sorted(comunes)),
+                      solapamiento=solapan(vars_cp(ca, cfg["carga_minima"], var_dict), vars_cp(cb, cfg["carga_minima"], var_dict), var_dict),
                       escala=es_escala_cp(ca, cfg["carga_minima"], var_dict, cfg) or es_escala_cp(cb, cfg["carga_minima"], var_dict, cfg))
             pares_cp[k] = pr
     clasificar(pares_cp, control_cp)
     for pr in pares_cp.values():
         pr["tipo"] = ("escala" if pr["robusta"] and pr["escala"]
-                      else "mecánico" if pr["robusta"] and pr["comparten"]
+                      else "mecánico" if pr["robusta"] and (pr["comparten"] or pr["solapamiento"])
                       else "no resiste tamaño" if pr["robusta"] and pr["resiste_tamano"] is False
                       else "patrón" if pr["robusta"] else "")
     print(f"  componentes: {dim_a} {[c['n'] for c in cps[dim_a]]} · {dim_b} {[c['n'] for c in cps[dim_b]]} · "
@@ -442,16 +455,16 @@ def main():
                 if v in datos:
                     els.append(dict(id=v, tipo="marcadora", componente=c["id"], nombre=f"{var_dict[v]['nombre_legible']} (marca CP{c['n']})",
                                     e=datos[v]["versiones"], c=datos[v]["versiones_canary"], escala=es_escala(v, var_dict, cfg), familia=var_dict[v].get("familia", ""),
-                                    metricas={gc.metrica_base(var_dict[v]["metrica_id"])}))
+                                    metricas={gc.metrica_base(var_dict[v]["metrica_id"])}, vars=[v]))
             else:
                 els.append(dict(id=c["id"], tipo="componente", componente=c["id"], nombre=nombre_cp(c, cfg["carga_minima"]),
                                 e=c["estable"], c=c["canary_serie"], escala=escala_cp, familia="",
-                                metricas=metricas_cp(c, cfg["carga_minima"], var_dict)))
+                                metricas=metricas_cp(c, cfg["carga_minima"], var_dict), vars=fuertes))
         for v in lados[dim]:
             if v not in cubiertas:
                 els.append(dict(id=v, tipo="variable", componente="", nombre=var_dict[v]["nombre_legible"],
                                 e=datos[v]["versiones"], c=datos[v]["versiones_canary"], escala=es_escala(v, var_dict, cfg), familia=var_dict[v].get("familia", ""),
-                                metricas={gc.metrica_base(var_dict[v]["metrica_id"])}))
+                                metricas={gc.metrica_base(var_dict[v]["metrica_id"])}, vars=[v]))
         return els
     red_a, red_b = elementos(dim_a), elementos(dim_b)
     pares_red, control_red = {}, set()
@@ -464,7 +477,8 @@ def main():
                 constr, misma_fam, solap = base["control"], base["misma_familia"], base["solapamiento"]
             else:
                 constr = False
-                solap = bool(ea["metricas"] & eb["metricas"])     # el componente contiene la misma métrica que el otro lado
+                # el componente contiene la misma métrica que el otro lado, o una con definición superpuesta
+                solap = bool(ea["metricas"] & eb["metricas"]) or solapan(ea["vars"], eb["vars"], var_dict)
                 misma_fam = dos_vars and ea["familia"] not in ("", "otra") and ea["familia"] == eb["familia"]
             tam_aplica = not constr and not (dos_vars and "tamano" in (ea["familia"], eb["familia"]))
             pr = evaluar_par(ea["e"], eb["e"], ea["c"], eb["c"], size_e, tam_aplica)
@@ -535,7 +549,7 @@ def main():
             "rho_corregida_sin_cortas", "rho_corregida_local", "alcance_temporal", "robusta", "escala", "misma_familia",
             "solapamiento", "control", "patron"]
     escribir_csv(destino / "pares_variables.csv", sorted(pares.values(), key=lambda p: -abs(p["rho_corregida"]) if num(p["rho_corregida"]) else 0), cols)
-    escribir_csv(destino / "pares_componentes.csv", list(pares_cp.values()), [c for c in cols if c not in ("escala", "misma_familia", "solapamiento", "control", "patron")] + ["comparten", "escala"])
+    escribir_csv(destino / "pares_componentes.csv", list(pares_cp.values()), [c for c in cols if c not in ("escala", "misma_familia", "solapamiento", "control", "patron")] + ["comparten", "solapamiento", "escala"])
     escribir_csv(destino / "pares_reducido.csv", sorted(pares_red.values(), key=lambda p: -abs(p["rho_corregida"]) if num(p["rho_corregida"]) else 0),
                  ["x_tipo", "y_tipo"] + cols)
     escribir_csv(destino / "triangulacion.csv", triang, list(triang[0]) if triang else ["par_id"])

@@ -272,11 +272,79 @@ El PCA de Producto usa solo los releases desde julio de 2019 porque CFDR y NUB e
 
 En resumen, usar el período desde 2019 no condiciona los resultados del PCA de Producto, y los componentes que entran en el cruce con otras dimensiones (bugs y flujo de documentación) se sostienen.
 
-## 6. Síntesis
+## 6. Clustering de métricas
+
+Como tercera técnica de análisis, las métricas de Producto se agruparon con un agrupamiento jerárquico (`analisis/generar_clustering.py`). Usa las mismas 13 variables, los mismos 185 releases y la misma transformación que el PCA, pero se calcula por separado: mide la distancia entre dos métricas como 1 − |correlación| y une primero las más parecidas, con enlace promedio. El resultado es un árbol (dendrograma) que se corta en una cantidad de grupos. Se analizaron dos cortes:
+
+- **Con la misma cantidad de grupos que componentes del PCA (4),** para comparar las dos técnicas con la misma cantidad de grupos.
+- **Con la cantidad que elige el propio clustering,** según la silueta comparada con la de datos permutados al azar, con la misma lógica que el análisis de Horn en el PCA. En Producto elige **9 grupos**.
+
+En los dos cortes, la solidez se mide con el mismo bootstrap de bloques que el PCA y con la réplica en canary.
+
+| | PCA | Clustering de métricas |
+|---|---|---|
+| Qué arma | Componentes: combinaciones de métricas con pesos (cargas) | Grupos de métricas, sin pesos |
+| Pertenencia | Una métrica puede cargar en varios componentes o en ninguno (carga menor que 0,4) | Cada métrica va a un único grupo |
+| Cuántos | Análisis de Horn, frente a datos permutados | Silueta, frente a datos permutados |
+| Solidez | Bootstrap de bloques y réplica en canary | El mismo bootstrap de bloques y réplica en canary |
+
+### 6.1 Cuántos grupos
+
+[[clustering silueta producto estable ajustado]]
+
+Todos los cortes superan la silueta de datos al azar, y el que más la supera es el de 9 grupos (0,30 frente a 0,06). Con pocas variables, la silueta tiende a favorecer grupos chicos: varios de los 9 grupos son pares de métricas o métricas solas.
+
+[[clustering dendrograma producto estable ajustado]]
+
+### 6.2 Con 4 grupos, como el PCA
+
+[[clustering grupos_pca producto estable ajustado]]
+
+1. **Bugs de usuarios y tiempo de reparación:** CFDR, NUB y MTTR.
+2. **Flujo de documentación:** DLOC 2.0, commits que tocan documentación y LE. Es exactamente el CP4 del PCA.
+3. **Documentación, wiki e issues abiertas:** Wiki Presence, CD, NOB, README Completeness, NOI y ANMCC. Junta el CP2 y el CP3 del PCA.
+4. **DLOC**, sola.
+
+La coincidencia con los componentes es moderada (ARI 0,57), pero este corte es inestable en el bootstrap (0,33) y se replica a medias en canary (0,62).
+
+### 6.3 Con 9 grupos, el criterio del clustering
+
+[[clustering grupos producto estable ajustado]]
+
+Quedan cuatro pares y cinco métricas solas:
+
+- **Pares:** CFDR y NUB; Wiki Presence y CD; README Completeness y NOI; DLOC 2.0 y commits que tocan documentación.
+- **Solas:** NOB, ANMCC, LE, MTTR y DLOC.
+
+Es un corte sólido: estable en el bootstrap (0,65), se repite igual en canary (1,00) y coincide con el PCA en el mismo nivel que el de 4 grupos (ARI 0,54).
+
+### 6.4 Comparación entre PCA y clustering
+
+| Componente del PCA | Clustering con 4 grupos | Clustering con 9 grupos | Lectura |
+|---|---|---|---|
+| CP1 · Bugs de usuarios: CFDR y NUB | CFDR, NUB y MTTR | CFDR y NUB, igual | Coinciden. Con 4 grupos se suma MTTR, que en el PCA no carga en ningún componente |
+| CP2 · Wiki y documentación temprana: Wiki Presence, CD y NOB | Unido con el CP3 en un grupo de 6 métricas | Wiki Presence y CD; NOB queda sola | Coincide el núcleo. NOB es la que menos carga en el PCA (0,62) |
+| CP3 · Issues abiertas y README: README, NOI y ANMCC | Unido con el CP2 | README y NOI; ANMCC queda sola | Coincide el núcleo. ANMCC es la que menos carga (−0,54) |
+| CP4 · Flujo de documentación: DLOC 2.0, commits que tocan documentación y LE | Las tres métricas, igual | DLOC 2.0 y commits que tocan documentación; LE queda sola | Coinciden. LE es la que menos carga (−0,41) |
+| Sin componente: MTTR y DLOC | DLOC sola; MTTR con los bugs | Cada una sola | El clustering obliga a ubicar cada métrica |
+
+- **Las dos técnicas encuentran los mismos núcleos.** Los cuatro pares más correlacionados son el centro de los cuatro componentes del PCA y son los grupos del corte en 9.
+- **Difieren en las métricas que cargan más débil** (NOB, ANMCC y LE). El PCA las suma a un componente con una carga moderada; el clustering, que no tiene pesos, las deja solas o, con menos grupos, junta componentes enteros.
+- **Con la misma cantidad de grupos, el PCA es más sólido.** El corte en 4 grupos une los dos componentes menos estables del PCA (Wiki y documentación temprana, 0,69, e issues abiertas y README, 0,84) y es inestable. El clustering solo es estable cuando separa las métricas en pares.
+- **Bugs y flujo de documentación aparecen con las dos técnicas y en los dos cortes.** Son los componentes que entran en los cruces con otras dimensiones.
+
+### 6.5 Con las 21 variables
+
+[[clustering dendrograma todas estable ajustado]]
+
+Con las variables por colaborador, el clustering también elige 9 grupos y coincide con el PCA en lo principal (ARI 0,59): README Completeness del proyecto y por colaborador con NOI, Wiki Presence con CD y DLOC p90, y MTTR con su versión por colaborador forman grupos iguales a componentes del PCA. La diferencia es que junta el flujo de documentación con ANMCC del proyecto y por colaborador, que en el PCA cargan en componentes distintos.
+
+## 7. Síntesis
 
 - **El análisis corregido es más confiable, pero encuentra menos patrones.** De las 7 relaciones robustas del análisis original, solo se mantiene CFDR ↔ NUB, que es la misma medida. Las relaciones de documentación y las de MTTR eran efectos de cómo se medía.
 - **Las dos relaciones que parecían tener contenido se descartan al validar.** ANMCC por colaborador ↔ LE por colaborador (+0,48) la arma la llegada de gente nueva, y ANMCC por colaborador ↔ commits que tocan documentación (−0,45), los commits chicos que solo tocan documentación (sección 4.7). Dentro de Producto no queda ningún patrón propio: solo relaciones esperables.
 - **En el PCA se mantiene el componente de bugs** y aparece uno nuevo de flujo de documentación. El de documentación de antes desaparece, y el que aparece en su lugar lo arma el escalón de Wiki Presence. Con toda la historia (sin CFDR ni NUB) se obtienen los mismos componentes, y el de flujo de documentación sale reforzado (sección 5.5).
+- **El clustering de métricas encuentra los mismos núcleos que los cuatro componentes del PCA** con un cálculo distinto, y en particular los de bugs y flujo de documentación, que son los que entran en los cruces. Con la misma cantidad de grupos, el PCA es más estable; el clustering solo es estable cuando separa las métricas en pares (sección 6).
 - **Con la medición corregida, las métricas de Producto son bastante independientes entre sí.** Para la tesis, eso tiene dos lecturas: que cada métrica aporta información propia al cruce con Persona y Proceso, y que el proceso de corrección es un resultado en sí mismo, porque muestra cuánto pueden engañar las métricas de repositorio si no se controlan los bots, los backports, el formato de los archivos y las ventanas de tiempo.
 
 El análisis original está en analisis/salidas_originales/reportes/informe_producto_producto.html.
