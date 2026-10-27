@@ -1,0 +1,21 @@
+{
+  "lados": {
+    "Proceso": {"niveles": ["producto", "persona_agregada"]},
+    "Producto": {"niveles": ["producto", "persona_agregada"]}
+  },
+  "compartidas": "excluir",
+  "asignar": {
+    "mttr_producto": "Proceso", "noi_producto": "Proceso",
+    "cfdr_producto": "Producto", "nub_producto": "Producto", "rc_producto": "Producto",
+    "wp_producto": "Producto", "nob_42_producto": "Producto", "anmcc_producto": "Producto",
+    "mttr_mediana": "Proceso", "anmcc_mediana": "Producto", "rc_mediana": "Producto"
+  },
+  "escala": {"familias": ["tamano"]},
+  "componentes": {
+    "conjunto": {"Proceso": "producto", "Producto": "producto"},
+    "enfoque": "ajustado",
+    "elegir": {"Proceso": [2, 5], "Producto": [1, 4]},
+    "umbral_bootstrap": 0.85,
+    "umbral_canary": 0.70
+  }
+}
