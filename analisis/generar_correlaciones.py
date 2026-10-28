@@ -506,9 +506,9 @@ def load_producto(var_dict):
                p.periodo_num,
                EXTRACT(EPOCH FROM (p.fecha_fin - p.fecha_inicio)) / 86400.0,
                r.value,
-               EXTRACT(YEAR FROM p.fecha_inicio)::int,
+               EXTRACT(YEAR FROM p.fecha_fin)::int,
                p.etiqueta,
-               TO_CHAR(p.fecha_inicio, 'YYYYMMDDHHMMSS'),
+               TO_CHAR(p.fecha_fin, 'YYYYMMDDHH24MISS'),
                p.tipo_analisis
         FROM resultado r
         JOIN periodo p ON p.periodo_id = r.periodo_id
