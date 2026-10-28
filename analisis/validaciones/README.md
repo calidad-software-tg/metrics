@@ -9,6 +9,7 @@ POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/cdiv_sin_com
 POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/experiencia_sin_recien_llegados.py
 POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/anmcc_sin_commits_doc.py
 POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/pca_producto_historia_completa.py
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/pca_clustering_componentes.py [--persona-proceso <config>]
 ```
 
 Necesitan la base corregida cargada, el clon de Next.js y los CSV de persona agregada y del diccionario, igual que el resto del análisis. `experiencia_sin_recien_llegados.py` tarda unos minutos porque lee Development Experience, que tiene millones de filas.
@@ -45,3 +46,11 @@ Definiciones usadas:
 
 - **Commit que solo toca documentación:** todos sus archivos cumplen `es_documentacion` (`16/dloc.py`), el mismo criterio de DLOC 2.0 y de commits que tocan documentación. Son 3.881 de 35.959 commits de la rama (10,8 %); cambian un archivo de mediana, contra cuatro en el resto.
 - **Recién llegado:** quien commitea por primera vez en esa ventana, la misma definición de la variable "Nuevos (commits)" de `export_persona.py`. En la ventana mediana son el 37 % de quienes commitean.
+
+## PCA y clustering sobre los componentes
+
+`pca_clustering_componentes.py` toma los puntajes por release de los componentes firmes de cada dimensión y les aplica un PCA y un clustering (análisis de segundo nivel del cruce entre dimensiones), con los controles del análisis principal: sin tamaño, sin el componente de escala, las dos cosas, réplica en canary y estabilidad por período.
+
+- **Sin controles** aparecen dos ejes estables en los cruces con Persona: volumen ↔ bugs (escala) y renovación ↔ flujo de documentación (mecánico: LE en los dos lados). En Proceso–Producto no hay estructura (Horn no retiene componentes).
+- **Con los controles** desaparece lo que dependía del volumen. Quedan dos ejes débiles, armados con relaciones que el cruce de componentes ya conoce: renovación ↔ resolución de lo nuevo (el único patrón entre componentes, Persona–Proceso) y bugs frente a concentración del núcleo y limpieza de lo viejo (pares no robustos uno por uno). Descontando el tamaño, en Proceso–Producto aparecen dos ejes débiles (bugs ↔ menos limpieza de lo viejo, resolución de lo nuevo ↔ flujo de documentación) que el clustering no sostiene.
+- **Conclusión:** confirma el cruce de componentes y no agrega patrones. Con 4 a 7 componentes la congruencia de Tucker da alta con facilidad y el clustering de 2 grupos es grueso: es una comprobación, no evidencia nueva.
