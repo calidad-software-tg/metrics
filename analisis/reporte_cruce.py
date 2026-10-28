@@ -1090,6 +1090,10 @@ def construir(cruce: str) -> dict:
     pares = pd.read_csv(PARES)
     p = pares[pares.cruce == cruce].copy()
     if p.empty:
+        a, b = cruce.split("–")
+        if a != b:
+            sys.exit(f"{PARES} tiene solo los pares dentro de cada dimensión. El cruce {cruce} se analiza con "
+                     f"cruces.py {a} {b} y su reporte es reporte_cruce_dimensiones.py {a} {b}.")
         sys.exit(f"No hay pares del cruce {cruce} en {PARES}")
     nombres = nombres_variables()
 

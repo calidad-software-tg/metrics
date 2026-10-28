@@ -100,7 +100,7 @@ variables es de la familia tamaño.
 
 `relacion_tamano` = cumple todo lo anterior salvo la última condición: el par incluye una
 variable de la familia tamaño, a la que no se le puede aplicar el control por tamaño. Es
-la categoría "escala" de cruce_dimensiones.py: se informa aparte y no cuenta como hallazgo,
+la categoría "escala" de cruces.py: se informa aparte y no cuenta como hallazgo,
 dentro de cada dimensión y entre dimensiones. Dentro de Persona describe cómo cambia el
 equipo cuando crece o se achica; entre dimensiones no es evidencia de relación.
 

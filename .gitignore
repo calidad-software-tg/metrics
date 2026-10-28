@@ -17,3 +17,4 @@ analisis/salidas_originales/
 db/fixes_seed.sql.gz
 analisis/salidas/cruces/
 analisis/salidas/validaciones/
+analisis/salidas/periodos/
