@@ -18,7 +18,8 @@ método que el análisis dentro de cada dimensión:
      permutación que respeta el orden en el tiempo (corrimiento circular).
   5. Triangulación: un patrón de variables se confirma si sus variables cargan en componentes
      que también se relacionan.
-  6. PCA conjunto con las variables de los dos lados: componentes que mezclan dimensiones.
+  6. PCA conjunto con las variables de los dos lados: componentes que mezclan dimensiones. Con las mismas
+     variables, clustering conjunto: grupos de métricas que mezclan dimensiones, comparados con el PCA conjunto.
   7. Red de métricas: nodos y aristas de las relaciones robustas, para ver qué variables hacen de puente.
 
   8. Cruce con los grupos del clustering de métricas (--grupos): repite 2–5 con los grupos de
@@ -67,6 +68,7 @@ Configuración (JSON, todo opcional; ver analisis/cruces/*.json):
     reducido.escala_si       proporción de variables de escala entre las que definen un componente a partir
                              de la cual el componente cuenta como escala (0,5).
     pca_conjunto             false para no correr el PCA conjunto.
+    clustering_conjunto      false para no correr el clustering conjunto (las mismas variables que el PCA conjunto).
     pca_conjunto_variables   "componentes" (por defecto: las variables con |carga| >= carga_minima en los
                              componentes elegidos de cada lado) o "todas" (necesita 3 releases por variable).
 
@@ -141,6 +143,7 @@ DEFAULTS = {
     "reducido": {"modo": "puntajes", "escala_si": 0.5},
     "permutaciones": 1000,
     "pca_conjunto": True,
+    "clustering_conjunto": True,
     "pca_conjunto_variables": "componentes",
 }
 
@@ -370,7 +373,9 @@ def cca(cps_a, cps_b, n_perm, rng):
 
 # ── 5. PCA conjunto ──────────────────────────────────────────────────────────
 
-def pca_conjunto(variables, datos, var_dict, enfoque, rng, carga_min, dim_de):
+def matriz_conjunta(variables, datos, var_dict, enfoque):
+    """Variables de los dos lados con cobertura suficiente y no constantes, y sus releases con todos los datos:
+    la misma entrada para el PCA conjunto y el clustering conjunto."""
     ventanas = set().union(*(set(datos[v]["versiones"]) for v in variables))
     cob = {v: sum(1 for t in datos[v]["versiones"].values() if t[1] is not None) / max(1, len(ventanas)) for v in variables}
     vs = [v for v in variables if cob[v] >= pca.MIN_COBERTURA]
@@ -381,6 +386,11 @@ def pca_conjunto(variables, datos, var_dict, enfoque, rng, carga_min, dim_de):
     if constantes:
         vs = [v for v in vs if v not in constantes]
         filas, _ = pca.tabla(vs, datos, "versiones")
+    return vs, filas
+
+
+def pca_conjunto(variables, datos, var_dict, enfoque, rng, carga_min, dim_de):
+    vs, filas = matriz_conjunta(variables, datos, var_dict, enfoque)
     res = pca.analizar(vs, filas, enfoque, None, rng) if len(filas) >= 30 else None
     if res is None:
         return dict(error=f"pocas ventanas con todos los datos ({len(filas)}) para {len(vs)} variables")
@@ -395,6 +405,56 @@ def pca_conjunto(variables, datos, var_dict, enfoque, rng, carga_min, dim_de):
                           cargas=[(v, round(x, 3)) for v, x in fuertes]))
     return dict(n=res["n"], variables=len(vs), excluidas=sorted(set(variables) - set(vs)), k=res["k"],
                 criterios=res["criterios"], componentes=comps)
+
+
+def clustering_conjunto(variables, datos, var_dict, enfoque, dim_de, res_pca):
+    """Clustering jerárquico de las métricas de los dos lados juntas, con las mismas variables y releases que el
+    PCA conjunto y el mismo método que clustering.py (1 − |correlación|, enlace promedio, corte por silueta frente
+    a datos permutados, estabilidad por bootstrap de bloques). Usa su propio generador de números aleatorios, así
+    no cambia el resto del cruce. Compara los grupos con los componentes del PCA conjunto."""
+    import clustering as cl
+    rng = np.random.default_rng(pca.SEMILLA)
+    vs, filas = matriz_conjunta(variables, datos, var_dict, enfoque)
+    if len(filas) < 30 or len(vs) < 4:
+        return dict(error=f"pocas ventanas o variables ({len(filas)} releases, {len(vs)} variables)")
+    Z, _ = pca.transformar(filas, enfoque)
+    p = Z.shape[1]
+    ks = list(range(2, min(cl.K_MAX, p - 1) + 1))
+    D = cl.distancias(Z)
+    L = cl.arbol(D)
+    cut = cl.cortes(L, ks)
+    sil = {k: cl.silueta(D, cut[k]) for k in ks}
+    nula = cl.nula_silueta(Z, ks, rng)
+    supera = [k for k in ks if sil[k] > nula[k]]
+    k_propio = max(supera, key=lambda k: sil[k] - nula[k]) if supera else None
+    # componente dominante de cada variable en el PCA conjunto (|carga| >= carga mínima), como referencia_pca
+    dominante = {}
+    if res_pca and "componentes" in res_pca:
+        for c in res_pca["componentes"]:
+            for v, x in c["cargas"]:
+                if abs(x) > abs(dominante.get(v, (None, 0))[1]):
+                    dominante[v] = (c["n"], x)
+    ref = [dominante[v][0] if v in dominante else -1 - i for i, v in enumerate(vs)]
+    soluciones = {}
+    k_pca = res_pca.get("k") if res_pca else None
+    for nombre, k in (("propio", k_propio), ("pca", k_pca)):
+        if k is None or k < 2 or k > p - 1:
+            continue
+        lab = cut[k] if k in cut else cl.fcluster(L, k, "maxclust")
+        grupos = {}
+        for v, g in zip(vs, lab):
+            grupos.setdefault(int(g), []).append(v)
+        filas_g = []
+        for g, mv in sorted(grupos.items(), key=lambda x: -len(x[1])):
+            dims = sorted({dim_de[v] for v in mv})
+            comps = sorted({dominante[v][0] for v in mv if v in dominante})
+            filas_g.append(dict(grupo=g, variables=mv, dimensiones=dims, mixto=len(dims) > 1, componentes_pca=comps))
+        soluciones[nombre] = dict(k=k, silueta=round(sil.get(k, float("nan")), 4), nula_p95=r4(nula.get(k)),
+                                  ari_pca=round(cl.ari(ref, lab), 4), estabilidad=cl.estabilidad(Z, k, lab, rng),
+                                  grupos=filas_g)
+    return dict(n=int(Z.shape[0]), variables=p, k_propio=k_propio, k_pca=k_pca,
+                silueta={str(k): round(sil[k], 4) for k in ks}, nula_p95={str(k): r4(nula[k]) for k in ks},
+                soluciones=soluciones)
 
 
 # ── salida ───────────────────────────────────────────────────────────────────
@@ -586,6 +646,12 @@ def _cruzar(dim_a, dim_b, cfg, destino, periodos):
         res_pca = pca_conjunto(vars_pca, datos, var_dict, cfg["componentes"]["enfoque"],
                                rng, cfg["carga_minima"], dim_de)
 
+    # ── 6b. clustering conjunto (mismas variables y releases que el PCA conjunto) ──
+    res_clus = None
+    if cfg["pca_conjunto"] and cfg["clustering_conjunto"]:
+        print("  clustering conjunto…", flush=True)
+        res_clus = clustering_conjunto(vars_pca, datos, var_dict, cfg["componentes"]["enfoque"], dim_de, res_pca)
+
     # ── 7. red ──
     aristas = [dict(origen=p["x_id"], destino=p["y_id"], rho=p["rho_corregida"], tipo=p["tipo"])
                for p in pares.values() if p["robusta"] and not p["control"]]
@@ -621,7 +687,7 @@ def _cruzar(dim_a, dim_b, cfg, destino, periodos):
                       elementos={d: [dict(id=e["id"], tipo=e["tipo"], componente=e["componente"], nombre=e["nombre"], escala=e["escala"])
                                      for e in els] for d, els in ((dim_a, red_a), (dim_b, red_b))},
                       conteo={t: sum(1 for p in pares_red.values() if p["tipo"] == t) for t in ("patrón", "escala", "mecánico", "no resiste tamaño", "control")}),
-        cca=res_cca, pca_conjunto=res_pca)
+        cca=res_cca, pca_conjunto=res_pca, clustering_conjunto=res_clus)
     # valores por release para el reporte (reporte_cruce_dimensiones.py)
     releases = {}
     for v in dim_de:
@@ -677,6 +743,18 @@ def _cruzar(dim_a, dim_b, cfg, destino, periodos):
                ", ".join(f"{v} ({x:+.2f})" for v, x in c["cargas"][:6]) for c in res_pca["componentes"]]
     elif res_pca:
         md += ["", "## PCA conjunto", "", res_pca["error"]]
+    if res_clus and "soluciones" in res_clus:
+        md += ["", "## Clustering conjunto", "",
+               f"{res_clus['variables']} variables, {res_clus['n']} releases; corte propio: "
+               f"{res_clus['k_propio'] or 'ninguno supera la nula'}."]
+        for nombre, sol in res_clus["soluciones"].items():
+            md += ["", f"**Corte {nombre}** ({sol['k']} grupos): silueta {f(sol['silueta'])} (nula p95 {f(sol['nula_p95'])}), "
+                       f"ARI con el PCA conjunto {f(sol['ari_pca'])}, estabilidad {f(sol['estabilidad']['mediana'])}.", ""]
+            md += [f"- {'**mezcla dimensiones** · ' if g['mixto'] else ''}" + ", ".join(g["variables"])
+                   + (f" (CP {', '.join(map(str, g['componentes_pca']))} del PCA conjunto)" if g["componentes_pca"] else "")
+                   for g in sol["grupos"] if len(g["variables"]) > 1]
+    elif res_clus:
+        md += ["", "## Clustering conjunto", "", res_clus["error"]]
     (destino / "resumen.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     print(f"  salida: {destino}")
 
