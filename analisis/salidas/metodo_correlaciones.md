@@ -46,19 +46,24 @@ Dentro de cada cruce, solo pares con `por_construccion = false`.
 ## Pares por_construccion
 
 misma_metrica; activos ↔ nuevos del mismo canal; activos_comentarios/cierre ↔ activos_interaccion;
-proporciones ↔ sus dos componentes (numerador y denominador); nc/sc/nci ↔ exprev.
+proporciones ↔ sus dos componentes (numerador y denominador); nc/sc/nci ↔ exprev y rexprev, y
+exprev ↔ rexprev (se calculan con los mismos eventos de issues, PR y comentarios).
 
 ## solapamiento_definicion
 
 Métricas distintas cuya definición comparte ingredientes: ANMCC ↔ Contribution
 Diversity; Learning Easy ↔ Development Experience; Learning Easy ↔ nuevos en commits;
 REXP ↔ REXPRev; DLOC ↔ README Completeness (DLOC cuenta las líneas de los README.md);
-NOI ↔ CFDR / NUB (cada bug abierto es una issue abierta).
+NOI ↔ CFDR / NUB (cada bug abierto es una issue abierta); dos proporciones de participación que
+comparten un conteo (por ejemplo, proporción que commitea y tasa de ingreso de commits, que usan los
+commiters activos). Es el único criterio de relación mecánica, igual para las métricas del proyecto y
+para las variables por colaborador.
 
 ## misma_familia
 
 Las dos variables tienen la misma familia, salvo "otra" (que agrupa variables sin
-familia propia y no es un aspecto común).
+familia propia y no es un aspecto común). Es descriptiva: no descarta pares (la relación mecánica se
+marca solo con solapamiento_definicion). La familia tamaño define la escala.
 
 ## Categorías y fuerza
 
@@ -94,7 +99,7 @@ AND NOT depende_ventanas_cortas.
 
 ## hallazgo_candidato y nivel_evidencia
 
-`hallazgo_candidato` = robusta AND NOT solapamiento_definicion AND NOT misma_familia
+`hallazgo_candidato` = robusta AND NOT solapamiento_definicion
 AND (resiste el control por tamaño, o el control no aplica) AND ninguna de las dos
 variables es de la familia tamaño.
 

@@ -8,7 +8,7 @@ método que el análisis dentro de cada dimensión:
   1. Cruce de variables: correlación parcial de Spearman entre cada variable de un lado y cada
      variable del otro, con muestra efectiva, Benjamini–Hochberg, estabilidad por período, réplica
      en canary y control por tamaño. Cada par se marca como control, escala (involucra conteos de
-     participantes), mecánico (misma familia o definición superpuesta) o patrón.
+     participantes), mecánico (definición superpuesta) o patrón.
   2. Cruce de componentes: la misma correlación entre los puntajes por release de los componentes
      firmes de cada dimensión (PCA ya calculado por pca.py).
   3. Conjunto reducido: de cada lado, un puntaje por cada componente firme (o su variable de carga
@@ -519,7 +519,7 @@ def _cruzar(dim_a, dim_b, cfg, destino, periodos):
     clasificar(pares, control)
     for k, pr in pares.items():
         pr["control"] = k in control
-        pr["mecanico"] = pr["misma_familia"] or pr["solapamiento"]
+        pr["mecanico"] = pr["solapamiento"]
         pr["patron"] = bool(pr["robusta"] and not pr["control"] and not pr["escala"] and not pr["mecanico"]
                             and pr["resiste_tamano"] is not False)
         pr["tipo"] = ("control" if pr["control"] else "patrón" if pr["patron"] else "escala" if pr["robusta"] and pr["escala"]
@@ -606,7 +606,7 @@ def _cruzar(dim_a, dim_b, cfg, destino, periodos):
     clasificar(pares_red, control_red)
     for k, pr in pares_red.items():
         pr["control"] = k in control_red
-        pr["mecanico"] = pr["misma_familia"] or pr["solapamiento"]
+        pr["mecanico"] = pr["solapamiento"]
         pr["patron"] = bool(pr["robusta"] and not pr["control"] and not pr["escala"] and not pr["mecanico"]
                             and pr["resiste_tamano"] is not False)
         pr["tipo"] = ("control" if pr["control"] else "patrón" if pr["patron"] else "escala" if pr["robusta"] and pr["escala"]
@@ -885,7 +885,7 @@ def nombre_g(g, var_dict, metodo):
 
 def tipo_par(pr):
     pr["control"] = pr.get("control", False)
-    pr["mecanico"] = pr.get("misma_familia", False) or pr.get("solapamiento", False)
+    pr["mecanico"] = pr.get("solapamiento", False)
     pr["patron"] = bool(pr["robusta"] and not pr["control"] and not pr["escala"] and not pr["mecanico"]
                         and pr["resiste_tamano"] is not False)
     pr["tipo"] = ("control" if pr["control"] else "patrón" if pr["patron"] else "escala" if pr["robusta"] and pr["escala"]

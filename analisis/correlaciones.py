@@ -65,6 +65,7 @@ ACTIVOS_NUEVOS = {
 }
 
 # proporciones: cada ratio es por_construccion con sus dos componentes
+COMPONENTES_RATIO = {vid: {num_id, den_id} for vid, num_id, den_id in RATIO_DEFS_CORR}
 RATIO_POR_CONSTRUCCION = frozenset(
     frozenset([vid, comp])
     for vid, num_id, den_id in RATIO_DEFS_CORR
@@ -367,11 +368,17 @@ def es_por_construccion(x_id, y_id, misma_metrica):
         return True
     if frozenset([x_id, y_id]) in RATIO_POR_CONSTRUCCION:
         return True
+    # EXPRev y REXPRev se calculan con los mismos eventos (issues y PR abiertos y cerrados, comentarios)
+    # que NC, SC y NCI, y entre sí
     def _nc_sc_nci(vid):
         return vid.startswith("nc_") or vid.startswith("sc_") or vid.startswith("nci_")
-    if _nc_sc_nci(x_id) and y_id.startswith("exprev_"):
+    def _revision(vid):
+        return vid.startswith("exprev_") or vid.startswith("rexprev_")
+    if _nc_sc_nci(x_id) and _revision(y_id):
         return True
-    if _nc_sc_nci(y_id) and x_id.startswith("exprev_"):
+    if _nc_sc_nci(y_id) and _revision(x_id):
+        return True
+    if _revision(x_id) and _revision(y_id):
         return True
     return False
 
@@ -394,6 +401,9 @@ def es_solapamiento_definicion(x_id, y_id, metricas=None):
         return True
     if (_starts(x_id, "rexp") and _starts(y_id, "rexprev")) or \
        (_starts(y_id, "rexp") and _starts(x_id, "rexprev")):
+        return True
+    # dos proporciones de participación que comparten un conteo (numerador o denominador)
+    if x_id in COMPONENTES_RATIO and y_id in COMPONENTES_RATIO and COMPONENTES_RATIO[x_id] & COMPONENTES_RATIO[y_id]:
         return True
     return False
 
@@ -599,19 +609,24 @@ Dentro de cada cruce, solo pares con `por_construccion = false`.
 ## Pares por_construccion
 
 misma_metrica; activos ↔ nuevos del mismo canal; activos_comentarios/cierre ↔ activos_interaccion;
-proporciones ↔ sus dos componentes (numerador y denominador); nc/sc/nci ↔ exprev.
+proporciones ↔ sus dos componentes (numerador y denominador); nc/sc/nci ↔ exprev y rexprev, y
+exprev ↔ rexprev (se calculan con los mismos eventos de issues, PR y comentarios).
 
 ## solapamiento_definicion
 
 Métricas distintas cuya definición comparte ingredientes: ANMCC ↔ Contribution
 Diversity; Learning Easy ↔ Development Experience; Learning Easy ↔ nuevos en commits;
 REXP ↔ REXPRev; DLOC ↔ README Completeness (DLOC cuenta las líneas de los README.md);
-NOI ↔ CFDR / NUB (cada bug abierto es una issue abierta).
+NOI ↔ CFDR / NUB (cada bug abierto es una issue abierta); dos proporciones de participación que
+comparten un conteo (por ejemplo, proporción que commitea y tasa de ingreso de commits, que usan los
+commiters activos). Es el único criterio de relación mecánica, igual para las métricas del proyecto y
+para las variables por colaborador.
 
 ## misma_familia
 
 Las dos variables tienen la misma familia, salvo "otra" (que agrupa variables sin
-familia propia y no es un aspecto común).
+familia propia y no es un aspecto común). Es descriptiva: no descarta pares (la relación mecánica se
+marca solo con solapamiento_definicion). La familia tamaño define la escala.
 
 ## Categorías y fuerza
 
@@ -647,7 +662,7 @@ AND NOT depende_ventanas_cortas.
 
 ## hallazgo_candidato y nivel_evidencia
 
-`hallazgo_candidato` = robusta AND NOT solapamiento_definicion AND NOT misma_familia
+`hallazgo_candidato` = robusta AND NOT solapamiento_definicion
 AND (resiste el control por tamaño, o el control no aplica) AND ninguna de las dos
 variables es de la familia tamaño.
 
@@ -889,8 +904,7 @@ def _calcular(periodos, entre_dimensiones):
                 # escala (relacion_tamano) y no como hallazgo, en todos los cruces
                 con_tamano = (not pr["por_construccion"]
                               and "tamano" in (pr["x_familia"], pr["y_familia"]))
-                pasa_filtros = bool(robusta and not pr["solapamiento_definicion"]
-                                    and not pr["misma_familia"] and tamano_ok is not False)
+                pasa_filtros = bool(robusta and not pr["solapamiento_definicion"] and tamano_ok is not False)
                 hallazgo = pasa_filtros and not con_tamano
                 relacion_tam = pasa_filtros and con_tamano
                 alcance = pr.get("alcance_temporal", "")
@@ -916,8 +930,6 @@ def _calcular(periodos, entre_dimensiones):
                         motivos.append("depende de las ventanas de menos de 1 día")
                     if pr["solapamiento_definicion"]:
                         motivos.append("solapamiento de definición")
-                    if pr["misma_familia"]:
-                        motivos.append("misma familia")
                     if tamano_ok is False:
                         motivos.append("no resiste el control por tamaño")
                     if con_tamano:
