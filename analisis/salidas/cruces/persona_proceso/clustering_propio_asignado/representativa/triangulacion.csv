@@ -1,0 +1,17 @@
+par_id,x_nombre,y_nombre,rho_corregida,grupo_x,grupo_y,par_grupos,rho_grupos,tipo_par_grupos,triangulado
+le_mediana__anmcc_mediana,LE (Learning Ease) [mediana],ANMCC (Avg Modified Components per Commit) [mediana],0.4793,G1,solo,,,,False
+dev_exp_mediana__anmcc_mediana,dev_exp (Development Experience) [mediana],ANMCC (Avg Modified Components per Commit) [mediana],0.3839,G1,solo,,,,False
+sc_mediana__jarczyk_success_rate_producto,SC (Social Contribution) [mediana],Jarczyk Success Rate [producto],0.3282,G3,G2,persona_g3__proceso_g2,0.151,no robusto,False
+rexprev_mediana__cfdr_producto,REXPRev (Recent Review Experience) [mediana],CFDR (Customer Found Defects & Regressions) [producto],-0.3138,G4,G1,persona_g4__proceso_g1,-0.275,no robusto,False
+rexprev_mediana__nub_producto,REXPRev (Recent Review Experience) [mediana],NUB (Bugs Detected by Users) [producto],-0.3107,G4,G1,persona_g4__proceso_g1,-0.275,no robusto,False
+nc_share_top10pct__nci_p90,NC (Number of Comments) [share_top10pct],NCI (Number of Closed Issues) [p90],0.2898,G3,solo,,,,False
+exprev_p90__cfdr_producto,EXPRev (Code Review Experience) [p90],CFDR (Customer Found Defects & Regressions) [producto],-0.2786,G4,G1,persona_g4__proceso_g1,-0.275,no robusto,False
+exprev_p90__nub_producto,EXPRev (Code Review Experience) [p90],NUB (Bugs Detected by Users) [producto],-0.274,G4,G1,persona_g4__proceso_g1,-0.275,no robusto,False
+tasa_nuevos_commits_ratio__cfdr_producto,Tasa de ingreso (commits) [ratio],CFDR (Customer Found Defects & Regressions) [producto],0.2353,G1,G1,persona_g1__proceso_g1,0.193,no robusto,False
+tasa_nuevos_commits_ratio__nub_producto,Tasa de ingreso (commits) [ratio],NUB (Bugs Detected by Users) [producto],0.235,G1,G1,persona_g1__proceso_g1,0.193,no robusto,False
+dev_exp_mediana__mttr_mediana,dev_exp (Development Experience) [mediana],MTTR (Mean Time to Repair) [mediana],-0.2277,G1,solo,,,,False
+prop_cierran_ratio__process_performance_producto,Proporción que cierra issues [ratio],Process Performance [producto],0.2273,G4,G2,persona_g4__proceso_g2,0.141,no robusto,False
+prop_cierran_ratio__jarczyk_success_rate_producto,Proporción que cierra issues [ratio],Jarczyk Success Rate [producto],0.2266,G4,G2,persona_g4__proceso_g2,0.141,no robusto,False
+exprev_p90__process_performance_producto,EXPRev (Code Review Experience) [p90],Process Performance [producto],0.2206,G4,G2,persona_g4__proceso_g2,0.141,no robusto,False
+exprev_share_top10pct__mttr_producto,EXPRev (Code Review Experience) [share_top10pct],MTTR (Mean Time to Repair) [producto],0.2002,G3,G3,persona_g3__proceso_g3,0.2444,patrón,True
+prop_comentan_ratio__anmcc_producto,Proporción que comenta [ratio],ANMCC (Avg Modified Components per Commit) [producto],0.1721,solo,solo,,,,False

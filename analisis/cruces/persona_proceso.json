@@ -1,0 +1,21 @@
+{
+  "lados": {
+    "Persona": {"niveles": ["persona_agregada"]},
+    "Proceso": {"niveles": ["producto", "persona_agregada"]}
+  },
+  "compartidas": "excluir",
+  "asignar": {
+    "cdiv_mediana": "Persona", "cdiv_p90": "Persona", "cdiv_share_top10pct": "Persona",
+    "dev_exp_mediana": "Persona", "exprev_p90": "Persona", "exprev_share_top10pct": "Persona",
+    "nc_p90": "Persona", "nc_share_top10pct": "Persona", "rexprev_mediana": "Persona",
+    "sc_mediana": "Persona", "sc_p90": "Persona", "sc_share_top10pct": "Persona"
+  },
+  "escala": {"familias": ["tamano"]},
+  "componentes": {
+    "conjunto": {"Persona": "todas", "Proceso": "producto"},
+    "enfoque": "ajustado",
+    "elegir": {"Proceso": [1, 2, 5]},
+    "umbral_bootstrap": 0.85,
+    "umbral_canary": 0.70
+  }
+}

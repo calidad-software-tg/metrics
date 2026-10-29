@@ -1,0 +1,1176 @@
+{
+ "dimensiones": [
+  "Persona",
+  "Proceso"
+ ],
+ "corte": "propio",
+ "grupos": {
+  "Persona": {
+   "k": 10,
+   "conjunto": "todas",
+   "estabilidad": 0.7122968167272202,
+   "ari_canary": 0.3197069032009256,
+   "ari_pca": 0.6631016042780749,
+   "sueltas": [
+    "cd_mediana",
+    "cdiv_share_top10pct",
+    "prop_comentan_ratio",
+    "ss_mediana",
+    "tasa_nuevos_interaccion_ratio"
+   ],
+   "grupos": [
+    {
+     "id": "persona_g1",
+     "variables": [
+      "activos_commits_conteo",
+      "cdiv_mediana",
+      "dev_exp_mediana",
+      "le_mediana",
+      "nuevos_commits_conteo",
+      "rexp_mediana",
+      "tasa_nuevos_commits_ratio"
+     ],
+     "central": "nuevos_commits_conteo",
+     "signos": [
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      1
+     ],
+     "pesos": [
+      0.351,
+      -0.317,
+      -0.395,
+      -0.42,
+      0.456,
+      -0.23,
+      0.428
+     ],
+     "varianza_grupo": 0.585
+    },
+    {
+     "id": "persona_g2",
+     "variables": [
+      "activos_cierre_conteo",
+      "activos_comentarios_conteo",
+      "activos_interaccion_conteo",
+      "disc_centrality_mediana",
+      "nuevos_interaccion_conteo"
+     ],
+     "central": "activos_interaccion_conteo",
+     "signos": [
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "pesos": [
+      0.409,
+      0.508,
+      0.512,
+      0.25,
+      0.499
+     ],
+     "varianza_grupo": 0.722
+    },
+    {
+     "id": "persona_g3",
+     "variables": [
+      "exprev_share_top10pct",
+      "nc_share_top10pct",
+      "prop_commitean_ratio",
+      "sc_mediana",
+      "sc_p90"
+     ],
+     "central": "exprev_share_top10pct",
+     "signos": [
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "pesos": [
+      0.53,
+      0.511,
+      0.41,
+      0.324,
+      0.43
+     ],
+     "varianza_grupo": 0.582
+    },
+    {
+     "id": "persona_g4",
+     "variables": [
+      "exprev_p90",
+      "nc_p90",
+      "prop_cierran_ratio",
+      "rexprev_mediana"
+     ],
+     "central": "exprev_p90",
+     "signos": [
+      1,
+      1,
+      1,
+      1
+     ],
+     "pesos": [
+      0.58,
+      0.566,
+      0.389,
+      0.438
+     ],
+     "varianza_grupo": 0.545
+    },
+    {
+     "id": "persona_g5",
+     "variables": [
+      "cdiv_p90",
+      "sc_share_top10pct"
+     ],
+     "central": "cdiv_p90",
+     "signos": [
+      1,
+      1
+     ],
+     "pesos": [
+      0.707,
+      0.707
+     ],
+     "varianza_grupo": 0.748
+    }
+   ]
+  },
+  "Proceso": {
+   "k": 7,
+   "conjunto": "producto",
+   "estabilidad": 0.6373626373626373,
+   "ari_canary": 0.4990892531876138,
+   "ari_pca": 0.6994535519125683,
+   "sueltas": [
+    "anmcc_producto",
+    "nob_42_producto",
+    "wp_producto"
+   ],
+   "grupos": [
+    {
+     "id": "proceso_g1",
+     "variables": [
+      "cfdr_producto",
+      "nub_producto"
+     ],
+     "central": "cfdr_producto",
+     "signos": [
+      1,
+      1
+     ],
+     "pesos": [
+      0.707,
+      0.707
+     ],
+     "varianza_grupo": 1.0
+    },
+    {
+     "id": "proceso_g2",
+     "variables": [
+      "jarczyk_success_rate_producto",
+      "process_performance_producto"
+     ],
+     "central": "jarczyk_success_rate_producto",
+     "signos": [
+      1,
+      1
+     ],
+     "pesos": [
+      0.707,
+      0.707
+     ],
+     "varianza_grupo": 0.887
+    },
+    {
+     "id": "proceso_g3",
+     "variables": [
+      "mttr_producto",
+      "nci_producto"
+     ],
+     "central": "mttr_producto",
+     "signos": [
+      1,
+      1
+     ],
+     "pesos": [
+      0.707,
+      0.707
+     ],
+     "varianza_grupo": 0.659
+    },
+    {
+     "id": "proceso_g4",
+     "variables": [
+      "noi_producto",
+      "rc_producto"
+     ],
+     "central": "noi_producto",
+     "signos": [
+      1,
+      1
+     ],
+     "pesos": [
+      0.707,
+      0.707
+     ],
+     "varianza_grupo": 0.677
+    }
+   ]
+  }
+ },
+ "metodos": {
+  "promedio": {
+   "grupos": {
+    "pares": 20,
+    "tipos": {
+     "patrón": 5,
+     "escala": 2,
+     "mecánico": 0,
+     "no resiste tamaño": 1,
+     "control": 0
+    },
+    "robustos": [
+     {
+      "par": "persona_g2__proceso_g1",
+      "x": "G2 Persona: Activos, Activos, Activos, Disc. Centrality, Nuevos contribuyentes",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": 0.638,
+      "tamano": 0.0541,
+      "canary": 0.4988,
+      "tipo": "escala"
+     },
+     {
+      "par": "persona_g3__proceso_g1",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": -0.3656,
+      "tamano": -0.1343,
+      "canary": -0.0749,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g2__proceso_g3",
+      "x": "G2 Persona: Activos, Activos, Activos, Disc. Centrality, Nuevos contribuyentes",
+      "y": "G3 Proceso: MTTR, NCI",
+      "rho": 0.2204,
+      "tamano": 0.0321,
+      "canary": 0.4045,
+      "tipo": "escala"
+     },
+     {
+      "par": "persona_g1__proceso_g1",
+      "x": "G1 Persona: Activos, CDIV, dev_exp, LE, Nuevos contribuyentes…",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": 0.2164,
+      "tamano": 0.0569,
+      "canary": 0.0929,
+      "tipo": "no resiste tamaño"
+     },
+     {
+      "par": "persona_g4__proceso_g2",
+      "x": "G4 Persona: EXPRev, NC, Proporción que cierra issues [ratio], REXPRev",
+      "y": "G2 Proceso: Jarczyk Success Rate, Process Performance",
+      "rho": 0.2129,
+      "tamano": 0.2609,
+      "canary": 0.1425,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g3__proceso_g3",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "G3 Proceso: MTTR, NCI",
+      "rho": 0.2073,
+      "tamano": 0.3355,
+      "canary": 0.2292,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g1__proceso_g3",
+      "x": "G1 Persona: Activos, CDIV, dev_exp, LE, Nuevos contribuyentes…",
+      "y": "G3 Proceso: MTTR, NCI",
+      "rho": 0.1916,
+      "tamano": 0.1411,
+      "canary": 0.1789,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g1__proceso_g2",
+      "x": "G1 Persona: Activos, CDIV, dev_exp, LE, Nuevos contribuyentes…",
+      "y": "G2 Proceso: Jarczyk Success Rate, Process Performance",
+      "rho": 0.1764,
+      "tamano": 0.1589,
+      "canary": 0.0745,
+      "tipo": "patrón"
+     }
+    ]
+   },
+   "reducido": {
+    "elementos": {
+     "Persona": 10,
+     "Proceso": 14
+    },
+    "pares": 140,
+    "tipos": {
+     "patrón": 3,
+     "escala": 1,
+     "mecánico": 4,
+     "no resiste tamaño": 1,
+     "control": 0
+    },
+    "patrones": [
+     {
+      "par": "prop_comentan_ratio__proceso_g4",
+      "x": "Proporción que comenta [ratio]",
+      "y": "G4 Proceso: NOI, RC",
+      "rho": -0.506,
+      "tamano": -0.4424,
+      "canary": -0.172
+     },
+     {
+      "par": "persona_g3__proceso_g1",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": -0.3656,
+      "tamano": -0.1343,
+      "canary": -0.0749
+     },
+     {
+      "par": "persona_g3__nci_p90",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "NCI (Number of Closed Issues) [p90]",
+      "rho": 0.2662,
+      "tamano": 0.2549,
+      "canary": 0.2291
+     }
+    ]
+   },
+   "cca": {
+    "n": 185,
+    "correlaciones": [
+     0.6458,
+     0.5064,
+     0.1563,
+     0.1296
+    ],
+    "p_primera": 0.001,
+    "nula_p95": 0.5005
+   },
+   "triangulacion": {
+    "patrones": 16,
+    "triangulados": 4,
+    "detalle": [
+     {
+      "par_id": "le_mediana__anmcc_mediana",
+      "x_nombre": "LE (Learning Ease) [mediana]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [mediana]",
+      "rho_corregida": 0.4793,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "dev_exp_mediana__anmcc_mediana",
+      "x_nombre": "dev_exp (Development Experience) [mediana]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [mediana]",
+      "rho_corregida": 0.3839,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "sc_mediana__jarczyk_success_rate_producto",
+      "x_nombre": "SC (Social Contribution) [mediana]",
+      "y_nombre": "Jarczyk Success Rate [producto]",
+      "rho_corregida": 0.3282,
+      "grupo_x": "G3",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g3__proceso_g2",
+      "rho_grupos": 0.1682,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "rexprev_mediana__cfdr_producto",
+      "x_nombre": "REXPRev (Recent Review Experience) [mediana]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": -0.3138,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.3053,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "rexprev_mediana__nub_producto",
+      "x_nombre": "REXPRev (Recent Review Experience) [mediana]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": -0.3107,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.3053,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "nc_share_top10pct__nci_p90",
+      "x_nombre": "NC (Number of Comments) [share_top10pct]",
+      "y_nombre": "NCI (Number of Closed Issues) [p90]",
+      "rho_corregida": 0.2898,
+      "grupo_x": "G3",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__cfdr_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": -0.2786,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.3053,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__nub_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": -0.274,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.3053,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "tasa_nuevos_commits_ratio__cfdr_producto",
+      "x_nombre": "Tasa de ingreso (commits) [ratio]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": 0.2353,
+      "grupo_x": "G1",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g1__proceso_g1",
+      "rho_grupos": 0.2164,
+      "tipo_par_grupos": "no resiste tamaño",
+      "triangulado": false
+     },
+     {
+      "par_id": "tasa_nuevos_commits_ratio__nub_producto",
+      "x_nombre": "Tasa de ingreso (commits) [ratio]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": 0.235,
+      "grupo_x": "G1",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g1__proceso_g1",
+      "rho_grupos": 0.2164,
+      "tipo_par_grupos": "no resiste tamaño",
+      "triangulado": false
+     },
+     {
+      "par_id": "dev_exp_mediana__mttr_mediana",
+      "x_nombre": "dev_exp (Development Experience) [mediana]",
+      "y_nombre": "MTTR (Mean Time to Repair) [mediana]",
+      "rho_corregida": -0.2277,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "prop_cierran_ratio__process_performance_producto",
+      "x_nombre": "Proporción que cierra issues [ratio]",
+      "y_nombre": "Process Performance [producto]",
+      "rho_corregida": 0.2273,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.2129,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "prop_cierran_ratio__jarczyk_success_rate_producto",
+      "x_nombre": "Proporción que cierra issues [ratio]",
+      "y_nombre": "Jarczyk Success Rate [producto]",
+      "rho_corregida": 0.2266,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.2129,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "exprev_p90__process_performance_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "Process Performance [producto]",
+      "rho_corregida": 0.2206,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.2129,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "exprev_share_top10pct__mttr_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [share_top10pct]",
+      "y_nombre": "MTTR (Mean Time to Repair) [producto]",
+      "rho_corregida": 0.2002,
+      "grupo_x": "G3",
+      "grupo_y": "G3",
+      "par_grupos": "persona_g3__proceso_g3",
+      "rho_grupos": 0.2073,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "prop_comentan_ratio__anmcc_producto",
+      "x_nombre": "Proporción que comenta [ratio]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [producto]",
+      "rho_corregida": 0.1721,
+      "grupo_x": "solo",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     }
+    ]
+   }
+  },
+  "componente": {
+   "grupos": {
+    "pares": 20,
+    "tipos": {
+     "patrón": 5,
+     "escala": 2,
+     "mecánico": 0,
+     "no resiste tamaño": 1,
+     "control": 0
+    },
+    "robustos": [
+     {
+      "par": "persona_g2__proceso_g1",
+      "x": "G2 Persona: Activos, Activos, Activos, Disc. Centrality, Nuevos contribuyentes",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": 0.6627,
+      "tamano": 0.0899,
+      "canary": 0.5204,
+      "tipo": "escala"
+     },
+     {
+      "par": "persona_g3__proceso_g1",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": -0.3673,
+      "tamano": -0.14,
+      "canary": -0.0633,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g2__proceso_g3",
+      "x": "G2 Persona: Activos, Activos, Activos, Disc. Centrality, Nuevos contribuyentes",
+      "y": "G3 Proceso: MTTR, NCI",
+      "rho": 0.2222,
+      "tamano": 0.0272,
+      "canary": 0.3935,
+      "tipo": "escala"
+     },
+     {
+      "par": "persona_g3__proceso_g3",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "G3 Proceso: MTTR, NCI",
+      "rho": 0.2145,
+      "tamano": 0.3422,
+      "canary": 0.2354,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g1__proceso_g1",
+      "x": "G1 Persona: Activos, CDIV, dev_exp, LE, Nuevos contribuyentes…",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": 0.2086,
+      "tamano": 0.0607,
+      "canary": 0.0906,
+      "tipo": "no resiste tamaño"
+     },
+     {
+      "par": "persona_g4__proceso_g2",
+      "x": "G4 Persona: EXPRev, NC, Proporción que cierra issues [ratio], REXPRev",
+      "y": "G2 Proceso: Jarczyk Success Rate, Process Performance",
+      "rho": 0.204,
+      "tamano": 0.253,
+      "canary": 0.1248,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g1__proceso_g3",
+      "x": "G1 Persona: Activos, CDIV, dev_exp, LE, Nuevos contribuyentes…",
+      "y": "G3 Proceso: MTTR, NCI",
+      "rho": 0.201,
+      "tamano": 0.1542,
+      "canary": 0.1785,
+      "tipo": "patrón"
+     },
+     {
+      "par": "persona_g1__proceso_g2",
+      "x": "G1 Persona: Activos, CDIV, dev_exp, LE, Nuevos contribuyentes…",
+      "y": "G2 Proceso: Jarczyk Success Rate, Process Performance",
+      "rho": 0.1729,
+      "tamano": 0.1561,
+      "canary": 0.076,
+      "tipo": "patrón"
+     }
+    ]
+   },
+   "reducido": {
+    "elementos": {
+     "Persona": 10,
+     "Proceso": 14
+    },
+    "pares": 140,
+    "tipos": {
+     "patrón": 3,
+     "escala": 1,
+     "mecánico": 4,
+     "no resiste tamaño": 0,
+     "control": 0
+    },
+    "patrones": [
+     {
+      "par": "prop_comentan_ratio__proceso_g4",
+      "x": "Proporción que comenta [ratio]",
+      "y": "G4 Proceso: NOI, RC",
+      "rho": -0.506,
+      "tamano": -0.4424,
+      "canary": -0.172
+     },
+     {
+      "par": "persona_g3__proceso_g1",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "G1 Proceso: CFDR, NUB",
+      "rho": -0.3673,
+      "tamano": -0.14,
+      "canary": -0.0633
+     },
+     {
+      "par": "persona_g3__nci_p90",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC",
+      "y": "NCI (Number of Closed Issues) [p90]",
+      "rho": 0.2799,
+      "tamano": 0.2691,
+      "canary": 0.2354
+     }
+    ]
+   },
+   "cca": {
+    "n": 185,
+    "correlaciones": [
+     0.655,
+     0.4975,
+     0.1664,
+     0.1288
+    ],
+    "p_primera": 0.001,
+    "nula_p95": 0.5097
+   },
+   "triangulacion": {
+    "patrones": 16,
+    "triangulados": 4,
+    "detalle": [
+     {
+      "par_id": "le_mediana__anmcc_mediana",
+      "x_nombre": "LE (Learning Ease) [mediana]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [mediana]",
+      "rho_corregida": 0.4793,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "dev_exp_mediana__anmcc_mediana",
+      "x_nombre": "dev_exp (Development Experience) [mediana]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [mediana]",
+      "rho_corregida": 0.3839,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "sc_mediana__jarczyk_success_rate_producto",
+      "x_nombre": "SC (Social Contribution) [mediana]",
+      "y_nombre": "Jarczyk Success Rate [producto]",
+      "rho_corregida": 0.3282,
+      "grupo_x": "G3",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g3__proceso_g2",
+      "rho_grupos": 0.1504,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "rexprev_mediana__cfdr_producto",
+      "x_nombre": "REXPRev (Recent Review Experience) [mediana]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": -0.3138,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.314,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "rexprev_mediana__nub_producto",
+      "x_nombre": "REXPRev (Recent Review Experience) [mediana]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": -0.3107,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.314,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "nc_share_top10pct__nci_p90",
+      "x_nombre": "NC (Number of Comments) [share_top10pct]",
+      "y_nombre": "NCI (Number of Closed Issues) [p90]",
+      "rho_corregida": 0.2898,
+      "grupo_x": "G3",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__cfdr_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": -0.2786,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.314,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__nub_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": -0.274,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.314,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "tasa_nuevos_commits_ratio__cfdr_producto",
+      "x_nombre": "Tasa de ingreso (commits) [ratio]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": 0.2353,
+      "grupo_x": "G1",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g1__proceso_g1",
+      "rho_grupos": 0.2086,
+      "tipo_par_grupos": "no resiste tamaño",
+      "triangulado": false
+     },
+     {
+      "par_id": "tasa_nuevos_commits_ratio__nub_producto",
+      "x_nombre": "Tasa de ingreso (commits) [ratio]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": 0.235,
+      "grupo_x": "G1",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g1__proceso_g1",
+      "rho_grupos": 0.2086,
+      "tipo_par_grupos": "no resiste tamaño",
+      "triangulado": false
+     },
+     {
+      "par_id": "dev_exp_mediana__mttr_mediana",
+      "x_nombre": "dev_exp (Development Experience) [mediana]",
+      "y_nombre": "MTTR (Mean Time to Repair) [mediana]",
+      "rho_corregida": -0.2277,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "prop_cierran_ratio__process_performance_producto",
+      "x_nombre": "Proporción que cierra issues [ratio]",
+      "y_nombre": "Process Performance [producto]",
+      "rho_corregida": 0.2273,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.204,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "prop_cierran_ratio__jarczyk_success_rate_producto",
+      "x_nombre": "Proporción que cierra issues [ratio]",
+      "y_nombre": "Jarczyk Success Rate [producto]",
+      "rho_corregida": 0.2266,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.204,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "exprev_p90__process_performance_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "Process Performance [producto]",
+      "rho_corregida": 0.2206,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.204,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "exprev_share_top10pct__mttr_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [share_top10pct]",
+      "y_nombre": "MTTR (Mean Time to Repair) [producto]",
+      "rho_corregida": 0.2002,
+      "grupo_x": "G3",
+      "grupo_y": "G3",
+      "par_grupos": "persona_g3__proceso_g3",
+      "rho_grupos": 0.2145,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "prop_comentan_ratio__anmcc_producto",
+      "x_nombre": "Proporción que comenta [ratio]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [producto]",
+      "rho_corregida": 0.1721,
+      "grupo_x": "solo",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     }
+    ]
+   }
+  },
+  "representativa": {
+   "grupos": {
+    "pares": 20,
+    "tipos": {
+     "patrón": 1,
+     "escala": 1,
+     "mecánico": 0,
+     "no resiste tamaño": 0,
+     "control": 0
+    },
+    "robustos": [
+     {
+      "par": "persona_g2__proceso_g1",
+      "x": "G2 Persona: Activos, Activos, Activos, Disc. Centrality, Nuevos contribuyentes · representa Activos",
+      "y": "G1 Proceso: CFDR, NUB · representa CFDR",
+      "rho": 0.6705,
+      "tamano": 0.0949,
+      "canary": 0.5556,
+      "tipo": "escala"
+     },
+     {
+      "par": "persona_g3__proceso_g3",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC · representa EXPRev",
+      "y": "G3 Proceso: MTTR, NCI · representa MTTR",
+      "rho": 0.2444,
+      "tamano": 0.2222,
+      "canary": 0.1672,
+      "tipo": "patrón"
+     }
+    ]
+   },
+   "reducido": {
+    "elementos": {
+     "Persona": 10,
+     "Proceso": 14
+    },
+    "pares": 140,
+    "tipos": {
+     "patrón": 2,
+     "escala": 1,
+     "mecánico": 3,
+     "no resiste tamaño": 0,
+     "control": 0
+    },
+    "patrones": [
+     {
+      "par": "persona_g3__nci_p90",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC · representa EXPRev",
+      "y": "NCI (Number of Closed Issues) [p90]",
+      "rho": 0.3659,
+      "tamano": 0.3584,
+      "canary": 0.3076
+     },
+     {
+      "par": "persona_g3__proceso_g3",
+      "x": "G3 Persona: EXPRev, NC, Proporción que commitea [ratio], SC, SC · representa EXPRev",
+      "y": "G3 Proceso: MTTR, NCI · representa MTTR",
+      "rho": 0.2444,
+      "tamano": 0.2222,
+      "canary": 0.1672
+     }
+    ]
+   },
+   "cca": {
+    "n": 185,
+    "correlaciones": [
+     0.6239,
+     0.3573,
+     0.1575,
+     0.1168
+    ],
+    "p_primera": 0.001,
+    "nula_p95": 0.4943
+   },
+   "triangulacion": {
+    "patrones": 16,
+    "triangulados": 1,
+    "detalle": [
+     {
+      "par_id": "le_mediana__anmcc_mediana",
+      "x_nombre": "LE (Learning Ease) [mediana]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [mediana]",
+      "rho_corregida": 0.4793,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "dev_exp_mediana__anmcc_mediana",
+      "x_nombre": "dev_exp (Development Experience) [mediana]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [mediana]",
+      "rho_corregida": 0.3839,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "sc_mediana__jarczyk_success_rate_producto",
+      "x_nombre": "SC (Social Contribution) [mediana]",
+      "y_nombre": "Jarczyk Success Rate [producto]",
+      "rho_corregida": 0.3282,
+      "grupo_x": "G3",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g3__proceso_g2",
+      "rho_grupos": 0.151,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "rexprev_mediana__cfdr_producto",
+      "x_nombre": "REXPRev (Recent Review Experience) [mediana]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": -0.3138,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.275,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "rexprev_mediana__nub_producto",
+      "x_nombre": "REXPRev (Recent Review Experience) [mediana]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": -0.3107,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.275,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "nc_share_top10pct__nci_p90",
+      "x_nombre": "NC (Number of Comments) [share_top10pct]",
+      "y_nombre": "NCI (Number of Closed Issues) [p90]",
+      "rho_corregida": 0.2898,
+      "grupo_x": "G3",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__cfdr_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": -0.2786,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.275,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__nub_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": -0.274,
+      "grupo_x": "G4",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g4__proceso_g1",
+      "rho_grupos": -0.275,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "tasa_nuevos_commits_ratio__cfdr_producto",
+      "x_nombre": "Tasa de ingreso (commits) [ratio]",
+      "y_nombre": "CFDR (Customer Found Defects & Regressions) [producto]",
+      "rho_corregida": 0.2353,
+      "grupo_x": "G1",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g1__proceso_g1",
+      "rho_grupos": 0.193,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "tasa_nuevos_commits_ratio__nub_producto",
+      "x_nombre": "Tasa de ingreso (commits) [ratio]",
+      "y_nombre": "NUB (Bugs Detected by Users) [producto]",
+      "rho_corregida": 0.235,
+      "grupo_x": "G1",
+      "grupo_y": "G1",
+      "par_grupos": "persona_g1__proceso_g1",
+      "rho_grupos": 0.193,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "dev_exp_mediana__mttr_mediana",
+      "x_nombre": "dev_exp (Development Experience) [mediana]",
+      "y_nombre": "MTTR (Mean Time to Repair) [mediana]",
+      "rho_corregida": -0.2277,
+      "grupo_x": "G1",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     },
+     {
+      "par_id": "prop_cierran_ratio__process_performance_producto",
+      "x_nombre": "Proporción que cierra issues [ratio]",
+      "y_nombre": "Process Performance [producto]",
+      "rho_corregida": 0.2273,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.141,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "prop_cierran_ratio__jarczyk_success_rate_producto",
+      "x_nombre": "Proporción que cierra issues [ratio]",
+      "y_nombre": "Jarczyk Success Rate [producto]",
+      "rho_corregida": 0.2266,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.141,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_p90__process_performance_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [p90]",
+      "y_nombre": "Process Performance [producto]",
+      "rho_corregida": 0.2206,
+      "grupo_x": "G4",
+      "grupo_y": "G2",
+      "par_grupos": "persona_g4__proceso_g2",
+      "rho_grupos": 0.141,
+      "tipo_par_grupos": "no robusto",
+      "triangulado": false
+     },
+     {
+      "par_id": "exprev_share_top10pct__mttr_producto",
+      "x_nombre": "EXPRev (Code Review Experience) [share_top10pct]",
+      "y_nombre": "MTTR (Mean Time to Repair) [producto]",
+      "rho_corregida": 0.2002,
+      "grupo_x": "G3",
+      "grupo_y": "G3",
+      "par_grupos": "persona_g3__proceso_g3",
+      "rho_grupos": 0.2444,
+      "tipo_par_grupos": "patrón",
+      "triangulado": true
+     },
+     {
+      "par_id": "prop_comentan_ratio__anmcc_producto",
+      "x_nombre": "Proporción que comenta [ratio]",
+      "y_nombre": "ANMCC (Avg Modified Components per Commit) [producto]",
+      "rho_corregida": 0.1721,
+      "grupo_x": "solo",
+      "grupo_y": "solo",
+      "par_grupos": "",
+      "rho_grupos": "",
+      "tipo_par_grupos": "",
+      "triangulado": false
+     }
+    ]
+   }
+  }
+ }
+}

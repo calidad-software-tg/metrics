@@ -1,0 +1,30 @@
+variable,dimension,nombre,grado_patrones
+activos_cierre_conteo,Persona,Activos (cierre de issues) [conteo],0
+activos_comentarios_conteo,Persona,Activos (comentarios) [conteo],0
+activos_commits_conteo,Persona,Activos (commits) [conteo],0
+activos_interaccion_conteo,Persona,Activos (interacción) [conteo],0
+anmcc_mediana,Proceso,ANMCC (Avg Modified Components per Commit) [mediana],2
+anmcc_producto,Proceso,ANMCC (Avg Modified Components per Commit) [producto],1
+cdiv_mediana,Persona,CDIV (Contribution Diversity) [mediana],0
+cdiv_p90,Persona,CDIV (Contribution Diversity) [p90],0
+cdiv_share_top10pct,Persona,CDIV (Contribution Diversity) [share_top10pct],0
+cfdr_producto,Proceso,CFDR (Customer Found Defects & Regressions) [producto],3
+dev_exp_mediana,Persona,dev_exp (Development Experience) [mediana],2
+exprev_p90,Persona,EXPRev (Code Review Experience) [p90],3
+exprev_share_top10pct,Persona,EXPRev (Code Review Experience) [share_top10pct],1
+jarczyk_success_rate_producto,Proceso,Jarczyk Success Rate [producto],2
+le_mediana,Persona,LE (Learning Ease) [mediana],1
+mttr_mediana,Proceso,MTTR (Mean Time to Repair) [mediana],1
+mttr_producto,Proceso,MTTR (Mean Time to Repair) [producto],1
+nc_share_top10pct,Persona,NC (Number of Comments) [share_top10pct],1
+nci_p90,Proceso,NCI (Number of Closed Issues) [p90],1
+nci_producto,Proceso,NCI (Number of Closed Issues) [producto],0
+nub_producto,Proceso,NUB (Bugs Detected by Users) [producto],3
+nuevos_commits_conteo,Persona,Nuevos contribuyentes (commits) [conteo],0
+nuevos_interaccion_conteo,Persona,Nuevos contribuyentes (interacción) [conteo],0
+process_performance_producto,Proceso,Process Performance [producto],2
+prop_cierran_ratio,Persona,Proporción que cierra issues [ratio],2
+prop_comentan_ratio,Persona,Proporción que comenta [ratio],1
+rexprev_mediana,Persona,REXPRev (Recent Review Experience) [mediana],2
+sc_mediana,Persona,SC (Social Contribution) [mediana],1
+tasa_nuevos_commits_ratio,Persona,Tasa de ingreso (commits) [ratio],2
