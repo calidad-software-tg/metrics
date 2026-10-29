@@ -1,0 +1,4 @@
+conjunto,variables_a,variables_b,n,r1,r2,nula_p50,nula_p95,p,canary_r1,arman_a,arman_b
+todas las variables,28,16,184,0.9123,0.8704,0.6572,0.6989,0.005,0.8156,,
+sin escala ni definiciones superpuestas,19,16,184,0.796,0.688,0.6095,0.6626,0.005,0.5835,"prop_cierran_ratio (0.82), exprev_share_top10pct (0.52), nc_share_top10pct (0.47), tasa_nuevos_commits_ratio (0.41), sc_p90 (0.35)","anmcc_mediana (0.53), nci_producto (0.38), jarczyk_success_rate_producto (0.31), cfdr_producto (0.28)"
+componentes firmes,3,3,185,0.586,0.329,0.2256,0.3293,0.005,0.51,,

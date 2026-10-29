@@ -1,0 +1,44 @@
+origen,destino,rho,tipo
+activos_cierre_conteo,cfdr_producto,0.4832,escala
+activos_cierre_conteo,jarczyk_success_rate_producto,0.2602,escala
+activos_cierre_conteo,nci_producto,0.5454,escala
+activos_cierre_conteo,nub_producto,0.4853,escala
+activos_comentarios_conteo,cfdr_producto,0.6068,escala
+activos_comentarios_conteo,nci_producto,0.4734,escala
+activos_comentarios_conteo,nub_producto,0.606,escala
+activos_commits_conteo,anmcc_mediana,-0.2665,escala
+activos_commits_conteo,nci_producto,0.4187,escala
+activos_interaccion_conteo,anmcc_mediana,-0.2741,escala
+activos_interaccion_conteo,cfdr_producto,0.6495,escala
+activos_interaccion_conteo,nci_producto,0.5004,escala
+activos_interaccion_conteo,nub_producto,0.6483,escala
+cdiv_mediana,anmcc_mediana,0.8443,mecánico
+cdiv_mediana,anmcc_producto,0.3329,mecánico
+cdiv_mediana,cfdr_producto,-0.2209,no resiste tamaño
+cdiv_mediana,nci_producto,-0.1949,no resiste tamaño
+cdiv_mediana,nub_producto,-0.2235,no resiste tamaño
+cdiv_p90,anmcc_mediana,0.3735,mecánico
+cdiv_p90,anmcc_producto,0.5608,mecánico
+cdiv_share_top10pct,anmcc_producto,0.4285,mecánico
+dev_exp_mediana,anmcc_mediana,0.3839,patrón
+dev_exp_mediana,mttr_mediana,-0.2277,patrón
+exprev_p90,cfdr_producto,-0.2786,patrón
+exprev_p90,nub_producto,-0.274,patrón
+exprev_p90,process_performance_producto,0.2206,patrón
+exprev_share_top10pct,mttr_producto,0.2002,patrón
+le_mediana,anmcc_mediana,0.4793,patrón
+nc_share_top10pct,nci_p90,0.2898,patrón
+nuevos_commits_conteo,nci_producto,0.3771,escala
+nuevos_interaccion_conteo,anmcc_mediana,-0.2538,escala
+nuevos_interaccion_conteo,cfdr_producto,0.6114,escala
+nuevos_interaccion_conteo,nci_producto,0.4443,escala
+nuevos_interaccion_conteo,nub_producto,0.6108,escala
+prop_cierran_ratio,jarczyk_success_rate_producto,0.2266,patrón
+prop_cierran_ratio,process_performance_producto,0.2273,patrón
+prop_comentan_ratio,anmcc_producto,0.1721,patrón
+rexprev_mediana,cfdr_producto,-0.3138,patrón
+rexprev_mediana,nub_producto,-0.3107,patrón
+sc_mediana,jarczyk_success_rate_producto,0.3282,patrón
+tasa_nuevos_commits_ratio,cfdr_producto,0.2353,patrón
+tasa_nuevos_commits_ratio,nci_producto,0.1884,no resiste tamaño
+tasa_nuevos_commits_ratio,nub_producto,0.235,patrón
