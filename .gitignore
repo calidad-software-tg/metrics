@@ -18,3 +18,6 @@ db/fixes_seed.sql.gz
 analisis/salidas/cruces/
 analisis/salidas/validaciones/
 analisis/salidas/periodos/
+
+# valores por release de todos los pares (se regeneran con relaciones.py --recalcular)
+analisis/salidas/relaciones/base/pares_valores*.csv

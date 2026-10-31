@@ -127,22 +127,42 @@ Marginal = el cruce de componentes de siempre; parcial = descontando los otros c
 
 ## 4. Perfiles de releases
 
-Diferencia entre el tercio de releases con el puntaje más alto y el más bajo del componente de Persona, en desvíos del otro componente.
+Diferencia entre el tercio de releases con el puntaje más alto y el más bajo de cada componente, en desvíos del componente de otra dimensión.
 
-| Persona | Otro | Diferencia | nula p95 | q | canary | años (alto / bajo) |
+| Desde | Otro | Diferencia | nula p95 | q | canary | años (alto / bajo) |
 |---|---|---|---|---|---|---|
-| persona_cp1 | proceso_cp2 | +0,39 | ±0.32 | 0.062 | +0,15 | 2023 / 2024 |
-| persona_cp1 | proceso_cp5 | +0,35 | ±0.35 | 0.067 | +0,15 | 2023 / 2024 |
-| persona_cp1 | producto_cp1 | +0,40 | ±0.38 | 0.058 | +0,04 | 2023 / 2024 |
-| persona_cp1 | producto_cp4 | +0,64 | ±0.32 | 0.004 | +0,67 | 2023 / 2024 |
+| persona_cp1 | proceso_cp2 | +0,39 | ±0.32 | 0.072 | +0,15 | 2023 / 2024 |
+| persona_cp1 | proceso_cp5 | +0,35 | ±0.35 | 0.085 | +0,15 | 2023 / 2024 |
+| persona_cp1 | producto_cp1 | +0,40 | ±0.38 | 0.062 | +0,04 | 2023 / 2024 |
+| persona_cp1 | producto_cp4 | +0,64 | ±0.32 | 0.005 | +0,67 | 2023 / 2024 |
 | persona_cp2 | proceso_cp2 | +0,28 | ±0.43 | 0.201 | +0,29 | 2023 / 2023 |
-| persona_cp2 | proceso_cp5 | +0,22 | ±0.44 | 0.343 | +0,41 | 2023 / 2023 |
-| persona_cp2 | producto_cp1 | +0,92 | ±0.55 | 0.004 | +1,11 | 2023 / 2023 |
-| persona_cp2 | producto_cp4 | +0,40 | ±0.32 | 0.058 | +0,20 | 2023 / 2023 |
+| persona_cp2 | proceso_cp5 | +0,22 | ±0.44 | 0.347 | +0,41 | 2023 / 2023 |
+| persona_cp2 | producto_cp1 | +0,92 | ±0.55 | 0.005 | +1,11 | 2023 / 2023 |
+| persona_cp2 | producto_cp4 | +0,40 | ±0.32 | 0.062 | +0,20 | 2023 / 2023 |
 | persona_cp3 | proceso_cp2 | +0,03 | ±0.40 | 0.932 | +0,08 | 2024 / 2023 |
-| persona_cp3 | proceso_cp5 | +0,52 | ±0.40 | 0.058 | +0,35 | 2024 / 2023 |
-| persona_cp3 | producto_cp1 | -0,76 | ±0.58 | 0.004 | +0,00 | 2024 / 2023 |
-| persona_cp3 | producto_cp4 | +0,27 | ±0.37 | 0.231 | +0,25 | 2024 / 2023 |
+| persona_cp3 | proceso_cp5 | +0,52 | ±0.40 | 0.062 | +0,35 | 2024 / 2023 |
+| persona_cp3 | producto_cp1 | -0,76 | ±0.58 | 0.005 | +0,00 | 2024 / 2023 |
+| persona_cp3 | producto_cp4 | +0,27 | ±0.37 | 0.247 | +0,25 | 2024 / 2023 |
+| proceso_cp2 | persona_cp1 | +0,39 | ±0.29 | 0.038 | +0,12 | 2023 / 2024 |
+| proceso_cp2 | persona_cp2 | +0,25 | ±0.36 | 0.257 | +0,37 | 2023 / 2024 |
+| proceso_cp2 | persona_cp3 | +0,19 | ±0.36 | 0.391 | +0,07 | 2023 / 2024 |
+| proceso_cp2 | producto_cp1 | +0,17 | ±0.41 | 0.509 | +0,26 | 2023 / 2024 |
+| proceso_cp2 | producto_cp4 | +0,51 | ±0.34 | 0.036 | +0,05 | 2023 / 2024 |
+| proceso_cp5 | persona_cp1 | +0,46 | ±0.35 | 0.005 | +0,10 | 2024 / 2024 |
+| proceso_cp5 | persona_cp2 | +0,34 | ±0.41 | 0.179 | +0,34 | 2024 / 2024 |
+| proceso_cp5 | persona_cp3 | +0,57 | ±0.30 | 0.005 | +0,33 | 2024 / 2024 |
+| proceso_cp5 | producto_cp1 | -0,37 | ±0.40 | 0.102 | -0,04 | 2024 / 2024 |
+| proceso_cp5 | producto_cp4 | +0,34 | ±0.33 | 0.091 | +0,29 | 2024 / 2024 |
+| producto_cp1 | persona_cp1 | +0,34 | ±0.43 | 0.197 | +0,02 | 2023 / 2024 |
+| producto_cp1 | persona_cp2 | +1,13 | ±0.57 | 0.005 | +1,11 | 2023 / 2024 |
+| producto_cp1 | persona_cp3 | -0,78 | ±0.55 | 0.028 | +0,03 | 2023 / 2024 |
+| producto_cp1 | proceso_cp2 | +0,27 | ±0.49 | 0.307 | +0,15 | 2023 / 2024 |
+| producto_cp1 | proceso_cp5 | -0,42 | ±0.44 | 0.102 | +0,03 | 2023 / 2024 |
+| producto_cp4 | persona_cp1 | +0,86 | ±0.34 | 0.005 | +0,69 | 2023 / 2024 |
+| producto_cp4 | persona_cp2 | +0,43 | ±0.40 | 0.046 | +0,15 | 2023 / 2024 |
+| producto_cp4 | persona_cp3 | +0,21 | ±0.33 | 0.307 | +0,19 | 2023 / 2024 |
+| producto_cp4 | proceso_cp2 | +0,37 | ±0.39 | 0.102 | +0,04 | 2023 / 2024 |
+| producto_cp4 | proceso_cp5 | +0,44 | ±0.38 | 0.062 | +0,27 | 2023 / 2024 |
 
 ## Rezago de un release (descriptivo)
 

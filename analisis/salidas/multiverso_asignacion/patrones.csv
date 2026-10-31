@@ -1,0 +1,31 @@
+x,y,rho,dims_x,dims_y,principal,entre_dimensiones,lecturas
+le_mediana,anmcc_mediana,0.4793,Persona+Producto,Proceso+Producto,Persona–Producto,0.75,Persona–Proceso 25%; Persona–Producto 25%; Proceso–Producto 25%; dentro de Producto 25%
+dev_exp_mediana,anmcc_mediana,0.3839,Persona+Proceso,Proceso+Producto,Persona–Producto,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+sc_mediana,jarczyk_success_rate_producto,0.3282,Persona+Proceso,Proceso,Persona–Proceso,0.5,Persona–Proceso 50%; dentro de Proceso 50%
+rexprev_mediana,cfdr_producto,-0.3138,Persona+Proceso,Proceso+Producto,Persona–Producto,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+rexprev_mediana,nub_producto,-0.3107,Persona+Proceso,Proceso+Producto,Persona–Producto,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+nc_share_top10pct,nci_p90,0.2898,Persona+Proceso,Proceso,Persona–Proceso,0.5,Persona–Proceso 50%; dentro de Proceso 50%
+exprev_p90,cfdr_producto,-0.2786,Persona+Proceso,Proceso+Producto,Persona–Producto,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+exprev_p90,nub_producto,-0.274,Persona+Proceso,Proceso+Producto,Persona–Producto,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+tasa_nuevos_commits_ratio,cfdr_producto,0.2353,Persona,Proceso+Producto,Persona–Producto,1.0,Persona–Proceso 50%; Persona–Producto 50%
+tasa_nuevos_commits_ratio,nub_producto,0.235,Persona,Proceso+Producto,Persona–Producto,1.0,Persona–Proceso 50%; Persona–Producto 50%
+dev_exp_mediana,mttr_mediana,-0.2277,Persona+Proceso,Proceso+Producto,Persona–Proceso,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+prop_cierran_ratio,process_performance_producto,0.2273,Persona,Proceso,Persona–Proceso,1.0,Persona–Proceso 100%
+prop_cierran_ratio,jarczyk_success_rate_producto,0.2266,Persona,Proceso,Persona–Proceso,1.0,Persona–Proceso 100%
+exprev_p90,process_performance_producto,0.2206,Persona+Proceso,Proceso,Persona–Proceso,0.5,Persona–Proceso 50%; dentro de Proceso 50%
+exprev_share_top10pct,mttr_producto,0.2002,Persona+Proceso,Proceso+Producto,Persona–Proceso,0.75,Persona–Proceso 25%; Persona–Producto 25%; dentro de Proceso 25%; Proceso–Producto 25%
+prop_comentan_ratio,anmcc_producto,0.1721,Persona,Proceso+Producto,Persona–Producto,1.0,Persona–Proceso 50%; Persona–Producto 50%
+cdiv_mediana,commits_doc_producto,-0.4245,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+prop_commitean_ratio,le_producto,-0.2877,Persona,Producto,Persona–Producto,1.0,Persona–Producto 100%
+exprev_share_top10pct,dloc_flujo_producto,0.2852,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+cdiv_p90,cd_producto,0.2819,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+tasa_nuevos_commits_ratio,le_producto,-0.2636,Persona,Producto,Persona–Producto,1.0,Persona–Producto 100%
+nc_p90,le_producto,-0.2162,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+nc_share_top10pct,dloc_flujo_producto,0.2062,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+prop_commitean_ratio,dloc_flujo_producto,0.2055,Persona,Producto,Persona–Producto,1.0,Persona–Producto 100%
+exprev_share_top10pct,le_producto,-0.2035,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+sc_p90,dloc_flujo_producto,0.1995,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+nc_share_top10pct,le_producto,-0.1992,Persona+Proceso,Producto,Persona–Producto,1.0,Persona–Producto 50%; Proceso–Producto 50%
+prop_cierran_ratio,dloc_mediana,-0.1979,Persona,Producto,Persona–Producto,1.0,Persona–Producto 100%
+cdiv_mediana,le_mediana,0.4855,Persona+Proceso,Persona+Producto,dentro de Persona,0.75,dentro de Persona 25%; Persona–Producto 25%; Persona–Proceso 25%; Proceso–Producto 25%
+nci_producto,dloc_flujo_producto,0.2154,Proceso,Producto,Proceso–Producto,1.0,Proceso–Producto 100%

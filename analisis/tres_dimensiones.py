@@ -36,9 +36,9 @@ Pasos:
      (|carga| >= 0,4), en los triángulos con al menos dos lados patrón y en el de la concentración del núcleo.
   3. Contraste. PCA y clustering conjunto de las variables de los siete componentes (cruces.pca_conjunto y
      cruces.clustering_conjunto), con y sin tamaño: ¿algún componente o grupo junta las tres dimensiones?
-  4. Interpretación. Perfiles de releases: tercio con el puntaje más alto y más bajo de cada componente de
-     Persona, diferencia de los demás componentes (en desvíos) contra la nula por corrimiento y su signo en
-     canary. Rezago de un release entre componentes de dimensiones distintas (descriptivo).
+  4. Interpretación. Perfiles de releases: tercio con el puntaje más alto y más bajo de cada componente,
+     diferencia de los componentes de las otras dos dimensiones (en desvíos) contra la nula por corrimiento y su
+     signo en canary. Rezago de un release entre componentes de dimensiones distintas (descriptivo).
 
 Salidas en analisis/salidas/tres_dimensiones/: resumen.md, resumen.json, red.csv, triangulos.csv,
 triangulacion_variables.csv, perfiles.csv, rezago.csv.
@@ -270,17 +270,15 @@ def perfiles(E, C, cols, rng):
     n = E.n
     margen = max(10, n // 10)
     for i, ci in enumerate(cols):
-        if not ci.startswith("persona"):
-            continue
         for j, cj in enumerate(cols):
-            if cj.startswith("persona"):
+            if ci.split("_")[0] == cj.split("_")[0]:      # solo componentes de dimensiones distintas
                 continue
             obs = diferencia_tercios(E.X[:, i], E.X[:, j])
             nula = np.array([diferencia_tercios(np.roll(E.X[:, i], rng.integers(margen, n - margen)), E.X[:, j])
                              for _ in range(N_PERM)])
             can = diferencia_tercios(C.X[:, i], C.X[:, j]) if C.n >= 30 else np.nan
             lo, hi = np.percentile(E.X[:, i], [100 / 3, 200 / 3])
-            filas.append(dict(persona=ci, otro=cj, diferencia_desvios=obs,
+            filas.append(dict(desde=ci, otro=cj, diferencia_desvios=obs,
                               p=float((1 + (np.abs(nula) >= abs(obs)).sum()) / (N_PERM + 1)),
                               nula_p95_abs=float(np.percentile(np.abs(nula), 95)), canary=can,
                               replica=num(can) and (can >= 0) == (obs >= 0),
@@ -580,10 +578,10 @@ def escribir_md(cps, E, C, glob, red, triangulos, filas_v, conj, perf, rez):
                      + ("; ".join(f"[{', '.join(g['dimensiones'])}] {', '.join(g['variables'])}" for g in mixtos) or "ningún grupo mixto"))
         L.append("")
     L += ["## 4. Perfiles de releases", "",
-          "Diferencia entre el tercio de releases con el puntaje más alto y el más bajo del componente de Persona, en desvíos del otro componente.", "",
-          "| Persona | Otro | Diferencia | nula p95 | q | canary | años (alto / bajo) |", "|---|---|---|---|---|---|---|"]
+          "Diferencia entre el tercio de releases con el puntaje más alto y el más bajo de cada componente, en desvíos del componente de otra dimensión.", "",
+          "| Desde | Otro | Diferencia | nula p95 | q | canary | años (alto / bajo) |", "|---|---|---|---|---|---|---|"]
     for f in perf:
-        L.append(f"| {f['persona']} | {f['otro']} | {f2(f['diferencia_desvios'])} | ±{f['nula_p95_abs']:.2f} | {f['q']:.3f} | "
+        L.append(f"| {f['desde']} | {f['otro']} | {f2(f['diferencia_desvios'])} | ±{f['nula_p95_abs']:.2f} | {f['q']:.3f} | "
                  f"{f2(f['canary'])} | {f['anio_medio_alto']:.0f} / {f['anio_medio_bajo']:.0f} |")
     L += ["", "## Rezago de un release (descriptivo)", "", "| Antes | Después | ρ | q | canary |", "|---|---|---|---|---|"]
     for f in sorted(rez, key=lambda f: f["q"])[:10]:

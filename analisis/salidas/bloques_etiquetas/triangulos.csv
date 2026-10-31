@@ -1,0 +1,2 @@
+elementos,componentes,tipo,desaparece,lados,asignaciones
+grupo,persona_g4 (concentración del núcleo) · proceso_g10 (cierre de lo viejo) · producto_g8 (Learning Ease),cadena,persona_g4↔proceso_g10,persona_g4↔proceso_g10 +0.21 → +0.15; persona_g4↔producto_g8 -0.29 → -0.25; proceso_g10↔producto_g8 -0.25 → -0.20,"persona_g4→Persona, proceso_g10→Proceso, producto_g8→Producto"
