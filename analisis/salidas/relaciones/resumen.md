@@ -1,14 +1,14 @@
 # Relaciones entre métricas con las lecturas del catálogo
 
-1431 pares de variables (sin las variantes), evaluados una sola vez y corregidos con Benjamini–Hochberg en una sola familia. 66 son patrón (robustos, resisten el tamaño, no son mecánicos ni de escala, no se descartaron al validar).
+1431 pares de variables (sin las variantes), evaluados una sola vez y corregidos con Benjamini–Hochberg en una sola familia. 65 son patrón (robustos, resisten el tamaño, no son mecánicos ni de escala, no se descartaron al validar).
 
 | Tipo | Patrones | Qué significa |
 |---|---|---|
 | entre dimensiones | 15 | sus variables no comparten ninguna dimensión del catálogo |
-| entre y dentro | 41 | pueden conectar dimensiones distintas o leerse dentro de una dimensión que comparten |
+| entre y dentro | 40 | pueden conectar dimensiones distintas o leerse dentro de una dimensión que comparten |
 | dentro | 10 | las dos variables son de la misma dimensión y de ninguna otra |
 
-Descartados al validar (no cuentan): 6.
+Descartados al validar (no cuentan): 7.
 
 ## Persona–Proceso
 
@@ -85,7 +85,7 @@ Descartados al validar (no cuentan): 6.
 
 ## Proceso–Producto
 
-21 patrones pueden conectar estas dos dimensiones; 8 solo pueden leerse como entre dimensiones.
+20 patrones pueden conectar estas dos dimensiones; 8 solo pueden leerse como entre dimensiones.
 
 | Patrón | ρ | Nivel | Catálogo | Otras lecturas | Canary | Con tamaño |
 |---|---|---|---|---|---|---|
@@ -98,7 +98,6 @@ Descartados al validar (no cuentan): 6.
 | dloc_flujo_producto ↔ sc_p90 | +0,20 | media | Producto / Persona+Proceso | Persona–Producto | +0,17 | +0,24 |
 | le_producto ↔ nc_share_top10pct | -0,20 | media | Producto / Persona+Proceso | Persona–Producto | -0,04 | -0,24 |
 | cdiv_mediana ↔ le_mediana | +0,49 | media | Persona+Proceso / Persona+Producto | Persona–Proceso, Persona–Producto, dentro de Persona | +0,22 | +0,46 |
-| anmcc_mediana ↔ commits_doc_producto | -0,45 | media | Proceso+Producto / Producto | dentro de Producto | -0,25 | -0,41 |
 | dis_producto ↔ mttr_mediana | +0,32 | media | Proceso / Proceso+Producto | dentro de Proceso | +0,41 | +0,32 |
 | cfdr_producto ↔ rexprev_mediana | -0,31 | media | Proceso+Producto / Persona+Proceso | Persona–Proceso, Persona–Producto, dentro de Proceso | -0,07 | -0,16 |
 | nub_producto ↔ rexprev_mediana | -0,31 | media | Proceso+Producto / Persona+Proceso | Persona–Proceso, Persona–Producto, dentro de Proceso | -0,07 | -0,16 |

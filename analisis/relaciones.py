@@ -58,6 +58,7 @@ DESCARTADOS = {
     frozenset(("le_mediana", "anmcc_mediana")): "sin los recién llegados",
     frozenset(("dev_exp_mediana", "anmcc_mediana")): "sin los recién llegados",
     frozenset(("cdiv_mediana", "commits_doc_producto")): "sin los commits que solo tocan documentación",
+    frozenset(("anmcc_mediana", "commits_doc_producto")): "sin los commits que solo tocan documentación",
     frozenset(("tasa_nuevos_commits_ratio", "le_producto")): "construcción de LE (los recién llegados)",
     frozenset(("prop_commitean_ratio", "le_producto")): "construcción de LE (los recién llegados)",
 }
