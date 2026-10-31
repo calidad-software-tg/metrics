@@ -69,8 +69,9 @@ dimensión (Persona, Proceso o Producto). Todo se corre desde la raíz del repos
 | `clustering.py` | Clustering de métricas de una dimensión (después de `pca.py`). |
 | `cruces.py` | Análisis entre dos dimensiones: reparte las métricas compartidas y cruza variables, componentes (de `pca.py`) y grupos (`--grupos`, de `clustering.py`); conjunto reducido, correlación canónica, triangulación y PCA conjunto. |
 | `temporal.py` | Clustering de releases (`releases`) y épocas con todas las métricas (`epocas`). Contexto y prueba de sensibilidad, no técnica principal. |
+| `tres_dimensiones.py` | Análisis de las tres dimensiones a la vez sobre los componentes de cada PCA: medida global (correlación canónica generalizada, RV y MFA), red de correlaciones parciales y triángulos, triangulación con variables, PCA y clustering conjunto, perfiles de releases y rezago. Salidas en `analisis/salidas/tres_dimensiones/`. |
 
-Orden: `correlaciones.py` y `pca.py` → `clustering.py` → `cruces.py` (y `--grupos`). `temporal.py` es independiente.
+Orden: `correlaciones.py` y `pca.py` → `clustering.py` → `cruces.py` (y `--grupos`) → `tres_dimensiones.py`. `temporal.py` es independiente.
 
 **Períodos.** La regla de estabilidad usa los cuatro períodos de calendario. Con `--periodos epocas`
 (`correlaciones.py` y `cruces.py`) usa las épocas de `preprocesamiento.CORTES_EPOCAS`, asignadas por número

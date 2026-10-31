@@ -13,8 +13,8 @@ Todos usan los mismos datos y la misma transformación que el PCA (rangos, con l
 
 1. **El clustering de métricas llega a los mismos núcleos que el PCA en las tres dimensiones** y no contradice ningún hallazgo. Difiere solo en las métricas débiles o de escalón (Wiki, NOB, README, Comment Density).
 2. **Entre dimensiones también coincide:** Proceso y Producto no se relacionan directamente, y lo que conecta las dimensiones pasa por Persona. En Persona–Proceso, además, confirma entre grupos una relación que con el PCA solo aparecía entre variables: **núcleo concentrado ↔ limpieza de lo viejo**.
-3. **En el tiempo, next.js pasa por cuatro épocas** con cortes comunes a las tres dimensiones (dic 2017, dic 2021, mar 2024), pero no hay momentos que se repitan y las relaciones entre métricas se mantienen, salvo en Persona en 2016–2019.
-4. **Los patrones de los cruces casi no dependen de cómo se corta la historia:** con las épocas en lugar de los períodos de calendario se mantiene el 70–80 %. Los que cambian están en el límite o son recientes.
+3. **En el tiempo, next.js pasa por cuatro épocas.** Cada dimensión por separado corta en dic 2021 y en 2024; el primer corte cambia (Persona en dic 2017, Proceso y Producto en ene 2020), y con todas las métricas juntas cae en ene 2020. No hay momentos que se repitan y las relaciones entre métricas se mantienen, salvo en Persona en 2016–2019.
+4. **Los patrones de los cruces casi no dependen de cómo se corta la historia:** con las épocas en lugar de los períodos de calendario se mantiene el 83–93 %. Los que cambian están en el límite, con una época o un período cerca de cero.
 
 ## 1. Clustering de métricas dentro de cada dimensión
 
@@ -73,7 +73,7 @@ Mismo resultado que con el PCA: ningún par de grupos robusto, correlación can�
 ### Persona–Producto
 
 - **Concentración ↔ bugs** (−0,37; con tamaño −0,13; canary −0,07): coincide con el CP3 ↔ CP1 del PCA (−0,36).
-- **Renovación ↔ flujo de documentación: indicio.** Con el PCA salía mecánico porque LE está en los dos componentes; con grupos, LE queda sola y el par sale como patrón (+0,29). `validaciones/grupos_persona_sin_superposicion.py` muestra que no lo arma Contribution Diversity (sin ella, −0,33 orientado a veteranía) sino la renovación: commiters nuevos, tasa de ingreso y activos ↔ flujo de documentación **+0,41** (con tamaño +0,32; canary +0,39). Entre variables, tasa de ingreso de commiters ↔ commits que tocan documentación es +0,35 (con tamaño +0,30; canary +0,30), pero con los períodos de calendario no es estable porque en 2016–2019 vale 0,00; con las épocas sí (sección 5).
+- **Renovación ↔ flujo de documentación: indicio.** Con el PCA salía mecánico porque LE está en los dos componentes; con grupos, LE queda sola y el par sale como patrón (+0,29). `validaciones/grupos_persona_sin_superposicion.py` muestra que no lo arma Contribution Diversity (sin ella, −0,33 orientado a veteranía) sino la renovación: commiters nuevos, tasa de ingreso y activos ↔ flujo de documentación **+0,41** (con tamaño +0,32; canary +0,39). Entre variables, tasa de ingreso de commiters ↔ commits que tocan documentación es +0,35 (con tamaño +0,30; canary +0,30), pero con los períodos de calendario no es estable porque en 2016–2019 vale 0,00; con las épocas sí, aunque por poco (sección 4).
 
 ### Persona–Proceso
 
@@ -81,7 +81,7 @@ Con el PCA hay un patrón entre componentes (veteranía ↔ resolución de lo nu
 
 | Par de grupos | Con todas las métricas | Sin la métrica sospechosa | Lectura |
 |---|---|---|---|
-| **Concentración ↔ limpieza de lo viejo** | +0,19 (con tamaño +0,30; canary +0,22) | Sin SC: +0,19 (+0,29; +0,21) | **Se sostiene.** Entre variables lo sostienen EXPRev del 10 % ↔ MTTR (+0,20; canary +0,17; patrón) y NC del 10 % ↔ NCI (+0,18; con tamaño +0,32). Con las épocas también es robusto entre componentes (sección 5) |
+| **Concentración ↔ limpieza de lo viejo** | +0,19 (con tamaño +0,30; canary +0,22) | Sin SC: +0,19 (+0,29; +0,21) | **Se sostiene.** Entre variables lo sostienen EXPRev del 10 % ↔ MTTR (+0,20; canary +0,17; patrón) y NC del 10 % ↔ NCI (+0,18; con tamaño +0,32). Con las épocas también es robusto entre componentes (sección 4) |
 | Núcleo de revisión ↔ resolución de lo nuevo | +0,19 (+0,21; +0,14) | Sin proporción que cierra: +0,15 (+0,17; +0,08) | En parte es superposición: cuantas más issues nuevas se cierran, más gente cierra issues |
 | Renovación ↔ limpieza de lo viejo | +0,31 (+0,20; +0,23) | — | En buena parte tamaño: entre variables, commiters nuevos ↔ NCI es escala |
 | Concentración ↔ bugs | −0,35 (−0,13; −0,05) | — | Es el de Persona–Producto (CFDR y NUB son de las dos) |
@@ -140,28 +140,41 @@ El clustering de métricas de la sección 1, corrido en cada período por separa
 
 ## 4. ¿Dependen los patrones de cómo se corta la historia?
 
-La regla de estabilidad pide el mismo signo en los cuatro períodos de calendario (2016–2019, 2020–2022, 2023–2024, 2025–2026). `validaciones/cruce_epocas.py` repite los cruces con las cuatro épocas de la sección 3.1 (cortes en 4.1.4, v12.0.5 y v14.1.1).
+La regla de estabilidad pide el mismo signo en los cuatro períodos de calendario (2016–2019, 2020–2022, 2023–2024, 2025–2026). `cruces.py --periodos ambos` repite los cruces con las cuatro **épocas de todas las métricas juntas** (`temporal.py epocas`: toda la historia, sin CFDR ni NUB, cada dimensión con el mismo peso), con cortes en **v9.1.7 (ene 2020), v12.0.5 (dic 2021) y v14.1.1 (mar 2024)**, asignadas por número de release. Recalculado el 28/10 con los criterios actuales (escala en los dos niveles, fecha del release en todas las series, relación mecánica solo cuando las variables comparten datos).
 
-| Cruce | Patrones con calendario | Con épocas | En los dos |
+> La primera versión de esta sección usaba las épocas por dimensión de la sección 3.1 (corte en 4.1.4, dic 2017), asignadas por fecha, y los criterios anteriores (`validaciones/cruce_epocas.py`). Daba 14 / 11 / 9, 23 / 21 / 17 y 12 / 11 / 8.
+
+| Cruce (pares de variables) | Patrones con calendario | Con épocas | En los dos |
 |---|---|---|---|
-| Proceso–Producto | 14 | 11 | 9 |
-| Persona–Producto | 23 | 21 | 17 |
-| Persona–Proceso | 12 | 11 | 8 |
+| Proceso–Producto | 14 | 15 | 13 |
+| Persona–Producto | 23 | 22 | 19 |
+| Persona–Proceso | 12 | 11 | 10 |
 
-Los que cambian son pares en el límite, con un período cerca de cero. Lo propio de Proceso–Producto (NCI ↔ DLOC 2.0) no cambia.
+Dentro de cada dimensión (`correlaciones.py --periodos ambos`): Persona 28 con calendario, 25 con épocas, 24 en los dos; Proceso (con variantes) 53, 47 y 40; Producto 5, 6 y 5.
+
+Los que cambian son pares en el límite, con una época o un período cerca de cero. Lo propio de Proceso–Producto (NCI ↔ DLOC 2.0) pasa con los dos cortes.
 
 **Con las épocas se confirman los dos hallazgos del clustering:**
 
-- **Concentración ↔ limpieza de lo viejo** (Persona–Proceso) pasa a robusta entre componentes: CP3 Persona ↔ CP5 Proceso +0,21 (con tamaño +0,26; canary +0,16). Con el calendario fallaba solo por 2020–2022 (−0,01); por época: +0,27, +0,12, +0,15.
-- **Renovación ↔ documentación** (Persona–Producto) pasa a patrón entre variables: tasa de ingreso de commiters ↔ commits que tocan documentación +0,35; por época: +0,27, +0,13, +0,56, +0,36.
+- **Concentración ↔ limpieza de lo viejo** (Persona–Proceso) pasa a patrón entre componentes: CP3 Persona ↔ CP5 Proceso +0,21 (con tamaño +0,26; canary +0,16). Con el calendario fallaba solo por 2020–2022 (−0,01), el período que contiene el corte de dic 2021; por época: +0,19, +0,19, +0,16 (la primera época no tiene datos de este componente).
+- **Renovación ↔ documentación** (Persona–Producto) pasa a patrón entre variables: tasa de ingreso de commiters ↔ commits que tocan documentación +0,35; por época: +0,00, +0,17, +0,56, +0,36. Pasa por poco: en la primera época vale 0,00, igual que en 2016–2019 con el calendario.
 
-**Se debilitan los que en realidad son recientes:**
+**Pasan con los dos cortes** (con los cortes anteriores dependían del corte):
 
-- **EXPRev (p90) ↔ CFDR y NUB** (Persona–Producto, "discusión concentrada, menos bugs"): por época +0,07, −0,02, −0,36; existe desde 2024. REXPRev ↔ bugs se mantiene.
-- **Proporción que cierra issues ↔ Jarczyk y Process Performance** (Persona–Proceso): por época +0,22, −0,10, +0,19, +0,52; es fuerte desde 2024 y tiene superposición.
-- **Contribution Diversity ↔ commits que tocan documentación** se cae, pero ya estaba descartado como construcción (`validaciones/README.md`).
+- **EXPRev (p90) ↔ CFDR y NUB** (Persona–Producto, "discusión concentrada, menos bugs"): por época −0,04, −0,02, −0,36. Mantiene el signo, pero solo tiene fuerza desde 2024. REXPRev ↔ CFDR también pasa (−0,20, −0,49, −0,22).
+- **Proporción que cierra issues ↔ Jarczyk y Process Performance** (Persona–Proceso): por época +0,04, +0,08, +0,19, +0,52 (Jarczyk). Mantiene el signo, pero es fuerte solo desde 2024, y tiene superposición.
+- **Contribution Diversity ↔ commits que tocan documentación**: también pasa, pero ya estaba descartado como construcción (`validaciones/README.md`).
+- **El hallazgo 1 de Persona–Producto** (concentración del núcleo ↔ DLOC 2.0: EXPRev y NC del 10 %, SC p90) y el patrón entre componentes de Persona–Proceso (renovación ↔ resolución de lo nuevo) pasan con los dos cortes.
 
-**Propuesta:** dejar los períodos de calendario como criterio principal, porque se fijaron antes de mirar los datos (las épocas salen de los mismos datos), y usar las épocas como prueba de sensibilidad: un patrón es *firme* si pasa con los dos cortes y *depende del corte* si pasa con uno solo.
+**Dependen del corte** (pasan solo con el calendario):
+
+- **Tasa de ingreso de commiters ↔ CFDR y NUB** (Persona–Producto y Persona–Proceso, +0,24): en la segunda época vale −0,02.
+- **EXPRev y comentarios del 10 % ↔ LE del proyecto** (Persona–Producto, −0,20 y −0,19): en la tercera época se dan vuelta (+0,07 y +0,18).
+- **Renovación ↔ bugs entre componentes** (CP1 Persona ↔ CP1 Producto, +0,17, el "patrón débil" del cruce): en la tercera época vale −0,02. En Persona–Proceso, con el componente de bugs de Proceso, en cambio pasa solo con las épocas.
+
+**Pasan solo con las épocas:** Contribution Diversity (p90) ↔ DLOC (p90), LE (mediana) ↔ commits que tocan documentación y LE (mediana) ↔ NCI, todos débiles (|ρ| ≤ 0,32).
+
+**Propuesta:** dejar los períodos de calendario como criterio principal, porque se fijaron antes de mirar los datos (las épocas salen de los mismos datos), y usar las épocas como prueba de sensibilidad: un patrón que pasa con los dos cortes se mantiene sin importar cómo se divide la historia; uno que pasa con uno solo depende del corte.
 
 ## 5. Conclusiones
 
@@ -175,12 +188,14 @@ Los que cambian son pares en el límite, con un período cerca de cero. Lo propi
 
 ## Cómo se corre
 
-Desde la raíz del repo, con la base corregida, después de `generar_pca.py` y `generar_clustering.py` de las tres dimensiones y de `cruce_dimensiones.py` del par:
+Desde la raíz del repo, con la base corregida, después de `pca.py` y `clustering.py` de las tres dimensiones y de `cruces.py` del par:
 
 ```bash
-POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/clustering_temporal.py
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/temporal.py releases
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/temporal.py epocas
 POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/cruce_clustering_asignado.py Proceso Producto analisis/cruces/proceso_producto_asignado.json propio
-POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/cruce_epocas.py Proceso Producto --config analisis/cruces/proceso_producto_asignado.json
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/cruces.py Proceso Producto --config analisis/cruces/proceso_producto_asignado.json --periodos ambos
+POSTGRES_DB=resultados_metricas_fixes python3 analisis/correlaciones.py --periodos ambos
 POSTGRES_DB=resultados_metricas_fixes python3 analisis/validaciones/grupos_persona_sin_superposicion.py
 ```
 

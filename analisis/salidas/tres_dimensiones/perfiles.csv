@@ -1,0 +1,13 @@
+persona,otro,diferencia_desvios,p,nula_p95_abs,canary,replica,anio_medio_alto,anio_medio_bajo,q
+persona_cp1,proceso_cp2,0.392,0.036,0.32,0.151,True,2023.323,2023.823,0.062
+persona_cp1,proceso_cp5,0.351,0.045,0.348,0.146,True,2023.323,2023.823,0.067
+persona_cp1,producto_cp1,0.404,0.026,0.383,0.044,True,2023.323,2023.823,0.058
+persona_cp1,producto_cp4,0.644,0.001,0.32,0.668,True,2023.323,2023.823,0.004
+persona_cp2,proceso_cp2,0.276,0.151,0.433,0.287,True,2023.21,2023.435,0.201
+persona_cp2,proceso_cp5,0.221,0.315,0.441,0.408,True,2023.21,2023.435,0.343
+persona_cp2,producto_cp1,0.923,0.001,0.547,1.112,True,2023.21,2023.435,0.004
+persona_cp2,producto_cp4,0.402,0.025,0.319,0.199,True,2023.21,2023.435,0.058
+persona_cp3,proceso_cp2,0.032,0.932,0.398,0.078,True,2023.839,2023.194,0.932
+persona_cp3,proceso_cp5,0.52,0.029,0.397,0.347,True,2023.839,2023.194,0.058
+persona_cp3,producto_cp1,-0.76,0.001,0.585,0.002,False,2023.839,2023.194,0.004
+persona_cp3,producto_cp4,0.27,0.193,0.371,0.25,True,2023.839,2023.194,0.231

@@ -1,0 +1,1842 @@
+{
+ "componentes": {
+  "persona_cp1": {
+   "nombre": "renovación del equipo",
+   "dimension": "Persona",
+   "n": 1,
+   "variables": [
+    "nuevos_commits_conteo",
+    "le_mediana",
+    "tasa_nuevos_commits_ratio",
+    "dev_exp_mediana",
+    "activos_commits_conteo",
+    "cdiv_mediana",
+    "prop_commitean_ratio",
+    "rexp_mediana"
+   ]
+  },
+  "persona_cp2": {
+   "nombre": "volumen de actividad",
+   "dimension": "Persona",
+   "n": 2,
+   "variables": [
+    "activos_comentarios_conteo",
+    "activos_interaccion_conteo",
+    "nuevos_interaccion_conteo",
+    "activos_cierre_conteo",
+    "disc_centrality_mediana",
+    "prop_comentan_ratio",
+    "activos_commits_conteo"
+   ]
+  },
+  "persona_cp3": {
+   "nombre": "concentración del núcleo",
+   "dimension": "Persona",
+   "n": 3,
+   "variables": [
+    "exprev_share_top10pct",
+    "nc_share_top10pct",
+    "sc_share_top10pct",
+    "sc_p90",
+    "cdiv_p90",
+    "prop_commitean_ratio"
+   ]
+  },
+  "proceso_cp2": {
+   "nombre": "resolución de lo nuevo",
+   "dimension": "Proceso",
+   "n": 2,
+   "variables": [
+    "jarczyk_success_rate_producto",
+    "process_performance_producto"
+   ]
+  },
+  "proceso_cp5": {
+   "nombre": "cierre de lo viejo",
+   "dimension": "Proceso",
+   "n": 5,
+   "variables": [
+    "mttr_producto",
+    "nci_producto"
+   ]
+  },
+  "producto_cp1": {
+   "nombre": "bugs de usuarios",
+   "dimension": "Producto",
+   "n": 1,
+   "variables": [
+    "cfdr_producto",
+    "nub_producto"
+   ]
+  },
+  "producto_cp4": {
+   "nombre": "flujo de documentación",
+   "dimension": "Producto",
+   "n": 4,
+   "variables": [
+    "dloc_flujo_producto",
+    "commits_doc_producto",
+    "le_producto"
+   ]
+  }
+ },
+ "asignacion": {
+  "Persona": [
+   "exprev",
+   "rexprev",
+   "cdiv",
+   "nc",
+   "sc",
+   "dev_exp",
+   "le (por colaborador)",
+   "cd (por colaborador)"
+  ],
+  "Proceso": [
+   "mttr",
+   "noi"
+  ],
+  "Producto": [
+   "cfdr",
+   "nub",
+   "rc",
+   "wp",
+   "nob_42",
+   "anmcc",
+   "le (proyecto)",
+   "cd (proyecto)"
+  ]
+ },
+ "releases": {
+  "estable": 185,
+  "canary": 1827
+ },
+ "global_": {
+  "todos": {
+   "n": 185,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp2",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.7139318828125807,
+   "rv_medio": 0.09751238387059032,
+   "mfa1": 0.24491969471849911,
+   "gcca_r": {
+    "0-1": 0.2921498357260464,
+    "0-2": 0.5544201974107513,
+    "1-2": 0.1835363467754895
+   },
+   "rv": {
+    "0-1": 0.058073403657621224,
+    "0-2": 0.18902068620241713,
+    "1-2": 0.045443061751732614
+   },
+   "gcca_nula_p95": 1.4396942058078197,
+   "gcca_p": 0.000999000999000999,
+   "rv_medio_nula_p95": 0.030636051055009807,
+   "rv_medio_p": 0.000999000999000999,
+   "mfa1_nula_p95": 0.20665433111043746,
+   "mfa1_p": 0.000999000999000999,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.24491969471849923,
+     "correlaciones": {
+      "persona_cp1": -0.5615192235438953,
+      "persona_cp2": -0.6436544791552999,
+      "persona_cp3": 0.10109344482065027,
+      "proceso_cp2": -0.454684655722176,
+      "proceso_cp5": -0.2681211577700346,
+      "producto_cp1": -0.5709263285672012,
+      "producto_cp4": -0.6084524031661003
+     },
+     "parte_por_dimension": {
+      "Persona": 0.42263649209957344,
+      "Proceso": 0.1650257693368349,
+      "Producto": 0.4123377385635912
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.21915586549303295,
+     "correlaciones": {
+      "persona_cp1": 0.2553203079604358,
+      "persona_cp2": -0.22394980105090326,
+      "persona_cp3": 0.6727036028378148,
+      "proceso_cp2": 0.07912197220875972,
+      "proceso_cp5": 0.6111440385564849,
+      "producto_cp1": -0.6540547921406056,
+      "producto_cp4": 0.39432612267405004
+     },
+     "parte_por_dimension": {
+      "Persona": 0.36254767288091705,
+      "Proceso": 0.2513652231696221,
+      "Producto": 0.3860871039494604
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.14834695955846483,
+     "correlaciones": {
+      "persona_cp1": -0.5052512557577121,
+      "persona_cp2": 0.6134015502318014,
+      "persona_cp3": 0.2919671049698986,
+      "proceso_cp2": -0.21860429626840486,
+      "proceso_cp5": 0.44179088668713723,
+      "producto_cp1": 0.1189979379701879,
+      "producto_cp4": -0.2723217064972604
+     },
+     "parte_por_dimension": {
+      "Persona": 0.6760487123615213,
+      "Proceso": 0.23758598704500794,
+      "Producto": 0.08636530059347
+     }
+    }
+   ]
+  },
+  "todos_canary": {
+   "n": 1827,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp2",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.6303277673527172,
+   "rv_medio": 0.06555745111912649,
+   "mfa1": 0.2286911520500152,
+   "gcca_r": {
+    "0-1": 0.2719083941649228,
+    "0-2": 0.5256752956436462,
+    "1-2": 0.08702947978677138
+   },
+   "rv": {
+    "0-1": 0.033913532504875464,
+    "0-2": 0.15139296907109084,
+    "1-2": 0.011365851781413144
+   },
+   "gcca_nula_p95": 1.1236770297730565,
+   "gcca_p": 0.0033222591362126247,
+   "rv_medio_nula_p95": 0.0026620743593312106,
+   "rv_medio_p": 0.0033222591362126247,
+   "mfa1_nula_p95": 0.1633755105547777,
+   "mfa1_p": 0.0033222591362126247,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.2286911520500153,
+     "correlaciones": {
+      "persona_cp1": -0.18016332760697956,
+      "persona_cp2": -0.8175526128375504,
+      "persona_cp3": -0.09711896281706385,
+      "proceso_cp2": -0.301128854999063,
+      "proceso_cp5": -0.37381237261916095,
+      "producto_cp1": -0.7473415144931448,
+      "producto_cp4": -0.3215274136463747
+     },
+     "parte_por_dimension": {
+      "Persona": 0.42480480041033275,
+      "Proceso": 0.1485330720747806,
+      "Producto": 0.4266621275148864
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.19667957668654362,
+     "correlaciones": {
+      "persona_cp1": 0.6038170877695197,
+      "persona_cp2": -0.27526227766176714,
+      "persona_cp3": 0.3717701400336083,
+      "proceso_cp2": -0.03942479840653527,
+      "proceso_cp5": 0.40637233268367023,
+      "producto_cp1": -0.38638035904277723,
+      "producto_cp4": 0.6938162955329479
+     },
+     "parte_por_dimension": {
+      "Persona": 0.40235505898901913,
+      "Proceso": 0.12494551864335834,
+      "Producto": 0.47269942236762313
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.15177483967034108,
+     "correlaciones": {
+      "persona_cp1": -0.48790552173776713,
+      "persona_cp2": 0.045936059565867014,
+      "persona_cp3": 0.5234296475280297,
+      "proceso_cp2": -0.26105293008035346,
+      "proceso_cp5": 0.6297860175628309,
+      "producto_cp1": -0.08887356368250696,
+      "producto_cp4": -0.2825648388752621
+     },
+     "parte_por_dimension": {
+      "Persona": 0.4633287891158815,
+      "Proceso": 0.45145026327123455,
+      "Producto": 0.08522094761288429
+     }
+    }
+   ]
+  },
+  "sin_volumen": {
+   "n": 185,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.5823151834836207,
+   "rv_medio": 0.07171657600130392,
+   "mfa1": 0.26211512699165457,
+   "gcca_r": {
+    "0-1": 0.30176958288236394,
+    "0-2": 0.3323443181552318,
+    "1-2": 0.2367163518454315
+   },
+   "rv": {
+    "0-1": 0.04955112104895969,
+    "0-2": 0.12015554520321946,
+    "1-2": 0.045443061751732614
+   },
+   "gcca_nula_p95": 1.3794069582688289,
+   "gcca_p": 0.000999000999000999,
+   "rv_medio_nula_p95": 0.02707484967797054,
+   "rv_medio_p": 0.000999000999000999,
+   "mfa1_nula_p95": 0.23017310754827314,
+   "mfa1_p": 0.000999000999000999,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.2621151269916547,
+     "correlaciones": {
+      "persona_cp1": -0.6510589226519574,
+      "persona_cp3": -0.3755221482001668,
+      "proceso_cp2": -0.39070027864480855,
+      "proceso_cp5": -0.5718647163489446,
+      "producto_cp1": 0.09537565203482773,
+      "producto_cp4": -0.7209046772794109
+     },
+     "parte_por_dimension": {
+      "Persona": 0.3551609798115294,
+      "Proceso": 0.30671087194013263,
+      "Producto": 0.338128148248338
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.24042008324617115,
+     "correlaciones": {
+      "persona_cp1": 0.39703416629554017,
+      "persona_cp3": -0.6414346548640099,
+      "proceso_cp2": 0.30560796729466405,
+      "proceso_cp5": -0.35964746290155014,
+      "producto_cp1": 0.7826270062463238,
+      "producto_cp4": 0.1991742933754493
+     },
+     "parte_por_dimension": {
+      "Persona": 0.39007518328325463,
+      "Proceso": 0.15527648840389074,
+      "Producto": 0.45464832831285423
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.1601495305054326,
+     "correlaciones": {
+      "persona_cp1": -0.3127331041945796,
+      "persona_cp3": 0.2952839704181988,
+      "proceso_cp2": 0.7964050297860278,
+      "proceso_cp5": -0.36421653425219724,
+      "producto_cp1": -0.07764778254877822,
+      "producto_cp4": -0.02650418298559243
+     },
+     "parte_por_dimension": {
+      "Persona": 0.19036334488217366,
+      "Proceso": 0.8025917076897762,
+      "Producto": 0.007044947428050145
+     }
+    }
+   ]
+  },
+  "sin_volumen_canary": {
+   "n": 1827,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.3974557769778866,
+   "rv_medio": 0.025481925776899884,
+   "mfa1": 0.23432491454486648,
+   "gcca_r": {
+    "0-1": 0.13887424278009036,
+    "0-2": 0.303575084574897,
+    "1-2": 0.13429977639019877
+   },
+   "rv": {
+    "0-1": 0.01579386833163001,
+    "0-2": 0.049286057217656505,
+    "1-2": 0.011365851781413144
+   },
+   "gcca_nula_p95": 1.1087224707994532,
+   "gcca_p": 0.0033222591362126247,
+   "rv_medio_nula_p95": 0.002435547777437506,
+   "rv_medio_p": 0.0033222591362126247,
+   "mfa1_nula_p95": 0.18508682856743466,
+   "mfa1_p": 0.0033222591362126247,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.23432491454486634,
+     "correlaciones": {
+      "persona_cp1": -0.6478817669629854,
+      "persona_cp3": -0.39531551614879523,
+      "proceso_cp2": -0.13753247758238624,
+      "proceso_cp5": -0.5055549399051309,
+      "producto_cp1": -0.03763746132400037,
+      "producto_cp4": -0.745827654700936
+     },
+     "parte_por_dimension": {
+      "Persona": 0.40395441405621507,
+      "Proceso": 0.19661760235349554,
+      "Producto": 0.3994279835902895
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.17968113808246383,
+     "correlaciones": {
+      "persona_cp1": 0.24407666938832626,
+      "persona_cp3": -0.3097467312187059,
+      "proceso_cp2": 0.6126227342333286,
+      "proceso_cp5": -0.3701456800852094,
+      "producto_cp1": 0.6344298194089044,
+      "producto_cp4": 0.05907579176002973
+     },
+     "parte_por_dimension": {
+      "Persona": 0.14222739412514468,
+      "Proceso": 0.47855413244711575,
+      "Producto": 0.3792184734277404
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.17654974712352675,
+     "correlaciones": {
+      "persona_cp1": 0.4379645311119936,
+      "persona_cp3": -0.5793471611182343,
+      "proceso_cp2": -0.3754815090454234,
+      "proceso_cp5": -0.42234127339524685,
+      "producto_cp1": -0.35382592569263943,
+      "producto_cp4": 0.3015528550941242
+     },
+     "parte_por_dimension": {
+      "Persona": 0.49094017802441925,
+      "Proceso": 0.30360461197064725,
+      "Producto": 0.20545521000493416
+     }
+    }
+   ]
+  },
+  "sin_tamano": {
+   "n": 185,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.575899105040651,
+   "rv_medio": 0.0716387395528231,
+   "mfa1": 0.2609040698710544,
+   "gcca_r": {
+    "0-1": 0.3009940913541618,
+    "0-2": 0.3232324595776318,
+    "1-2": 0.23741567794748442
+   },
+   "rv": {
+    "0-1": 0.04716823382495025,
+    "0-2": 0.1208424201635086,
+    "1-2": 0.04690556467001045
+   },
+   "gcca_nula_p95": 1.3814741568045878,
+   "gcca_p": 0.000999000999000999,
+   "rv_medio_nula_p95": 0.027273483877370105,
+   "rv_medio_p": 0.000999000999000999,
+   "mfa1_nula_p95": 0.2310668632133098,
+   "mfa1_p": 0.000999000999000999,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.2609040698710544,
+     "correlaciones": {
+      "persona_cp1": -0.5812527286309997,
+      "persona_cp3": -0.4596780382952037,
+      "proceso_cp2": -0.3419569922626981,
+      "proceso_cp5": -0.6133993912985624,
+      "producto_cp1": 0.24509691785583076,
+      "producto_cp4": -0.680846791492456
+     },
+     "parte_por_dimension": {
+      "Persona": 0.3473720176731001,
+      "Proceso": 0.3181868430093062,
+      "Producto": 0.3344411393175941
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.24139897864779009,
+     "correlaciones": {
+      "persona_cp1": 0.49205245032801576,
+      "persona_cp3": -0.582410027972244,
+      "proceso_cp2": 0.3682216281602088,
+      "proceso_cp5": -0.2787640645376956,
+      "producto_cp1": 0.7492361782042708,
+      "producto_cp4": 0.30999483404924016
+     },
+     "parte_por_dimension": {
+      "Persona": 0.3974252951663215,
+      "Proceso": 0.14872852224989394,
+      "Producto": 0.4538461825837851
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.1610123388159362,
+     "correlaciones": {
+      "persona_cp1": -0.3202262853144599,
+      "persona_cp3": 0.3065357878968924,
+      "proceso_cp2": 0.7919755486901678,
+      "proceso_cp5": -0.3613761908939984,
+      "producto_cp1": -0.07115304482506107,
+      "producto_cp4": -0.03275404583834988
+     },
+     "parte_por_dimension": {
+      "Persona": 0.20141939903838046,
+      "Proceso": 0.7922305531455395,
+      "Producto": 0.0063500478160803415
+     }
+    }
+   ]
+  },
+  "sin_tamano_canary": {
+   "n": 1827,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.382733091524805,
+   "rv_medio": 0.02480646609165514,
+   "mfa1": 0.23274508733058655,
+   "gcca_r": {
+    "0-1": 0.13563149254888637,
+    "0-2": 0.29645362629950794,
+    "1-2": 0.12130809326558908
+   },
+   "rv": {
+    "0-1": 0.016284452801455813,
+    "0-2": 0.04798757104565495,
+    "1-2": 0.010147374427854659
+   },
+   "gcca_nula_p95": 1.1118695227990365,
+   "gcca_p": 0.0033222591362126247,
+   "rv_medio_nula_p95": 0.0024661912175955843,
+   "rv_medio_p": 0.0033222591362126247,
+   "mfa1_nula_p95": 0.1871036074797617,
+   "mfa1_p": 0.0033222591362126247,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.2327450873305867,
+     "correlaciones": {
+      "persona_cp1": -0.634475443116438,
+      "persona_cp3": -0.4300318599504987,
+      "proceso_cp2": -0.08914786491534024,
+      "proceso_cp5": -0.5137960946034205,
+      "producto_cp1": 0.15091760748375543,
+      "producto_cp4": -0.7200775674078186
+     },
+     "parte_por_dimension": {
+      "Persona": 0.42072154587284893,
+      "Proceso": 0.19779507373082075,
+      "Producto": 0.3814833803963319
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.18125197595556983,
+     "correlaciones": {
+      "persona_cp1": 0.5288259966350167,
+      "persona_cp3": -0.5297853464300375,
+      "proceso_cp2": 0.2568907837565687,
+      "proceso_cp5": -0.5812273323961811,
+      "producto_cp1": 0.19523937977919506,
+      "producto_cp4": 0.2841308467709862
+     },
+     "parte_por_dimension": {
+      "Persona": 0.515273836299638,
+      "Proceso": 0.3771688948327576,
+      "Producto": 0.10755726886760604
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.1773364736434904,
+     "correlaciones": {
+      "persona_cp1": -0.10669033260268744,
+      "persona_cp3": 0.37711664651809523,
+      "proceso_cp2": 0.7420672265146993,
+      "proceso_cp5": 0.02506264943152449,
+      "producto_cp1": 0.5836286364122644,
+      "producto_cp4": -0.12427616976245381
+     },
+     "parte_por_dimension": {
+      "Persona": 0.14436767204033774,
+      "Proceso": 0.5262794347812175,
+      "Producto": 0.3293528931784459
+     }
+    }
+   ]
+  },
+  "sin_tamano_ni_documentacion": {
+   "n": 185,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1"
+   ],
+   "gcca": 1.4755663587546008,
+   "rv_medio": 0.053710730076654334,
+   "mfa1": 0.295748904914453,
+   "gcca_r": {
+    "0-1": 0.20476717410835393,
+    "0-2": 0.31855056409430343,
+    "1-2": 0.1815438698885701
+   },
+   "rv": {
+    "0-1": 0.04716823382495025,
+    "0-2": 0.08596220431971266,
+    "1-2": 0.02800175208530009
+   },
+   "gcca_nula_p95": 1.3546707674033354,
+   "gcca_p": 0.002997002997002997,
+   "rv_medio_nula_p95": 0.026758416002017126,
+   "rv_medio_p": 0.001998001998001998,
+   "mfa1_nula_p95": 0.27151585563186137,
+   "mfa1_p": 0.002997002997002997,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.29574890491445305,
+     "correlaciones": {
+      "persona_cp1": -0.08314652947828044,
+      "persona_cp3": 0.7411023474202739,
+      "proceso_cp2": -0.10651449377029065,
+      "proceso_cp5": 0.5812295808625157,
+      "producto_cp1": -0.7563018756005444
+     },
+     "parte_por_dimension": {
+      "Persona": 0.3714492852095093,
+      "Proceso": 0.2378589441826337,
+      "Producto": 0.3906917706078577
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.2463945620130046,
+     "correlaciones": {
+      "persona_cp1": 0.7793669387079748,
+      "persona_cp3": 0.09759076268766566,
+      "proceso_cp2": 0.5721439933996918,
+      "proceso_cp5": 0.4596112848018084,
+      "producto_cp1": 0.2816360664442836
+     },
+     "parte_por_dimension": {
+      "Persona": 0.4945877692116183,
+      "Proceso": 0.44038242227288416,
+      "Producto": 0.0650298085154979
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.1926183667818074,
+     "correlaciones": {
+      "persona_cp1": -0.3454167188714314,
+      "persona_cp3": 0.2973934955500143,
+      "proceso_cp2": 0.7689904071019346,
+      "proceso_cp5": -0.39188699388412745,
+      "producto_cp1": -0.08628427181371476
+     },
+     "parte_por_dimension": {
+      "Persona": 0.21305359742548205,
+      "Proceso": 0.779138531487049,
+      "Producto": 0.007807871087470037
+     }
+    }
+   ]
+  },
+  "sin_tamano_ni_documentacion_canary": {
+   "n": 1827,
+   "componentes": [
+    "persona_cp1",
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1"
+   ],
+   "gcca": 1.1825481068037158,
+   "rv_medio": 0.006932382254859447,
+   "mfa1": 0.23745831441551632,
+   "gcca_r": {
+    "0-1": 0.17716891145897842,
+    "0-2": -0.006008337436074198,
+    "1-2": 0.049795954735937814
+   },
+   "rv": {
+    "0-1": 0.016284452801455813,
+    "0-2": 0.00033775747507619176,
+    "1-2": 0.004174936488046336
+   },
+   "gcca_nula_p95": 1.0914178558893268,
+   "gcca_p": 0.0033222591362126247,
+   "rv_medio_nula_p95": 0.002056359822223828,
+   "rv_medio_p": 0.0033222591362126247,
+   "mfa1_nula_p95": 0.2197510488486331,
+   "mfa1_p": 0.0033222591362126247,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.2374583144155163,
+     "correlaciones": {
+      "persona_cp1": -0.31453007525254284,
+      "persona_cp3": -0.6778569004819653,
+      "proceso_cp2": -0.09950800802396044,
+      "proceso_cp5": -0.7579694857392125,
+      "producto_cp1": 0.2178985185973429
+     },
+     "parte_por_dimension": {
+      "Persona": 0.4650912625316587,
+      "Proceso": 0.4943768214052363,
+      "Producto": 0.04053191606310448
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.2145823051898376,
+     "correlaciones": {
+      "persona_cp1": 0.15293236797247398,
+      "persona_cp3": 0.1993324797314467,
+      "proceso_cp2": 0.7039298198003294,
+      "proceso_cp5": -0.12735762317054264,
+      "producto_cp1": 0.6999172617378572
+     },
+     "parte_por_dimension": {
+      "Persona": 0.058176871453863646,
+      "Proceso": 0.4790421901606004,
+      "Producto": 0.4627809383855345
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.1987786158287938,
+     "correlaciones": {
+      "persona_cp1": -0.7463078308464344,
+      "persona_cp3": 0.3523320561377497,
+      "proceso_cp2": -0.33441057250987066,
+      "proceso_cp5": 0.16147061042591335,
+      "producto_cp1": 0.4235920699353986
+     },
+     "parte_por_dimension": {
+      "Persona": 0.6776648069839067,
+      "Proceso": 0.13935590221994654,
+      "Producto": 0.1829792907961463
+     }
+    }
+   ]
+  },
+  "sin_tamano_ni_renovacion": {
+   "n": 185,
+   "componentes": [
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.5024810587025985,
+   "rv_medio": 0.052048506177753424,
+   "mfa1": 0.3017756855990341,
+   "gcca_r": {
+    "0-1": 0.2193369440539726,
+    "0-2": 0.315466375588815,
+    "1-2": 0.21417959603790748
+   },
+   "rv": {
+    "0-1": 0.03495287599526414,
+    "0-2": 0.07428707786798569,
+    "1-2": 0.04690556467001045
+   },
+   "gcca_nula_p95": 1.3677077647885099,
+   "gcca_p": 0.001998001998001998,
+   "rv_medio_nula_p95": 0.029048958236525653,
+   "rv_medio_p": 0.000999000999000999,
+   "mfa1_nula_p95": 0.2739040820614713,
+   "mfa1_p": 0.001998001998001998,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.3017756855990342,
+     "correlaciones": {
+      "persona_cp3": -0.7415448747638023,
+      "proceso_cp2": -0.05558688610780523,
+      "proceso_cp5": -0.6370258086580147,
+      "producto_cp1": 0.6663480343816003,
+      "producto_cp4": -0.3238282928563029
+     },
+     "parte_por_dimension": {
+      "Persona": 0.3666845464156182,
+      "Proceso": 0.271932325227874,
+      "Producto": 0.3613831283565078
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.24040273962827335,
+     "correlaciones": {
+      "persona_cp3": 0.07502858711772058,
+      "proceso_cp2": -0.7706389670463358,
+      "proceso_cp5": -0.08373893866602498,
+      "producto_cp1": -0.3864798281301015,
+      "producto_cp4": -0.6692659216043204
+     },
+     "parte_por_dimension": {
+      "Persona": 0.004712117391314291,
+      "Proceso": 0.5016456521221742,
+      "Producto": 0.4936422304865122
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.17659086133698812,
+     "correlaciones": {
+      "persona_cp3": -0.3973768260533885,
+      "proceso_cp2": -0.5114922956978273,
+      "proceso_cp5": 0.5360892476040593,
+      "producto_cp1": 0.20376625395267983,
+      "producto_cp4": 0.36437648705759046
+     },
+     "parte_por_dimension": {
+      "Persona": 0.17994460311688606,
+      "Proceso": 0.6239553523838377,
+      "Producto": 0.19610004449927682
+     }
+    }
+   ]
+  },
+  "sin_tamano_ni_renovacion_canary": {
+   "n": 1827,
+   "componentes": [
+    "persona_cp3",
+    "proceso_cp2",
+    "proceso_cp5",
+    "producto_cp1",
+    "producto_cp4"
+   ],
+   "gcca": 1.259787116837564,
+   "rv_medio": 0.012269499087475171,
+   "mfa1": 0.2544866606086429,
+   "gcca_r": {
+    "0-1": 0.16903298814119905,
+    "0-2": 0.09080720536803402,
+    "1-2": 0.1257457029084993
+   },
+   "rv": {
+    "0-1": 0.02025215936112969,
+    "0-2": 0.006408963473441166,
+    "1-2": 0.010147374427854659
+   },
+   "gcca_nula_p95": 1.0958060063006714,
+   "gcca_p": 0.0033222591362126247,
+   "rv_medio_nula_p95": 0.0021645577925806163,
+   "rv_medio_p": 0.0033222591362126247,
+   "mfa1_nula_p95": 0.22236589332895856,
+   "mfa1_p": 0.0033222591362126247,
+   "factores_mfa": [
+    {
+     "factor": 1,
+     "inercia": 0.25448666060864295,
+     "correlaciones": {
+      "persona_cp3": -0.6636011107557392,
+      "proceso_cp2": -0.05220880205981526,
+      "proceso_cp5": -0.7072756535193955,
+      "producto_cp1": 0.18260623854355507,
+      "producto_cp4": -0.5368756228360733
+     },
+     "parte_por_dimension": {
+      "Persona": 0.352988621381486,
+      "Proceso": 0.3995109477917175,
+      "Producto": 0.24750043082679674
+     }
+    },
+    {
+     "factor": 2,
+     "inercia": 0.21229259297825492,
+     "correlaciones": {
+      "persona_cp3": 0.2679785132634772,
+      "proceso_cp2": 0.7727088418760371,
+      "proceso_cp5": -0.10900995235961594,
+      "producto_cp1": 0.6134283358948028,
+      "producto_cp4": -0.06567449231714231
+     },
+     "parte_por_dimension": {
+      "Persona": 0.06900437481470818,
+      "Proceso": 0.5798447379468753,
+      "Producto": 0.3511508872384158
+     }
+    },
+    {
+     "factor": 3,
+     "inercia": 0.18930783365420756,
+     "correlaciones": {
+      "persona_cp3": -0.318175785312362,
+      "proceso_cp2": 0.6156996207857094,
+      "proceso_cp5": -0.06910377807935641,
+      "producto_cp1": -0.6445176941205976,
+      "producto_cp4": 0.222544226920843
+     },
+     "parte_por_dimension": {
+      "Persona": 0.10908805139648649,
+      "Proceso": 0.40988505828007665,
+      "Producto": 0.4810268903234365
+     }
+    }
+   ]
+  }
+ },
+ "conjunto": {
+  "ajustado": {
+   "pca": {
+    "n": 189,
+    "variables": 28,
+    "excluidas": [],
+    "k": 4,
+    "criterios": {
+     "kaiser": 7,
+     "codo": 5,
+     "varianza_70": 6,
+     "varianza_80": 9,
+     "horn": 4
+    },
+    "componentes": [
+     {
+      "n": 1,
+      "varianza": 0.2391,
+      "bootstrap": 0.9877,
+      "mixto": true,
+      "dimensiones": [
+       "Persona",
+       "Producto"
+      ],
+      "cargas": [
+       [
+        "nuevos_commits_conteo",
+        0.924
+       ],
+       [
+        "tasa_nuevos_commits_ratio",
+        0.831
+       ],
+       [
+        "le_mediana",
+        -0.822
+       ],
+       [
+        "dev_exp_mediana",
+        -0.813
+       ],
+       [
+        "activos_commits_conteo",
+        0.795
+       ],
+       [
+        "cdiv_mediana",
+        -0.661
+       ],
+       [
+        "prop_commitean_ratio",
+        0.604
+       ],
+       [
+        "le_producto",
+        -0.506
+       ],
+       [
+        "rexp_mediana",
+        -0.504
+       ],
+       [
+        "commits_doc_producto",
+        0.446
+       ]
+      ]
+     },
+     {
+      "n": 2,
+      "varianza": 0.1836,
+      "bootstrap": 0.9873,
+      "mixto": true,
+      "dimensiones": [
+       "Persona",
+       "Proceso",
+       "Producto"
+      ],
+      "cargas": [
+       [
+        "activos_interaccion_conteo",
+        0.951
+       ],
+       [
+        "activos_comentarios_conteo",
+        0.936
+       ],
+       [
+        "nuevos_interaccion_conteo",
+        0.918
+       ],
+       [
+        "activos_cierre_conteo",
+        0.739
+       ],
+       [
+        "cfdr_producto",
+        0.729
+       ],
+       [
+        "nub_producto",
+        0.729
+       ],
+       [
+        "prop_commitean_ratio",
+        -0.498
+       ],
+       [
+        "nci_producto",
+        0.468
+       ],
+       [
+        "disc_centrality_mediana",
+        0.403
+       ]
+      ]
+     },
+     {
+      "n": 3,
+      "varianza": 0.108,
+      "bootstrap": 0.9727,
+      "mixto": false,
+      "dimensiones": [
+       "Persona"
+      ],
+      "cargas": [
+       [
+        "exprev_share_top10pct",
+        0.828
+       ],
+       [
+        "sc_share_top10pct",
+        0.764
+       ],
+       [
+        "nc_share_top10pct",
+        0.752
+       ],
+       [
+        "sc_p90",
+        0.688
+       ],
+       [
+        "cdiv_p90",
+        0.561
+       ]
+      ]
+     },
+     {
+      "n": 4,
+      "varianza": 0.0669,
+      "bootstrap": 0.9172,
+      "mixto": false,
+      "dimensiones": [
+       "Proceso"
+      ],
+      "cargas": [
+       [
+        "process_performance_producto",
+        0.878
+       ],
+       [
+        "jarczyk_success_rate_producto",
+        0.875
+       ]
+      ]
+     }
+    ]
+   },
+   "clustering": {
+    "n": 189,
+    "variables": 28,
+    "k_propio": 9,
+    "k_pca": 4,
+    "silueta": {
+     "2": 0.1749,
+     "3": 0.2269,
+     "4": 0.2422,
+     "5": 0.2889,
+     "6": 0.2884,
+     "7": 0.3167,
+     "8": 0.327,
+     "9": 0.3398,
+     "10": 0.3186
+    },
+    "nula_p95": {
+     "2": 0.0273,
+     "3": 0.0301,
+     "4": 0.0334,
+     "5": 0.0368,
+     "6": 0.0403,
+     "7": 0.0451,
+     "8": 0.0485,
+     "9": 0.0534,
+     "10": 0.0551
+    },
+    "soluciones": {
+     "propio": {
+      "k": 9,
+      "silueta": 0.3398,
+      "nula_p95": 0.0534,
+      "ari_pca": 0.7075,
+      "estabilidad": {
+       "mediana": 0.8544437028289777,
+       "p05": 0.6297388223983215,
+       "largo_bloque": 14
+      },
+      "grupos": [
+       {
+        "grupo": 9,
+        "variables": [
+         "activos_commits_conteo",
+         "cdiv_mediana",
+         "dev_exp_mediana",
+         "le_mediana",
+         "le_producto",
+         "nuevos_commits_conteo",
+         "rexp_mediana",
+         "tasa_nuevos_commits_ratio"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         1
+        ]
+       },
+       {
+        "grupo": 3,
+        "variables": [
+         "activos_cierre_conteo",
+         "activos_comentarios_conteo",
+         "activos_interaccion_conteo",
+         "cfdr_producto",
+         "nci_producto",
+         "nub_producto",
+         "nuevos_interaccion_conteo"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Proceso",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         2
+        ]
+       },
+       {
+        "grupo": 6,
+        "variables": [
+         "exprev_share_top10pct",
+         "nc_share_top10pct",
+         "prop_commitean_ratio",
+         "sc_p90"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         1,
+         3
+        ]
+       },
+       {
+        "grupo": 7,
+        "variables": [
+         "cdiv_p90",
+         "sc_share_top10pct"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         3
+        ]
+       },
+       {
+        "grupo": 8,
+        "variables": [
+         "commits_doc_producto",
+         "dloc_flujo_producto"
+        ],
+        "dimensiones": [
+         "Producto"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         1
+        ]
+       },
+       {
+        "grupo": 1,
+        "variables": [
+         "jarczyk_success_rate_producto",
+         "process_performance_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         4
+        ]
+       },
+       {
+        "grupo": 4,
+        "variables": [
+         "disc_centrality_mediana"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         2
+        ]
+       },
+       {
+        "grupo": 2,
+        "variables": [
+         "mttr_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": []
+       },
+       {
+        "grupo": 5,
+        "variables": [
+         "prop_comentan_ratio"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": []
+       }
+      ]
+     },
+     "pca": {
+      "k": 4,
+      "silueta": 0.2422,
+      "nula_p95": 0.0334,
+      "ari_pca": 0.5737,
+      "estabilidad": {
+       "mediana": 0.40620108808535116,
+       "p05": 0.12684433921404442,
+       "largo_bloque": 14
+      },
+      "grupos": [
+       {
+        "grupo": 4,
+        "variables": [
+         "activos_commits_conteo",
+         "cdiv_mediana",
+         "cdiv_p90",
+         "commits_doc_producto",
+         "dev_exp_mediana",
+         "dloc_flujo_producto",
+         "exprev_share_top10pct",
+         "le_mediana",
+         "le_producto",
+         "nc_share_top10pct",
+         "nuevos_commits_conteo",
+         "prop_commitean_ratio",
+         "rexp_mediana",
+         "sc_p90",
+         "sc_share_top10pct",
+         "tasa_nuevos_commits_ratio"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         1,
+         3
+        ]
+       },
+       {
+        "grupo": 3,
+        "variables": [
+         "activos_cierre_conteo",
+         "activos_comentarios_conteo",
+         "activos_interaccion_conteo",
+         "cfdr_producto",
+         "disc_centrality_mediana",
+         "nci_producto",
+         "nub_producto",
+         "nuevos_interaccion_conteo",
+         "prop_comentan_ratio"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Proceso",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         2
+        ]
+       },
+       {
+        "grupo": 1,
+        "variables": [
+         "jarczyk_success_rate_producto",
+         "process_performance_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         4
+        ]
+       },
+       {
+        "grupo": 2,
+        "variables": [
+         "mttr_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": []
+       }
+      ]
+     }
+    }
+   }
+  },
+  "tamano": {
+   "pca": {
+    "n": 189,
+    "variables": 22,
+    "excluidas": [
+     "activos_cierre_conteo",
+     "activos_comentarios_conteo",
+     "activos_commits_conteo",
+     "activos_interaccion_conteo",
+     "nuevos_commits_conteo",
+     "nuevos_interaccion_conteo"
+    ],
+    "k": 6,
+    "criterios": {
+     "kaiser": 7,
+     "codo": 7,
+     "varianza_70": 7,
+     "varianza_80": 9,
+     "horn": 6
+    },
+    "componentes": [
+     {
+      "n": 1,
+      "varianza": 0.199,
+      "bootstrap": 0.9865,
+      "mixto": true,
+      "dimensiones": [
+       "Persona",
+       "Producto"
+      ],
+      "cargas": [
+       [
+        "dev_exp_mediana",
+        0.856
+       ],
+       [
+        "le_mediana",
+        0.847
+       ],
+       [
+        "tasa_nuevos_commits_ratio",
+        -0.785
+       ],
+       [
+        "prop_commitean_ratio",
+        -0.661
+       ],
+       [
+        "cdiv_mediana",
+        0.622
+       ],
+       [
+        "rexp_mediana",
+        0.588
+       ],
+       [
+        "le_producto",
+        0.586
+       ]
+      ]
+     },
+     {
+      "n": 2,
+      "varianza": 0.1658,
+      "bootstrap": 0.9727,
+      "mixto": false,
+      "dimensiones": [
+       "Persona"
+      ],
+      "cargas": [
+       [
+        "exprev_share_top10pct",
+        0.808
+       ],
+       [
+        "sc_share_top10pct",
+        0.784
+       ],
+       [
+        "sc_p90",
+        0.748
+       ],
+       [
+        "nc_share_top10pct",
+        0.735
+       ],
+       [
+        "cdiv_p90",
+        0.597
+       ]
+      ]
+     },
+     {
+      "n": 3,
+      "varianza": 0.101,
+      "bootstrap": 0.9699,
+      "mixto": true,
+      "dimensiones": [
+       "Persona",
+       "Producto"
+      ],
+      "cargas": [
+       [
+        "cfdr_producto",
+        0.943
+       ],
+       [
+        "nub_producto",
+        0.942
+       ],
+       [
+        "prop_comentan_ratio",
+        -0.588
+       ]
+      ]
+     },
+     {
+      "n": 4,
+      "varianza": 0.0854,
+      "bootstrap": 0.9622,
+      "mixto": false,
+      "dimensiones": [
+       "Proceso"
+      ],
+      "cargas": [
+       [
+        "jarczyk_success_rate_producto",
+        0.923
+       ],
+       [
+        "process_performance_producto",
+        0.918
+       ]
+      ]
+     },
+     {
+      "n": 5,
+      "varianza": 0.0666,
+      "bootstrap": 0.8942,
+      "mixto": true,
+      "dimensiones": [
+       "Persona",
+       "Proceso"
+      ],
+      "cargas": [
+       [
+        "mttr_producto",
+        0.807
+       ],
+       [
+        "nci_producto",
+        0.706
+       ],
+       [
+        "exprev_share_top10pct",
+        0.409
+       ],
+       [
+        "nc_share_top10pct",
+        0.406
+       ]
+      ]
+     },
+     {
+      "n": 6,
+      "varianza": 0.0606,
+      "bootstrap": 0.9247,
+      "mixto": false,
+      "dimensiones": [
+       "Producto"
+      ],
+      "cargas": [
+       [
+        "dloc_flujo_producto",
+        0.792
+       ],
+       [
+        "commits_doc_producto",
+        0.79
+       ]
+      ]
+     }
+    ]
+   },
+   "clustering": {
+    "n": 189,
+    "variables": 22,
+    "k_propio": 9,
+    "k_pca": 6,
+    "silueta": {
+     "2": 0.1275,
+     "3": 0.1763,
+     "4": 0.2161,
+     "5": 0.2716,
+     "6": 0.3013,
+     "7": 0.3382,
+     "8": 0.3287,
+     "9": 0.351,
+     "10": 0.3431
+    },
+    "nula_p95": {
+     "2": 0.0329,
+     "3": 0.0343,
+     "4": 0.0385,
+     "5": 0.0444,
+     "6": 0.0488,
+     "7": 0.0535,
+     "8": 0.057,
+     "9": 0.0595,
+     "10": 0.0621
+    },
+    "soluciones": {
+     "propio": {
+      "k": 9,
+      "silueta": 0.351,
+      "nula_p95": 0.0595,
+      "ari_pca": 0.7777,
+      "estabilidad": {
+       "mediana": 0.6907630522088354,
+       "p05": 0.43669105233539673,
+       "largo_bloque": 14
+      },
+      "grupos": [
+       {
+        "grupo": 8,
+        "variables": [
+         "cdiv_p90",
+         "exprev_share_top10pct",
+         "nc_share_top10pct",
+         "sc_p90",
+         "sc_share_top10pct"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         2
+        ]
+       },
+       {
+        "grupo": 6,
+        "variables": [
+         "dev_exp_mediana",
+         "le_mediana",
+         "le_producto",
+         "prop_commitean_ratio",
+         "tasa_nuevos_commits_ratio"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         1
+        ]
+       },
+       {
+        "grupo": 5,
+        "variables": [
+         "cdiv_mediana",
+         "rexp_mediana"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         1
+        ]
+       },
+       {
+        "grupo": 1,
+        "variables": [
+         "cfdr_producto",
+         "nub_producto"
+        ],
+        "dimensiones": [
+         "Producto"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         3
+        ]
+       },
+       {
+        "grupo": 7,
+        "variables": [
+         "commits_doc_producto",
+         "dloc_flujo_producto"
+        ],
+        "dimensiones": [
+         "Producto"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         6
+        ]
+       },
+       {
+        "grupo": 3,
+        "variables": [
+         "jarczyk_success_rate_producto",
+         "process_performance_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         4
+        ]
+       },
+       {
+        "grupo": 4,
+        "variables": [
+         "mttr_producto",
+         "nci_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         5
+        ]
+       },
+       {
+        "grupo": 9,
+        "variables": [
+         "disc_centrality_mediana"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": []
+       },
+       {
+        "grupo": 2,
+        "variables": [
+         "prop_comentan_ratio"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         3
+        ]
+       }
+      ]
+     },
+     "pca": {
+      "k": 6,
+      "silueta": 0.3013,
+      "nula_p95": 0.0488,
+      "ari_pca": 0.9383,
+      "estabilidad": {
+       "mediana": 0.7616834909227659,
+       "p05": 0.4499496290869127,
+       "largo_bloque": 14
+      },
+      "grupos": [
+       {
+        "grupo": 3,
+        "variables": [
+         "cdiv_mediana",
+         "dev_exp_mediana",
+         "le_mediana",
+         "le_producto",
+         "prop_commitean_ratio",
+         "rexp_mediana",
+         "tasa_nuevos_commits_ratio"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         1
+        ]
+       },
+       {
+        "grupo": 5,
+        "variables": [
+         "cdiv_p90",
+         "exprev_share_top10pct",
+         "nc_share_top10pct",
+         "sc_p90",
+         "sc_share_top10pct"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         2
+        ]
+       },
+       {
+        "grupo": 2,
+        "variables": [
+         "jarczyk_success_rate_producto",
+         "mttr_producto",
+         "nci_producto",
+         "process_performance_producto"
+        ],
+        "dimensiones": [
+         "Proceso"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         4,
+         5
+        ]
+       },
+       {
+        "grupo": 1,
+        "variables": [
+         "cfdr_producto",
+         "nub_producto",
+         "prop_comentan_ratio"
+        ],
+        "dimensiones": [
+         "Persona",
+         "Producto"
+        ],
+        "mixto": true,
+        "componentes_pca": [
+         3
+        ]
+       },
+       {
+        "grupo": 4,
+        "variables": [
+         "commits_doc_producto",
+         "dloc_flujo_producto"
+        ],
+        "dimensiones": [
+         "Producto"
+        ],
+        "mixto": false,
+        "componentes_pca": [
+         6
+        ]
+       },
+       {
+        "grupo": 6,
+        "variables": [
+         "disc_centrality_mediana"
+        ],
+        "dimensiones": [
+         "Persona"
+        ],
+        "mixto": false,
+        "componentes_pca": []
+       }
+      ]
+     }
+    }
+   }
+  }
+ }
+}
