@@ -83,8 +83,10 @@ VENTANA_LOCAL        = 21    # releases por grado de libertad del spline de tend
 
 # Pares de métricas cuya definición se solapa, además de las reglas de
 # es_solapamiento_definicion: DLOC cuenta las líneas de los README.md que evalúa
-# README Completeness; cada bug abierto (CFDR/NUB) es una issue abierta (NOI).
-SOLAPAMIENTO_METRICAS = {frozenset({"dloc", "rc"}), frozenset({"noi", "cfdr"}), frozenset({"noi", "nub"})}
+# README Completeness; cada bug abierto (CFDR/NUB) es una issue abierta (NOI); CFDR y NUB cuentan
+# las mismas issues (etiquetadas como bug y reportadas por alguien de fuera del equipo principal).
+SOLAPAMIENTO_METRICAS = {frozenset({"dloc", "rc"}), frozenset({"noi", "cfdr"}), frozenset({"noi", "nub"}),
+                         frozenset({"cfdr", "nub"})}
 ADVERTENCIA_DLOC = ("DLOC no cuenta archivos .mdx: la documentación oficial (docs/) pasó de .md a .mdx "
                     "en 2023 (v13.4 → v14.0) y desde entonces no se cuenta")
 

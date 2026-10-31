@@ -51,7 +51,6 @@ import tres_dimensiones as td  # noqa: E402
 SALIDA = corr.ROOT / "analisis" / "salidas" / "relaciones"
 BASE = SALIDA / "base"
 DIMS = ("Persona", "Proceso", "Producto")
-MISMA_MEDIDA = 0.99   # dos métricas con |ρ| ≥ 0,99 miden lo mismo (CFDR y NUB): no es una relación entre aspectos
 PARES_DIM = [("Persona", "Proceso"), ("Persona", "Producto"), ("Proceso", "Producto")]
 # descartados al validar (recalculando las variables sin los datos que podían fabricar la relación)
 DESCARTADOS = {
@@ -118,8 +117,7 @@ def clasificar(var_dict):
         dx, dy = dims_de(var_dict[x]), dims_de(var_dict[y])
         entre, dentro = lecturas(dx, dy)
         validacion = DESCARTADOS.get(frozenset((x, y)), "")
-        misma_medida = not np.isnan(rho) and abs(rho) >= MISMA_MEDIDA
-        patron = pasa and not con_tamano and not validacion and not misma_medida
+        patron = pasa and not con_tamano and not validacion
         tipo = ("entre dimensiones" if entre and not dentro else "entre y dentro" if entre else "dentro")
         motivo = ("control" if k in control else "" if pasa and not con_tamano else
                   "escala" if pasa and con_tamano else
@@ -127,8 +125,6 @@ def clasificar(var_dict):
                   "no robusto" if not robusta else "mecánico" if r["solapamiento_definicion"] == "True" else "no resiste tamaño")
         if pasa and not con_tamano and validacion:
             motivo = "descartado al validar: " + validacion
-        if pasa and not con_tamano and misma_medida:
-            motivo = "misma medida"
         filas.append(dict(par_id=k, x=x, y=y, x_nombre=r["x_nombre"], y_nombre=r["y_nombre"], dims_x="+".join(dx), dims_y="+".join(dy),
                           rho=rho, q=p_fdr, categoria=cat, fuerza=fuerza, rho_canary=num(r["rho_canary"]),
                           rho_tamano=num(r["rho_corregida_tamano"]), rho_2016_2019=num(r["rho_2016_2019"]), rho_2020_2022=num(r["rho_2020_2022"]),
