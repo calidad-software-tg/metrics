@@ -1,0 +1,17 @@
+par_id,x_nombre,y_nombre,rho_corregida,componentes_x,componentes_y,par_componentes_robusto,triangulado
+dev_exp_mediana__anmcc_mediana,dev_exp (Development Experience) [mediana],ANMCC (Avg Modified Components per Commit) [mediana],0.3839,CP1,,,False
+dev_exp_mediana__mttr_mediana,dev_exp (Development Experience) [mediana],MTTR (Mean Time to Repair) [mediana],-0.2277,CP1,,,False
+exprev_p90__cfdr_producto,EXPRev (Code Review Experience) [p90],CFDR (Customer Found Defects & Regressions) [producto],-0.2786,,CP1,,False
+exprev_p90__nub_producto,EXPRev (Code Review Experience) [p90],NUB (Bugs Detected by Users) [producto],-0.274,,CP1,,False
+exprev_p90__process_performance_producto,EXPRev (Code Review Experience) [p90],Process Performance [producto],0.2206,,CP2,,False
+exprev_share_top10pct__mttr_producto,EXPRev (Code Review Experience) [share_top10pct],MTTR (Mean Time to Repair) [producto],0.2002,CP3,CP5,,False
+le_mediana__anmcc_mediana,LE (Learning Ease) [mediana],ANMCC (Avg Modified Components per Commit) [mediana],0.4793,CP1,,,False
+nc_share_top10pct__nci_p90,NC (Number of Comments) [share_top10pct],NCI (Number of Closed Issues) [p90],0.2898,CP3,,,False
+prop_cierran_ratio__jarczyk_success_rate_producto,Proporción que cierra issues [ratio],Jarczyk Success Rate [producto],0.2266,,CP2,,False
+prop_cierran_ratio__process_performance_producto,Proporción que cierra issues [ratio],Process Performance [producto],0.2273,,CP2,,False
+prop_comentan_ratio__anmcc_producto,Proporción que comenta [ratio],ANMCC (Avg Modified Components per Commit) [producto],0.1721,,,,False
+rexprev_mediana__cfdr_producto,REXPRev (Recent Review Experience) [mediana],CFDR (Customer Found Defects & Regressions) [producto],-0.3138,,CP1,,False
+rexprev_mediana__nub_producto,REXPRev (Recent Review Experience) [mediana],NUB (Bugs Detected by Users) [producto],-0.3107,,CP1,,False
+sc_mediana__jarczyk_success_rate_producto,SC (Social Contribution) [mediana],Jarczyk Success Rate [producto],0.3282,,CP2,,False
+tasa_nuevos_commits_ratio__cfdr_producto,Tasa de ingreso (commits) [ratio],CFDR (Customer Found Defects & Regressions) [producto],0.2353,CP1,CP1,,False
+tasa_nuevos_commits_ratio__nub_producto,Tasa de ingreso (commits) [ratio],NUB (Bugs Detected by Users) [producto],0.235,CP1,CP1,,False

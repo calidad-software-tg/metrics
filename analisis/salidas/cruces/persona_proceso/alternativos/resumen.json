@@ -1,0 +1,210 @@
+{
+ "cca": {
+  "filas": [
+   {
+    "conjunto": "todas las variables",
+    "variables_a": 28,
+    "variables_b": 16,
+    "n": 184,
+    "r1": 0.9123101447030966,
+    "r2": 0.8704262236865378,
+    "nula_p50": 0.6572048484833484,
+    "nula_p95": 0.6988548865660836,
+    "p": 0.004975124378109453,
+    "canary_r1": 0.8155532965179426,
+    "arman_a": "",
+    "arman_b": ""
+   },
+   {
+    "conjunto": "sin escala ni definiciones superpuestas",
+    "variables_a": 19,
+    "variables_b": 16,
+    "n": 184,
+    "r1": 0.7960196110020343,
+    "r2": 0.6879883222973117,
+    "nula_p50": 0.6094553910670748,
+    "nula_p95": 0.6626062884564309,
+    "p": 0.004975124378109453,
+    "canary_r1": 0.5835455102860104,
+    "arman_a": "prop_cierran_ratio (0.82), exprev_share_top10pct (0.52), nc_share_top10pct (0.47), tasa_nuevos_commits_ratio (0.41), sc_p90 (0.35)",
+    "arman_b": "anmcc_mediana (0.53), nci_producto (0.38), jarczyk_success_rate_producto (0.31), cfdr_producto (0.28)"
+   },
+   {
+    "conjunto": "componentes firmes",
+    "variables_a": 3,
+    "variables_b": 3,
+    "n": 185,
+    "r1": 0.5859867013953018,
+    "r2": 0.329036956146987,
+    "nula_p50": 0.2256367995406509,
+    "nula_p95": 0.3292931792424749,
+    "p": 0.004975124378109453,
+    "canary_r1": 0.5099811166014456
+   }
+  ],
+  "aporta": true
+ },
+ "reglas": {
+  "reglas": 2003,
+  "fuertes": 687,
+  "nula_p50": 64.5,
+  "nula_p95": 150.2,
+  "p": 0.0196078431372549,
+  "ya_significativas": 291,
+  "nuevas_que_replican": 3,
+  "ejemplos_nuevas": [
+   "EXPRev (Code Review Experience) [share_top10pct] alto → NCI (Number of Closed Issues) [p90] alto",
+   "SS (Skill Similarity) [mediana] alto → NOI (Number of Open Issues) [producto] bajo",
+   "Proporción que comenta [ratio] alto → NOI (Number of Open Issues) [producto] bajo"
+  ],
+  "aporta": true
+ },
+ "clustering_releases": {
+  "mejor_ajustado": {
+   "enfoque": "ajustado",
+   "k": 2,
+   "silueta": 0.10111861354545536,
+   "nula_p95": 0.05248986183082506,
+   "p": 0.0196078431372549,
+   "estabilidad_ari": 0.5119952069297662,
+   "v_cramer_periodo": 0.12055988306500139,
+   "tamanos": "96/88"
+  },
+  "mejor_crudo": {
+   "enfoque": "crudo",
+   "k": 2,
+   "silueta": 0.257723366520454,
+   "nula_p95": 0.14346894263311835,
+   "p": 0.0196078431372549,
+   "estabilidad_ari": 0.8936803441082654,
+   "v_cramer_periodo": 0.6872663942241758,
+   "tamanos": "86/98"
+  },
+  "aporta": false
+ },
+ "clustering_metricas": {
+  "filas": [
+   {
+    "k": 6,
+    "ari_con_pca": 0.12965234640079346,
+    "estabilidad_ari": 0.49284323829153787,
+    "grupos_que_mezclan_dimensiones": 3,
+    "grupos": "prop_comentan_ratio, nob_42_producto, noi_producto, rc_mediana, rc_producto, wp_producto | activos_commits_conteo, cdiv_mediana, cdiv_p90, cdiv_share_top10pct, dev_exp_mediana, le_mediana, nuevos_commits_conteo, rexp_mediana, tasa_nuevos_commits_ratio, anmcc_mediana, anmcc_producto | activos_cierre_conteo, activos_comentarios_conteo, activos_interaccion_conteo, disc_centrality_mediana, exprev_p90, exprev_share_top10pct, nc_p90, nc_share_top10pct, nuevos_interaccion_conteo, prop_cierran_ratio, prop_commitean_ratio, rexprev_mediana, sc_mediana, sc_p90, sc_share_top10pct, tasa_nuevos_interaccion_ratio, cfdr_producto, jarczyk_success_rate_producto, nci_producto, nci_share_top10pct, nub_producto, process_performance_producto | mttr_mediana, mttr_producto, nci_p90"
+   },
+   {
+    "k": 8,
+    "ari_con_pca": 0.18636396065033176,
+    "estabilidad_ari": 0.707871966321521,
+    "grupos_que_mezclan_dimensiones": 4,
+    "grupos": "prop_comentan_ratio, noi_producto, rc_mediana, rc_producto | nob_42_producto, wp_producto | activos_commits_conteo, cdiv_mediana, cdiv_p90, cdiv_share_top10pct, dev_exp_mediana, le_mediana, nuevos_commits_conteo, rexp_mediana, tasa_nuevos_commits_ratio, anmcc_mediana, anmcc_producto | sc_mediana, jarczyk_success_rate_producto, process_performance_producto | activos_cierre_conteo, activos_comentarios_conteo, activos_interaccion_conteo, disc_centrality_mediana, exprev_p90, exprev_share_top10pct, nc_p90, nc_share_top10pct, nuevos_interaccion_conteo, prop_cierran_ratio, prop_commitean_ratio, rexprev_mediana, sc_p90, sc_share_top10pct, tasa_nuevos_interaccion_ratio, cfdr_producto, nci_producto, nci_share_top10pct, nub_producto | mttr_mediana, mttr_producto, nci_p90"
+   },
+   {
+    "k": 10,
+    "ari_con_pca": 0.31314598103698643,
+    "estabilidad_ari": 0.47972914992706084,
+    "grupos_que_mezclan_dimensiones": 4,
+    "grupos": "prop_comentan_ratio, noi_producto, rc_mediana, rc_producto | nob_42_producto, wp_producto | activos_commits_conteo, cdiv_mediana, cdiv_p90, cdiv_share_top10pct, dev_exp_mediana, le_mediana, nuevos_commits_conteo, rexp_mediana, tasa_nuevos_commits_ratio, anmcc_mediana, anmcc_producto | sc_mediana, jarczyk_success_rate_producto, process_performance_producto | disc_centrality_mediana, tasa_nuevos_interaccion_ratio | activos_cierre_conteo, activos_comentarios_conteo, activos_interaccion_conteo, nuevos_interaccion_conteo, cfdr_producto, nci_producto, nci_share_top10pct, nub_producto | exprev_p90, exprev_share_top10pct, nc_p90, nc_share_top10pct, prop_cierran_ratio, prop_commitean_ratio, rexprev_mediana, sc_p90, sc_share_top10pct | mttr_mediana, mttr_producto, nci_p90"
+   }
+  ],
+  "componentes_referencia": 6,
+  "aporta": false
+ },
+ "regresion_sin_tamano": [
+  "cfdr_producto",
+  "nci_producto",
+  "nub_producto"
+ ],
+ "rf_sin_tamano": [
+  "jarczyk_success_rate_producto",
+  "nci_producto"
+ ],
+ "regresion": {
+  "predecibles": [],
+  "aporta": false
+ },
+ "random_forest": {
+  "mejor_que_lineal": [
+   "jarczyk_success_rate_producto",
+   "nci_producto"
+  ],
+  "aporta": true
+ },
+ "informacion_mutua": {
+  "pares": 448,
+  "significativos": 49,
+  "tambien_spearman": 32,
+  "nuevos": 8,
+  "nuevos_que_replican": 2,
+  "descartados_por_pocos_valores": 8,
+  "ejemplos": [
+   "Proporción que cierra issues [ratio] ↔ NCI (Number of Closed Issues) [producto] (MI 0.084, ρ +0.33)",
+   "REXP (Recent Experience) [mediana] ↔ NCI (Number of Closed Issues) [share_top10pct] (MI 0.070, ρ -0.21)"
+  ],
+  "aporta": true
+ },
+ "datos": {
+  "dim_a": "Persona",
+  "dim_b": "Proceso",
+  "variables_a": [
+   "activos_cierre_conteo",
+   "activos_comentarios_conteo",
+   "activos_commits_conteo",
+   "activos_interaccion_conteo",
+   "cd_mediana",
+   "cdiv_mediana",
+   "cdiv_p90",
+   "cdiv_share_top10pct",
+   "dev_exp_mediana",
+   "disc_centrality_mediana",
+   "exprev_p90",
+   "exprev_share_top10pct",
+   "le_mediana",
+   "nc_p90",
+   "nc_share_top10pct",
+   "nuevos_commits_conteo",
+   "nuevos_interaccion_conteo",
+   "prop_cierran_ratio",
+   "prop_comentan_ratio",
+   "prop_commitean_ratio",
+   "rexp_mediana",
+   "rexprev_mediana",
+   "sc_mediana",
+   "sc_p90",
+   "sc_share_top10pct",
+   "ss_mediana",
+   "tasa_nuevos_commits_ratio",
+   "tasa_nuevos_interaccion_ratio"
+  ],
+  "variables_b": [
+   "anmcc_mediana",
+   "anmcc_producto",
+   "cfdr_producto",
+   "jarczyk_success_rate_producto",
+   "mttr_mediana",
+   "mttr_producto",
+   "nci_p90",
+   "nci_producto",
+   "nci_share_top10pct",
+   "nob_42_producto",
+   "noi_producto",
+   "nub_producto",
+   "process_performance_producto",
+   "rc_mediana",
+   "rc_producto",
+   "wp_producto"
+  ],
+  "fuera": [
+   [
+    "dis_mediana",
+    "cobertura 132/271"
+   ],
+   [
+    "dis_producto",
+    "cobertura 132/271"
+   ]
+  ],
+  "releases": 184,
+  "releases_canary": 1593,
+  "permutaciones": 200
+ }
+}
