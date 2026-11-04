@@ -59,8 +59,22 @@ DESCARTADOS = {
     frozenset(("dev_exp_mediana", "anmcc_mediana")): "sin los recién llegados",
     frozenset(("cdiv_mediana", "commits_doc_producto")): "sin los commits que solo tocan documentación",
     frozenset(("anmcc_mediana", "commits_doc_producto")): "sin los commits que solo tocan documentación",
-    frozenset(("tasa_nuevos_commits_ratio", "le_producto")): "construcción de LE (los recién llegados)",
-    frozenset(("prop_commitean_ratio", "le_producto")): "construcción de LE (los recién llegados)",
+    # validaciones/le_producto_sin_recien_llegados.py: LE del proyecto sin los recién llegados; con la tasa de ingreso
+    # desaparece (-0,26 → +0,08), con la proporción que commitea se mantiene (-0,29 → -0,20) y no se descarta
+    frozenset(("tasa_nuevos_commits_ratio", "le_producto")): "sin los recién llegados",
+    # validaciones/experiencia_ingreso_sin_recien_llegados.py: las medianas de experiencia con la tasa de ingreso y
+    # entre sí desaparecen sin los recién llegados (con la proporción que commitea, LE y dev_exp se mantienen)
+    frozenset(("le_mediana", "tasa_nuevos_commits_ratio")): "sin los recién llegados",
+    frozenset(("dev_exp_mediana", "tasa_nuevos_commits_ratio")): "sin los recién llegados",
+    frozenset(("cdiv_mediana", "tasa_nuevos_commits_ratio")): "sin los recién llegados",
+    frozenset(("rexp_mediana", "tasa_nuevos_commits_ratio")): "sin los recién llegados",
+    frozenset(("cdiv_mediana", "le_mediana")): "sin los recién llegados",
+    frozenset(("cdiv_mediana", "dev_exp_mediana")): "sin los recién llegados",
+    frozenset(("le_mediana", "rexp_mediana")): "sin los recién llegados",
+    # validaciones/nci_sin_issues_del_release.py: la mitad de los cierres son issues abiertas en el mismo release, que
+    # también cuentan Jarczyk y Process Performance (con NCI sin ellas: +0,39 → +0,15 y +0,28 → +0,08)
+    frozenset(("nci_producto", "jarczyk_success_rate_producto")): "sin las issues abiertas y cerradas en el mismo release",
+    frozenset(("nci_producto", "process_performance_producto")): "sin las issues abiertas y cerradas en el mismo release",
 }
 
 

@@ -1,7 +1,7 @@
 variable_id,nombre_legible,metrica_id,nivel,estadistico,dim_persona,dim_proceso,dim_producto,dim_persona_por_nivel,dims_texto,familia,n_estable,n_canary,pct_moda,rho_tiempo,rho_duracion,incluida,motivo_exclusion,advertencia
 anmcc_producto,ANMCC (Avg Modified Components per Commit) [producto],anmcc,producto,valor,0,1,1,0,Proceso+Producto,,271,3643,0.7,0.652,0.023,sí,,
 cd_producto,CD (Comment Density) [producto],cd,producto,valor,0,0,1,0,Producto,,271,3785,1.8,0.442,-0.085,sí,,
-cfdr_producto,CFDR (Customer Found Defects & Regressions) [producto],cfdr,producto,valor,0,1,1,0,Proceso+Producto,,190,2288,2.6,-0.350,0.700,sí,,Solo releases desde mediados de 2020 — antes el repo no clasificaba bugs
+cfdr_producto,CFDR (Customer Found Defects & Regressions) [producto],cfdr,producto,valor,0,1,1,0,Proceso+Producto,,190,2288,2.6,-0.350,0.700,sí,,Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs
 commits_doc_producto,Commits que tocan documentación (proporción) [producto],commits_doc,producto,valor,0,0,1,0,Producto,,271,3643,3.7,0.253,0.089,sí,,
 dis_producto,DIS (Doc Issue Survival) [producto],dis,producto,valor,0,1,0,0,Proceso,,132,529,16.7,0.360,0.277,sí,,DIS: posible falso positivo por etiquetas que contienen 'doc' (ej. 'Docker') debido a match de subcadena en _DOC_KEYWORDS
 dloc_producto,DLOC (Documentation Lines of Code) [producto],dloc,producto,valor,0,0,1,0,Producto,,271,3785,1.8,0.977,-0.158,sí,,
@@ -17,7 +17,7 @@ nci_con_bots_producto,NCI con bots [producto],nci_con_bots,producto,valor,0,1,0,
 nob_42_producto,NOB (branches activas con PR abierto) [producto],nob_42,producto,valor,0,1,1,0,Proceso+Producto,,271,3785,18.8,0.924,-0.184,sí,,
 noi_producto,NOI (Number of Open Issues) [producto],noi,producto,valor,0,1,1,0,Proceso+Producto,,271,3785,0.7,0.866,-0.130,sí,,
 noi_28_producto,noi_28 [producto],noi_28,producto,valor,0,0,0,0,Sin dimensión,,271,3785,0.7,0.866,-0.130,no,idéntica a noi (misma descarga y mismo cálculo),
-nub_producto,NUB (Bugs Detected by Users) [producto],nub,producto,valor,0,1,1,0,Proceso+Producto,,190,2288,3.2,-0.351,0.701,sí,,NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs (substring match en _KEYWORDS_BUG); solo releases desde mediados de 2020 — antes el repo no clasificaba bugs
+nub_producto,NUB (Bugs Detected by Users) [producto],nub,producto,valor,0,1,1,0,Proceso+Producto,,190,2288,3.2,-0.351,0.701,sí,,NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs (substring match en _KEYWORDS_BUG); solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs
 process_performance_producto,Process Performance [producto],process_performance,producto,valor,0,1,0,0,Proceso,,271,3123,1.8,-0.850,0.135,sí,,
 rc_producto,RC (Readme Completeness) [producto],rc,producto,valor,0,1,1,0,Proceso+Producto,,267,3768,60.3,0.189,-0.081,sí,,
 schedule_compliance_producto,Schedule Compliance [producto],schedule_compliance,producto,valor,0,1,0,0,Proceso,,15,22,46.7,-0.230,-0.128,no,n_estable=15 < 30,
