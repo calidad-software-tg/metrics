@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="651.234537pt" height="225.200288pt" viewBox="0 0 651.234537 225.200288" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-04T20:39:58.989288</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 225.200288 
+L 651.234538 225.200288 
+L 651.234538 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 116.693077 30.415317 
+L 467.675077 30.415317 
+L 467.675077 19.895328 
+L 116.693077 19.895328 
+z
+" clip-path="url(#p922b5ee1ce)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 239.004987 47.383042 
+L 345.363168 47.383042 
+L 345.363168 36.863053 
+L 239.004987 36.863053 
+z
+" clip-path="url(#p922b5ee1ce)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 244.322896 64.350767 
+L 340.045259 64.350767 
+L 340.045259 53.830778 
+L 244.322896 53.830778 
+z
+" clip-path="url(#p922b5ee1ce)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 265.594532 81.318492 
+L 318.773623 81.318492 
+L 318.773623 70.798503 
+L 265.594532 70.798503 
+z
+" clip-path="url(#p922b5ee1ce)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 270.912441 98.286217 
+L 313.455714 98.286217 
+L 313.455714 87.766228 
+L 270.912441 87.766228 
+z
+" clip-path="url(#p922b5ee1ce)" style="fill: #e34948"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="27.317432" transform="rotate(-0 109.673437 27.317432)">Evaluados</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="27.172588" transform="rotate(-0 292.184077 27.172588)">33</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="35.55356" transform="rotate(-0 478.204538 35.55356)">−23 no significativos</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="44.276719" transform="rotate(-0 109.673437 44.276719)">Significativos</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="44.140313" transform="rotate(-0 292.184077 44.140313)">10</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="52.528785" transform="rotate(-0 478.204538 52.528785)">−1 no robustos</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="61.252882" transform="rotate(-0 109.673437 61.252882)">Robustos</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="61.108038" transform="rotate(-0 292.184077 61.108038)">9</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="69.49651" transform="rotate(-0 478.204538 69.49651)">−2 de escala, −2 mecánicos</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="78.220607" transform="rotate(-0 109.673437 78.220607)">Patrones</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="78.075763" transform="rotate(-0 292.184077 78.075763)">5</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="86.464235" transform="rotate(-0 478.204538 86.464235)">−1 del mismo aspecto</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="95.188332" transform="rotate(-0 109.673437 95.188332)">Entre aspectos distintos</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="95.043488" transform="rotate(-0 292.184077 95.043488)">4</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="11.398477" y="8.974687" transform="rotate(-0 11.398477 8.974687)">Componentes del PCA</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_7">
+    <path d="M 116.693077 149.528747 
+L 467.675077 149.528747 
+L 467.675077 139.008758 
+L 116.693077 139.008758 
+z
+" clip-path="url(#pa42f927aac)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 241.642669 166.496472 
+L 342.725485 166.496472 
+L 342.725485 155.976483 
+L 241.642669 155.976483 
+z
+" clip-path="url(#pa42f927aac)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 255.681949 183.464197 
+L 328.686205 183.464197 
+L 328.686205 172.944208 
+L 255.681949 172.944208 
+z
+" clip-path="url(#pa42f927aac)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 268.317301 200.431922 
+L 316.050854 200.431922 
+L 316.050854 189.911933 
+L 268.317301 189.911933 
+z
+" clip-path="url(#pa42f927aac)" style="fill: #3a3a3a"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 271.125158 217.399647 
+L 313.242998 217.399647 
+L 313.242998 206.879658 
+L 271.125158 206.879658 
+z
+" clip-path="url(#pa42f927aac)" style="fill: #e34948"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="146.430862" transform="rotate(-0 109.673437 146.430862)">Evaluados (+6 no evaluables)</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="146.286018" transform="rotate(-0 292.184077 146.286018)">125</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="154.66699" transform="rotate(-0 478.204538 154.66699)">−89 no significativos</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="163.390149" transform="rotate(-0 109.673437 163.390149)">Significativos</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="163.253743" transform="rotate(-0 292.184077 163.253743)">36</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="171.642215" transform="rotate(-0 478.204538 171.642215)">−10 no robustos</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="180.366312" transform="rotate(-0 109.673437 180.366312)">Robustos</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="180.221468" transform="rotate(-0 292.184077 180.221468)">26</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="188.60994" transform="rotate(-0 478.204538 188.60994)">−4 de escala, −3 mecánicos, −2 no resisten el tamaño</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="197.334037" transform="rotate(-0 109.673437 197.334037)">Patrones</text>
+   </g>
+   <g id="text_26">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="292.184077" y="197.189193" transform="rotate(-0 292.184077 197.189193)">17</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #6b6b6b" x="478.204538" y="205.577665" transform="rotate(-0 478.204538 205.577665)">−2 del mismo aspecto</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="109.673437" y="214.301762" transform="rotate(-0 109.673437 214.301762)">Entre aspectos distintos</text>
+   </g>
+   <g id="text_29">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="317.454781" y="214.156918" transform="rotate(-0 317.454781 214.156918)">15</text>
+   </g>
+   <g id="text_30">
+    <text style="font-weight: 700; font-size: 9px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="11.398477" y="128.088117" transform="rotate(-0 11.398477 128.088117)">Grupos del clustering</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p922b5ee1ce">
+   <rect x="116.693077" y="14.974687" width="350.982" height="88.23217"/>
+  </clipPath>
+  <clipPath id="pa42f927aac">
+   <rect x="116.693077" y="134.088117" width="350.982" height="88.23217"/>
+  </clipPath>
+ </defs>
+</svg>

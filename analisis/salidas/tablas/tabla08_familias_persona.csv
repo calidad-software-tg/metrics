@@ -1,0 +1,7 @@
+familia,nombre,patrones,rho,entre,no_son_patron_en_los_datos
+A,Participación en el código y concentración del núcleo,5,"+0,25 a +0,47",Persona–Proceso,
+B,Participación en el cierre de issues y revisores más activos,4,"+0,25 a +0,31",Persona–Proceso,
+C,Participación en el código y experiencia de quienes commitean,2,"−0,33 y −0,30",Persona–Proceso; Persona–Producto,
+D,Medidas de la concentración del núcleo entre sí,5,"+0,19 a +0,47",Persona–Proceso,
+E,Medidas de la experiencia entre sí,1,"+0,44",Persona–Proceso,
+F,Diversidad de los más activos y experiencia,2,"−0,29 y +0,24",Persona–Proceso,

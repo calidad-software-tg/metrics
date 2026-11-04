@@ -1,0 +1,8 @@
+familia,nombre,patrones,rho,entre,no_son_patron_en_los_datos
+O,Concentración del núcleo y documentación,5,"+0,20 a +0,29",Persona–Producto; Persona–Producto; Proceso–Producto,
+P,Participación en el cierre de issues y resolución de lo nuevo,2,"+0,23 y +0,23",Persona–Proceso,
+Q,Ingreso de nuevos contribuyentes y bugs reportados,2,"+0,23 y +0,24",Persona–Proceso; Persona–Producto,
+R,"Learning Ease del proyecto, participación en el código y concentración del núcleo",3,"−0,22 a −0,20",Persona–Producto; Proceso–Producto,LE del proyecto ↔ Proporción que commitea (descartado al validar: construcción de LE (los recién llegados))
+S,Documentación y cierre de issues,1,"+0,22",Proceso–Producto,
+T,Documentación por colaborador y participación en el cierre de issues,1,"−0,20",Persona–Producto,
+U,Tamaño de los cambios y participación en la discusión,1,"+0,17",Persona–Proceso; Persona–Producto,

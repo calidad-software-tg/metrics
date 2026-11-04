@@ -1,0 +1,1103 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="395.370501pt" height="372.968188pt" viewBox="0 0 395.370501 372.968188" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-04T20:39:56.554986</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 372.968188 
+L 395.370501 372.968188 
+L 395.370501 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 177.263796 104.381877 
+L 204.504027 104.381877 
+L 204.504027 77.141646 
+L 177.263796 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #7ca9df; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 204.504027 104.381877 
+L 231.744258 104.381877 
+L 231.744258 77.141646 
+L 204.504027 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #edcbc9; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 231.744258 104.381877 
+L 258.984488 104.381877 
+L 258.984488 77.141646 
+L 231.744258 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #ecb6b4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 232.833867 103.292267 
+L 257.894879 103.292267 
+L 257.894879 78.231255 
+L 232.833867 78.231255 
+L 232.833867 103.292267 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 258.984488 104.381877 
+L 286.224719 104.381877 
+L 286.224719 77.141646 
+L 258.984488 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #d0dce8; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 286.224719 104.381877 
+L 313.46495 104.381877 
+L 313.46495 77.141646 
+L 286.224719 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed4d2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 313.46495 104.381877 
+L 340.705181 104.381877 
+L 340.705181 77.141646 
+L 313.46495 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #659bdd; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 340.705181 104.381877 
+L 367.945412 104.381877 
+L 367.945412 77.141646 
+L 340.705181 77.141646 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe4e1; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 177.263796 131.622107 
+L 204.504027 131.622107 
+L 204.504027 104.381877 
+L 177.263796 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #acc6e4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 204.504027 131.622107 
+L 231.744258 131.622107 
+L 231.744258 104.381877 
+L 204.504027 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed4d2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 231.744258 131.622107 
+L 258.984488 131.622107 
+L 258.984488 104.381877 
+L 231.744258 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed6d3; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 258.984488 131.622107 
+L 286.224719 131.622107 
+L 286.224719 104.381877 
+L 258.984488 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe7e4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 286.224719 131.622107 
+L 313.46495 131.622107 
+L 313.46495 104.381877 
+L 286.224719 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e77c7a; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 313.46495 131.622107 
+L 340.705181 131.622107 
+L 340.705181 104.381877 
+L 313.46495 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #c2d3e7; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 340.705181 131.622107 
+L 367.945412 131.622107 
+L 367.945412 104.381877 
+L 340.705181 104.381877 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #d5dfe9; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 177.263796 158.862338 
+L 204.504027 158.862338 
+L 204.504027 131.622107 
+L 177.263796 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e4e8eb; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 204.504027 158.862338 
+L 231.744258 158.862338 
+L 231.744258 131.622107 
+L 204.504027 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe5e2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 231.744258 158.862338 
+L 258.984488 158.862338 
+L 258.984488 131.622107 
+L 231.744258 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #edcac7; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 258.984488 158.862338 
+L 286.224719 158.862338 
+L 286.224719 131.622107 
+L 258.984488 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe7e4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 286.224719 158.862338 
+L 313.46495 158.862338 
+L 313.46495 131.622107 
+L 286.224719 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #94b7e2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 287.314328 157.772729 
+L 312.375341 157.772729 
+L 312.375341 132.711717 
+L 287.314328 132.711717 
+L 287.314328 157.772729 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 313.46495 158.862338 
+L 340.705181 158.862338 
+L 340.705181 131.622107 
+L 313.46495 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e0e5ea; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_24">
+    <path d="M 340.705181 158.862338 
+L 367.945412 158.862338 
+L 367.945412 131.622107 
+L 340.705181 131.622107 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed6d3; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_25">
+    <path d="M 95.543104 186.102569 
+L 122.783335 186.102569 
+L 122.783335 158.862338 
+L 95.543104 158.862338 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #7ca9df; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_26">
+    <path d="M 122.783335 186.102569 
+L 150.023565 186.102569 
+L 150.023565 158.862338 
+L 122.783335 158.862338 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #acc6e4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_27">
+    <path d="M 150.023565 186.102569 
+L 177.263796 186.102569 
+L 177.263796 158.862338 
+L 150.023565 158.862338 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e4e8eb; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_28">
+    <path d="M 286.224719 186.102569 
+L 313.46495 186.102569 
+L 313.46495 158.862338 
+L 286.224719 158.862338 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #b3cae5; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_29">
+    <path d="M 313.46495 186.102569 
+L 340.705181 186.102569 
+L 340.705181 158.862338 
+L 313.46495 158.862338 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e99795; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_30">
+    <path d="M 340.705181 186.102569 
+L 367.945412 186.102569 
+L 367.945412 158.862338 
+L 340.705181 158.862338 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #ebeceb; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_31">
+    <path d="M 95.543104 213.3428 
+L 122.783335 213.3428 
+L 122.783335 186.102569 
+L 95.543104 186.102569 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #edcbc9; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_32">
+    <path d="M 122.783335 213.3428 
+L 150.023565 213.3428 
+L 150.023565 186.102569 
+L 122.783335 186.102569 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed4d2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_33">
+    <path d="M 150.023565 213.3428 
+L 177.263796 213.3428 
+L 177.263796 186.102569 
+L 150.023565 186.102569 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe5e2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_34">
+    <path d="M 286.224719 213.3428 
+L 313.46495 213.3428 
+L 313.46495 186.102569 
+L 286.224719 186.102569 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed0ce; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_35">
+    <path d="M 313.46495 213.3428 
+L 340.705181 213.3428 
+L 340.705181 186.102569 
+L 313.46495 186.102569 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #d0dce8; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_36">
+    <path d="M 340.705181 213.3428 
+L 367.945412 213.3428 
+L 367.945412 186.102569 
+L 340.705181 186.102569 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #b3cae5; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_37">
+    <path d="M 341.79479 212.25319 
+L 366.855802 212.25319 
+L 366.855802 187.192178 
+L 341.79479 187.192178 
+L 341.79479 212.25319 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_38">
+    <path d="M 95.543104 240.58303 
+L 122.783335 240.58303 
+L 122.783335 213.3428 
+L 95.543104 213.3428 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #ecb6b4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_39">
+    <path d="M 96.632713 239.493421 
+L 121.693725 239.493421 
+L 121.693725 214.432409 
+L 96.632713 214.432409 
+L 96.632713 239.493421 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_40">
+    <path d="M 122.783335 240.58303 
+L 150.023565 240.58303 
+L 150.023565 213.3428 
+L 122.783335 213.3428 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed6d3; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_41">
+    <path d="M 150.023565 240.58303 
+L 177.263796 240.58303 
+L 177.263796 213.3428 
+L 150.023565 213.3428 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #edcac7; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_42">
+    <path d="M 286.224719 240.58303 
+L 313.46495 240.58303 
+L 313.46495 213.3428 
+L 286.224719 213.3428 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe5e2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_43">
+    <path d="M 313.46495 240.58303 
+L 340.705181 240.58303 
+L 340.705181 213.3428 
+L 313.46495 213.3428 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #bacfe6; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_44">
+    <path d="M 314.554559 239.493421 
+L 339.615572 239.493421 
+L 339.615572 214.432409 
+L 314.554559 214.432409 
+L 314.554559 239.493421 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_45">
+    <path d="M 340.705181 240.58303 
+L 367.945412 240.58303 
+L 367.945412 213.3428 
+L 340.705181 213.3428 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #ecedec; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_46">
+    <path d="M 95.543104 267.823261 
+L 122.783335 267.823261 
+L 122.783335 240.58303 
+L 95.543104 240.58303 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #d0dce8; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_47">
+    <path d="M 122.783335 267.823261 
+L 150.023565 267.823261 
+L 150.023565 240.58303 
+L 122.783335 240.58303 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe7e4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_48">
+    <path d="M 150.023565 267.823261 
+L 177.263796 267.823261 
+L 177.263796 240.58303 
+L 150.023565 240.58303 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe7e4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_49">
+    <path d="M 286.224719 267.823261 
+L 313.46495 267.823261 
+L 313.46495 240.58303 
+L 286.224719 240.58303 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #dbe2ea; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_50">
+    <path d="M 313.46495 267.823261 
+L 340.705181 267.823261 
+L 340.705181 240.58303 
+L 313.46495 240.58303 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eeeeec; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_51">
+    <path d="M 340.705181 267.823261 
+L 367.945412 267.823261 
+L 367.945412 240.58303 
+L 340.705181 240.58303 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e6e9eb; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_52">
+    <path d="M 95.543104 295.063492 
+L 122.783335 295.063492 
+L 122.783335 267.823261 
+L 95.543104 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed4d2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_53">
+    <path d="M 122.783335 295.063492 
+L 150.023565 295.063492 
+L 150.023565 267.823261 
+L 122.783335 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e77c7a; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_54">
+    <path d="M 150.023565 295.063492 
+L 177.263796 295.063492 
+L 177.263796 267.823261 
+L 150.023565 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #94b7e2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_55">
+    <path d="M 151.113175 293.973883 
+L 176.174187 293.973883 
+L 176.174187 268.91287 
+L 151.113175 268.91287 
+L 151.113175 293.973883 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_56">
+    <path d="M 177.263796 295.063492 
+L 204.504027 295.063492 
+L 204.504027 267.823261 
+L 177.263796 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #b3cae5; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_57">
+    <path d="M 204.504027 295.063492 
+L 231.744258 295.063492 
+L 231.744258 267.823261 
+L 204.504027 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed0ce; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_58">
+    <path d="M 231.744258 295.063492 
+L 258.984488 295.063492 
+L 258.984488 267.823261 
+L 231.744258 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe5e2; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_59">
+    <path d="M 258.984488 295.063492 
+L 286.224719 295.063492 
+L 286.224719 267.823261 
+L 258.984488 267.823261 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #dbe2ea; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_60">
+    <path d="M 95.543104 322.303723 
+L 122.783335 322.303723 
+L 122.783335 295.063492 
+L 95.543104 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #659bdd; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_61">
+    <path d="M 122.783335 322.303723 
+L 150.023565 322.303723 
+L 150.023565 295.063492 
+L 122.783335 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #c2d3e7; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_62">
+    <path d="M 150.023565 322.303723 
+L 177.263796 322.303723 
+L 177.263796 295.063492 
+L 150.023565 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e0e5ea; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_63">
+    <path d="M 177.263796 322.303723 
+L 204.504027 322.303723 
+L 204.504027 295.063492 
+L 177.263796 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e99795; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_64">
+    <path d="M 204.504027 322.303723 
+L 231.744258 322.303723 
+L 231.744258 295.063492 
+L 204.504027 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #d0dce8; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_65">
+    <path d="M 231.744258 322.303723 
+L 258.984488 322.303723 
+L 258.984488 295.063492 
+L 231.744258 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #bacfe6; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_66">
+    <path d="M 232.833867 321.214114 
+L 257.894879 321.214114 
+L 257.894879 296.153101 
+L 232.833867 296.153101 
+L 232.833867 321.214114 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_67">
+    <path d="M 258.984488 322.303723 
+L 286.224719 322.303723 
+L 286.224719 295.063492 
+L 258.984488 295.063492 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eeeeec; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_68">
+    <path d="M 95.543104 349.543954 
+L 122.783335 349.543954 
+L 122.783335 322.303723 
+L 95.543104 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #efe4e1; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_69">
+    <path d="M 122.783335 349.543954 
+L 150.023565 349.543954 
+L 150.023565 322.303723 
+L 122.783335 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #d5dfe9; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_70">
+    <path d="M 150.023565 349.543954 
+L 177.263796 349.543954 
+L 177.263796 322.303723 
+L 150.023565 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #eed6d3; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_71">
+    <path d="M 177.263796 349.543954 
+L 204.504027 349.543954 
+L 204.504027 322.303723 
+L 177.263796 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #ebeceb; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_72">
+    <path d="M 204.504027 349.543954 
+L 231.744258 349.543954 
+L 231.744258 322.303723 
+L 204.504027 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #b3cae5; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_73">
+    <path d="M 205.593636 348.454344 
+L 230.654648 348.454344 
+L 230.654648 323.393332 
+L 205.593636 323.393332 
+L 205.593636 348.454344 
+z
+" clip-path="url(#p84b3f84945)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_74">
+    <path d="M 231.744258 349.543954 
+L 258.984488 349.543954 
+L 258.984488 322.303723 
+L 231.744258 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #ecedec; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_75">
+    <path d="M 258.984488 349.543954 
+L 286.224719 349.543954 
+L 286.224719 322.303723 
+L 258.984488 322.303723 
+z
+" clip-path="url(#p84b3f84945)" style="fill: #e6e9eb; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_76">
+    <path d="M 86.009023 104.381877 
+L 92.819081 104.381877 
+L 92.819081 77.141646 
+L 86.009023 77.141646 
+z
+" style="fill: #d9520b; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_77">
+    <path d="M 95.543104 74.417623 
+L 122.783335 74.417623 
+L 122.783335 67.607565 
+L 95.543104 67.607565 
+z
+" style="fill: #d9520b; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_78">
+    <path d="M 86.009023 131.622107 
+L 92.819081 131.622107 
+L 92.819081 104.381877 
+L 86.009023 104.381877 
+z
+" style="fill: #d9520b; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_79">
+    <path d="M 122.783335 74.417623 
+L 150.023565 74.417623 
+L 150.023565 67.607565 
+L 122.783335 67.607565 
+z
+" style="fill: #d9520b; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_80">
+    <path d="M 86.009023 158.862338 
+L 92.819081 158.862338 
+L 92.819081 131.622107 
+L 86.009023 131.622107 
+z
+" style="fill: #d9520b; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_81">
+    <path d="M 150.023565 74.417623 
+L 177.263796 74.417623 
+L 177.263796 67.607565 
+L 150.023565 67.607565 
+z
+" style="fill: #d9520b; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_82">
+    <path d="M 86.009023 186.102569 
+L 92.819081 186.102569 
+L 92.819081 158.862338 
+L 86.009023 158.862338 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_83">
+    <path d="M 177.263796 74.417623 
+L 204.504027 74.417623 
+L 204.504027 67.607565 
+L 177.263796 67.607565 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_84">
+    <path d="M 86.009023 213.3428 
+L 92.819081 213.3428 
+L 92.819081 186.102569 
+L 86.009023 186.102569 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_85">
+    <path d="M 204.504027 74.417623 
+L 231.744258 74.417623 
+L 231.744258 67.607565 
+L 204.504027 67.607565 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_86">
+    <path d="M 86.009023 240.58303 
+L 92.819081 240.58303 
+L 92.819081 213.3428 
+L 86.009023 213.3428 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_87">
+    <path d="M 231.744258 74.417623 
+L 258.984488 74.417623 
+L 258.984488 67.607565 
+L 231.744258 67.607565 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_88">
+    <path d="M 86.009023 267.823261 
+L 92.819081 267.823261 
+L 92.819081 240.58303 
+L 86.009023 240.58303 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_89">
+    <path d="M 258.984488 74.417623 
+L 286.224719 74.417623 
+L 286.224719 67.607565 
+L 258.984488 67.607565 
+z
+" style="fill: #3149c4; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_90">
+    <path d="M 86.009023 295.063492 
+L 92.819081 295.063492 
+L 92.819081 267.823261 
+L 86.009023 267.823261 
+z
+" style="fill: #0a8263; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_91">
+    <path d="M 286.224719 74.417623 
+L 313.46495 74.417623 
+L 313.46495 67.607565 
+L 286.224719 67.607565 
+z
+" style="fill: #0a8263; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_92">
+    <path d="M 86.009023 322.303723 
+L 92.819081 322.303723 
+L 92.819081 295.063492 
+L 86.009023 295.063492 
+z
+" style="fill: #0a8263; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_93">
+    <path d="M 313.46495 74.417623 
+L 340.705181 74.417623 
+L 340.705181 67.607565 
+L 313.46495 67.607565 
+z
+" style="fill: #0a8263; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_94">
+    <path d="M 86.009023 349.543954 
+L 92.819081 349.543954 
+L 92.819081 322.303723 
+L 86.009023 322.303723 
+z
+" style="fill: #0a8263; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_95">
+    <path d="M 340.705181 74.417623 
+L 367.945412 74.417623 
+L 367.945412 67.607565 
+L 340.705181 67.607565 
+z
+" style="fill: #0a8263; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="190.883912" y="92.443402" transform="rotate(-0 190.883912 92.443402)">−0,47</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="218.124142" y="92.443402" transform="rotate(-0 218.124142 92.443402)">+0,17</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="245.364373" y="92.443402" transform="rotate(-0 245.364373 92.443402)">+0,27</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="272.604604" y="92.443402" transform="rotate(-0 272.604604 92.443402)">−0,13</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="299.844835" y="92.443402" transform="rotate(-0 299.844835 92.443402)">+0,13</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="327.085065" y="92.443402" transform="rotate(-0 327.085065 92.443402)">−0,56</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="92.443402" transform="rotate(-0 354.325296 92.443402)">+0,05</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="190.883912" y="119.683633" transform="rotate(-0 190.883912 119.683633)">−0,27</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="218.124142" y="119.683633" transform="rotate(-0 218.124142 119.683633)">+0,13</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="245.364373" y="119.683633" transform="rotate(-0 245.364373 119.683633)">+0,12</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="272.604604" y="119.683633" transform="rotate(-0 272.604604 119.683633)">+0,04</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="299.844835" y="119.683633" transform="rotate(-0 299.844835 119.683633)">+0,55</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="327.085065" y="119.683633" transform="rotate(-0 327.085065 119.683633)">−0,18</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="119.683633" transform="rotate(-0 354.325296 119.683633)">−0,11</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="190.883912" y="146.923863" transform="rotate(-0 190.883912 146.923863)">−0,05</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="218.124142" y="146.923863" transform="rotate(-0 218.124142 146.923863)">+0,05</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="245.364373" y="146.923863" transform="rotate(-0 245.364373 146.923863)">+0,18</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="272.604604" y="146.923863" transform="rotate(-0 272.604604 146.923863)">+0,04</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="299.844835" y="146.923863" transform="rotate(-0 299.844835 146.923863)">−0,37</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="327.085065" y="146.923863" transform="rotate(-0 327.085065 146.923863)">−0,06</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="146.923863" transform="rotate(-0 354.325296 146.923863)">+0,12</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="109.163219" y="174.164094" transform="rotate(-0 109.163219 174.164094)">−0,47</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="136.40345" y="174.164094" transform="rotate(-0 136.40345 174.164094)">−0,27</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="174.164094" transform="rotate(-0 163.643681 174.164094)">−0,05</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="299.844835" y="174.164094" transform="rotate(-0 299.844835 174.164094)">−0,25</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="327.085065" y="174.164094" transform="rotate(-0 327.085065 174.164094)">+0,42</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="174.164094" transform="rotate(-0 354.325296 174.164094)">−0,02</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="109.163219" y="201.404325" transform="rotate(-0 109.163219 201.404325)">+0,17</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="136.40345" y="201.404325" transform="rotate(-0 136.40345 201.404325)">+0,13</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="201.404325" transform="rotate(-0 163.643681 201.404325)">+0,05</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="299.844835" y="201.404325" transform="rotate(-0 299.844835 201.404325)">+0,15</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="327.085065" y="201.404325" transform="rotate(-0 327.085065 201.404325)">−0,13</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="201.404325" transform="rotate(-0 354.325296 201.404325)">−0,25</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="109.163219" y="228.644556" transform="rotate(-0 109.163219 228.644556)">+0,27</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="136.40345" y="228.644556" transform="rotate(-0 136.40345 228.644556)">+0,12</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="228.644556" transform="rotate(-0 163.643681 228.644556)">+0,18</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="299.844835" y="228.644556" transform="rotate(-0 299.844835 228.644556)">+0,05</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="327.085065" y="228.644556" transform="rotate(-0 327.085065 228.644556)">−0,22</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="228.644556" transform="rotate(-0 354.325296 228.644556)">−0,02</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="109.163219" y="255.884786" transform="rotate(-0 109.163219 255.884786)">−0,13</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="136.40345" y="255.884786" transform="rotate(-0 136.40345 255.884786)">+0,04</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="255.884786" transform="rotate(-0 163.643681 255.884786)">+0,04</text>
+   </g>
+   <g id="text_43">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="299.844835" y="255.884786" transform="rotate(-0 299.844835 255.884786)">−0,09</text>
+   </g>
+   <g id="text_44">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="327.085065" y="255.884786" transform="rotate(-0 327.085065 255.884786)">−0,01</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="354.325296" y="255.884786" transform="rotate(-0 354.325296 255.884786)">−0,04</text>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="109.163219" y="283.125017" transform="rotate(-0 109.163219 283.125017)">+0,13</text>
+   </g>
+   <g id="text_47">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="136.40345" y="283.125017" transform="rotate(-0 136.40345 283.125017)">+0,55</text>
+   </g>
+   <g id="text_48">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="283.125017" transform="rotate(-0 163.643681 283.125017)">−0,37</text>
+   </g>
+   <g id="text_49">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="190.883912" y="283.125017" transform="rotate(-0 190.883912 283.125017)">−0,25</text>
+   </g>
+   <g id="text_50">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="218.124142" y="283.125017" transform="rotate(-0 218.124142 283.125017)">+0,15</text>
+   </g>
+   <g id="text_51">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="245.364373" y="283.125017" transform="rotate(-0 245.364373 283.125017)">+0,05</text>
+   </g>
+   <g id="text_52">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="272.604604" y="283.125017" transform="rotate(-0 272.604604 283.125017)">−0,09</text>
+   </g>
+   <g id="text_53">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="109.163219" y="310.365248" transform="rotate(-0 109.163219 310.365248)">−0,56</text>
+   </g>
+   <g id="text_54">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="136.40345" y="310.365248" transform="rotate(-0 136.40345 310.365248)">−0,18</text>
+   </g>
+   <g id="text_55">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="310.365248" transform="rotate(-0 163.643681 310.365248)">−0,06</text>
+   </g>
+   <g id="text_56">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="190.883912" y="310.365248" transform="rotate(-0 190.883912 310.365248)">+0,42</text>
+   </g>
+   <g id="text_57">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="218.124142" y="310.365248" transform="rotate(-0 218.124142 310.365248)">−0,13</text>
+   </g>
+   <g id="text_58">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="245.364373" y="310.365248" transform="rotate(-0 245.364373 310.365248)">−0,22</text>
+   </g>
+   <g id="text_59">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="272.604604" y="310.365248" transform="rotate(-0 272.604604 310.365248)">−0,01</text>
+   </g>
+   <g id="text_60">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="109.163219" y="337.605479" transform="rotate(-0 109.163219 337.605479)">+0,05</text>
+   </g>
+   <g id="text_61">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="136.40345" y="337.605479" transform="rotate(-0 136.40345 337.605479)">−0,11</text>
+   </g>
+   <g id="text_62">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="163.643681" y="337.605479" transform="rotate(-0 163.643681 337.605479)">+0,12</text>
+   </g>
+   <g id="text_63">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="190.883912" y="337.605479" transform="rotate(-0 190.883912 337.605479)">−0,02</text>
+   </g>
+   <g id="text_64">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="218.124142" y="337.605479" transform="rotate(-0 218.124142 337.605479)">−0,25</text>
+   </g>
+   <g id="text_65">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="245.364373" y="337.605479" transform="rotate(-0 245.364373 337.605479)">−0,02</text>
+   </g>
+   <g id="text_66">
+    <text style="font-size: 7px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #111111" x="272.604604" y="337.605479" transform="rotate(-0 272.604604 337.605479)">−0,04</text>
+   </g>
+   <g id="text_67">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="92.676136" transform="rotate(-0 83.285 92.676136)">renovación y experiencia</text>
+   </g>
+   <g id="text_68">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="107.942576" y="63.662899" transform="rotate(-45 107.942576 63.662899)">renovación y experiencia</text>
+   </g>
+   <g id="text_69">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="119.923867" transform="rotate(-0 83.285 119.923867)">volumen de actividad</text>
+   </g>
+   <g id="text_70">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="135.193414" y="63.673506" transform="rotate(-45 135.193414 63.673506)">volumen de actividad</text>
+   </g>
+   <g id="text_71">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="147.164098" transform="rotate(-0 83.285 147.164098)">concentración del núcleo</text>
+   </g>
+   <g id="text_72">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="162.433644" y="63.673506" transform="rotate(-45 162.433644 63.673506)">concentración del núcleo</text>
+   </g>
+   <g id="text_73">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="174.396829" transform="rotate(-0 83.285 174.396829)">renovación y experiencia</text>
+   </g>
+   <g id="text_74">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="189.663268" y="63.662899" transform="rotate(-45 189.663268 63.662899)">renovación y experiencia</text>
+   </g>
+   <g id="text_75">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="201.644559" transform="rotate(-0 83.285 201.644559)">resolución de lo nuevo</text>
+   </g>
+   <g id="text_76">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="216.914106" y="63.673506" transform="rotate(-45 216.914106 63.673506)">resolución de lo nuevo</text>
+   </g>
+   <g id="text_77">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="228.879165" transform="rotate(-0 83.285 228.879165)">cierre de lo viejo</text>
+   </g>
+   <g id="text_78">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="244.14373" y="63.662899" transform="rotate(-45 244.14373 63.662899)">cierre de lo viejo</text>
+   </g>
+   <g id="text_79">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="256.125021" transform="rotate(-0 83.285 256.125021)">concentración del núcleo</text>
+   </g>
+   <g id="text_80">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="271.394567" y="63.673506" transform="rotate(-45 271.394567 63.673506)">concentración del núcleo</text>
+   </g>
+   <g id="text_81">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="283.357752" transform="rotate(-0 83.285 283.357752)">bugs de usuarios</text>
+   </g>
+   <g id="text_82">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="298.624192" y="63.662899" transform="rotate(-45 298.624192 63.662899)">bugs de usuarios</text>
+   </g>
+   <g id="text_83">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="310.597982" transform="rotate(-0 83.285 310.597982)">Learning Ease</text>
+   </g>
+   <g id="text_84">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="325.864422" y="63.662899" transform="rotate(-45 325.864422 63.662899)">Learning Ease</text>
+   </g>
+   <g id="text_85">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: end; fill: #111111" x="83.285" y="337.840088" transform="rotate(-0 83.285 337.840088)">cierre de lo viejo</text>
+   </g>
+   <g id="text_86">
+    <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="353.104653" y="63.662899" transform="rotate(-45 353.104653 63.662899)">cierre de lo viejo</text>
+   </g>
+   <g id="legend_1">
+    <g id="patch_96">
+     <path d="M 91.847012 365.176938 
+L 107.847012 365.176938 
+L 107.847012 359.576938 
+L 91.847012 359.576938 
+z
+" style="fill: #d9520b; stroke: #d9520b; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_87">
+     <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="114.247012" y="365.176938" transform="rotate(-0 114.247012 365.176938)">Persona</text>
+    </g>
+    <g id="patch_97">
+     <path d="M 155.575762 365.176938 
+L 171.575762 365.176938 
+L 171.575762 359.576938 
+L 155.575762 359.576938 
+z
+" style="fill: #3149c4; stroke: #3149c4; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_88">
+     <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="177.975762" y="365.176938" transform="rotate(-0 177.975762 365.176938)">Proceso</text>
+    </g>
+    <g id="patch_98">
+     <path d="M 219.304512 365.176938 
+L 235.304512 365.176938 
+L 235.304512 359.576938 
+L 219.304512 359.576938 
+z
+" style="fill: #0a8263; stroke: #0a8263; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_89">
+     <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="241.704512" y="365.176938" transform="rotate(-0 241.704512 365.176938)">Producto</text>
+    </g>
+    <g id="patch_99">
+     <path d="M 286.590762 365.176938 
+L 302.590762 365.176938 
+L 302.590762 359.576938 
+L 286.590762 359.576938 
+z
+" style="fill: #ffffff; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter"/>
+    </g>
+    <g id="text_90">
+     <text style="font-size: 8px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="308.990762" y="365.176938" transform="rotate(-0 308.990762 365.176938)">Patrón</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p84b3f84945">
+   <rect x="84.647012" y="66.245554" width="283.2984" height="283.2984"/>
+  </clipPath>
+ </defs>
+</svg>

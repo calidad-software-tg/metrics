@@ -1,0 +1,66 @@
+relacion,x,y,rho,rho_canary,rho_tamano,nivel,tipo,entre,dentro,mismo_tema
+Jarczyk Success Rate ↔ Process Performance,jarczyk_success_rate_producto,process_performance_producto,0.8284,0.516,0.8323,alta,dentro,,Proceso,True
+Commits que tocan documentación ↔ DLOC 2.0,commits_doc_producto,dloc_flujo_producto,0.4689,0.84,0.4328,alta,dentro,,Producto,True
+Jarczyk Success Rate ↔ NCI,jarczyk_success_rate_producto,nci_producto,0.3939,0.4434,0.4041,alta,dentro,,Proceso,False
+DIS ↔ NCI,dis_producto,nci_producto,0.2891,0.1834,0.3215,media,dentro,,Proceso,False
+REXP (mediana) ↔ Tasa de ingreso (commits),rexp_mediana,tasa_nuevos_commits_ratio,-0.2876,-0.2717,-0.2678,media,dentro,,Persona,True
+NCI ↔ Process Performance,nci_producto,process_performance_producto,0.2846,0.1921,0.3315,media,dentro,,Proceso,False
+DIS (mediana) ↔ Jarczyk Success Rate,dis_mediana,jarczyk_success_rate_producto,-0.2703,-0.3068,-0.2604,media,dentro,,Proceso,False
+DIS ↔ NCI (p90),dis_producto,nci_p90,0.2658,0.1849,0.2657,media,dentro,,Proceso,False
+DIS (mediana) ↔ NCI (p90),dis_mediana,nci_p90,0.2524,0.1765,0.2471,media,dentro,,Proceso,False
+Jarczyk Success Rate ↔ NCI (p90),jarczyk_success_rate_producto,nci_p90,0.19,0.2536,0.1988,baja,dentro,,Proceso,False
+DLOC 2.0 ↔ EXPRev (10 % más activo),dloc_flujo_producto,exprev_share_top10pct,0.2851,0.1817,0.3434,media,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+CD ↔ CDIV (p90),cd_producto,cdiv_p90,0.2819,0.0166,0.2944,baja,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+CFDR ↔ Tasa de ingreso (commits),cfdr_producto,tasa_nuevos_commits_ratio,0.2352,0.0725,0.1104,baja,entre dimensiones,Persona–Proceso; Persona–Producto,,False
+NUB ↔ Tasa de ingreso (commits),nub_producto,tasa_nuevos_commits_ratio,0.2349,0.0747,0.1102,baja,entre dimensiones,Persona–Proceso; Persona–Producto,,False
+Process Performance ↔ Proporción que cierra issues,process_performance_producto,prop_cierran_ratio,0.2273,0.1542,0.2304,media,entre dimensiones,Persona–Proceso,,False
+Jarczyk Success Rate ↔ Proporción que cierra issues,jarczyk_success_rate_producto,prop_cierran_ratio,0.2265,0.2627,0.2486,media,entre dimensiones,Persona–Proceso,,False
+LE del proyecto ↔ NC (p90),le_producto,nc_p90,-0.2163,-0.0297,-0.2617,baja,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+DLOC 2.0 ↔ NCI,dloc_flujo_producto,nci_producto,0.2154,0.2321,0.1145,media,entre dimensiones,Proceso–Producto,,False
+DLOC 2.0 ↔ NC (10 % más activo),dloc_flujo_producto,nc_share_top10pct,0.206,0.1204,0.2657,media,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+DLOC 2.0 ↔ Proporción que commitea,dloc_flujo_producto,prop_commitean_ratio,0.2055,0.3243,0.2853,media,entre dimensiones,Persona–Producto,,False
+EXPRev (10 % más activo) ↔ LE del proyecto,exprev_share_top10pct,le_producto,-0.2035,-0.0463,-0.2408,media,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+DLOC 2.0 ↔ SC (p90),dloc_flujo_producto,sc_p90,0.1995,0.1676,0.2429,media,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+LE del proyecto ↔ NC (10 % más activo),le_producto,nc_share_top10pct,-0.1992,-0.0354,-0.2401,media,entre dimensiones,Persona–Producto; Proceso–Producto,,False
+DLOC (mediana) ↔ Proporción que cierra issues,dloc_mediana,prop_cierran_ratio,-0.1979,-0.0111,-0.2077,media,entre dimensiones,Persona–Producto,,False
+ANMCC ↔ Proporción que comenta,anmcc_producto,prop_comentan_ratio,0.1721,0.023,0.2002,baja,entre dimensiones,Persona–Proceso; Persona–Producto,,False
+LE (mediana) ↔ Tasa de ingreso (commits),le_mediana,tasa_nuevos_commits_ratio,-0.7279,-0.4468,-0.7162,alta,entre y dentro,Persona–Producto,Persona,False
+Development Experience (mediana) ↔ Tasa de ingreso (commits),dev_exp_mediana,tasa_nuevos_commits_ratio,-0.7133,-0.447,-0.7128,alta,entre y dentro,Persona–Proceso,Persona,True
+CDIV (mediana) ↔ LE (mediana),cdiv_mediana,le_mediana,0.4855,0.2191,0.4621,media,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Persona,False
+EXPRev (10 % más activo) ↔ Proporción que commitea,exprev_share_top10pct,prop_commitean_ratio,0.4699,0.3385,0.4455,alta,entre y dentro,Persona–Proceso,Persona,False
+Proporción que commitea ↔ SC (p90),prop_commitean_ratio,sc_p90,0.4696,0.1708,0.4525,alta,entre y dentro,Persona–Proceso,Persona,False
+NC (10 % más activo) ↔ SC (p90),nc_share_top10pct,sc_p90,0.4656,0.1479,0.4508,alta,entre y dentro,Persona–Proceso,Persona; Proceso,True
+CDIV (p90) ↔ SC (10 % más activo),cdiv_p90,sc_share_top10pct,0.4608,0.0442,0.4735,media,entre y dentro,Persona–Proceso,Persona; Proceso,True
+CDIV (mediana) ↔ Tasa de ingreso (commits),cdiv_mediana,tasa_nuevos_commits_ratio,-0.4378,-0.326,-0.4019,media,entre y dentro,Persona–Proceso,Persona,True
+CDIV (mediana) ↔ REXP (mediana),cdiv_mediana,rexp_mediana,0.4352,0.3825,0.4214,media,entre y dentro,Persona–Proceso,Persona,True
+NC (10 % más activo) ↔ Proporción que commitea,nc_share_top10pct,prop_commitean_ratio,0.4265,0.286,0.3965,alta,entre y dentro,Persona–Proceso,Persona,False
+NC (10 % más activo) ↔ SC (10 % más activo),nc_share_top10pct,sc_share_top10pct,0.4248,0.1019,0.4554,alta,entre y dentro,Persona–Proceso,Persona; Proceso,True
+CDIV (mediana) ↔ Development Experience (mediana),cdiv_mediana,dev_exp_mediana,0.4064,0.2303,0.3943,media,entre y dentro,Persona–Proceso,Persona; Proceso,True
+Proporción que commitea ↔ SC (mediana),prop_commitean_ratio,sc_mediana,0.3519,0.3159,0.3244,media,entre y dentro,Persona–Proceso,Persona,False
+LE (mediana) ↔ Proporción que commitea,le_mediana,prop_commitean_ratio,-0.3272,-0.2291,-0.3961,media,entre y dentro,Persona–Producto,Persona,False
+DIS ↔ MTTR (mediana),dis_producto,mttr_mediana,0.3236,0.4057,0.3236,media,entre y dentro,Proceso–Producto,Proceso,False
+CFDR ↔ REXPRev (mediana),cfdr_producto,rexprev_mediana,-0.3139,-0.0705,-0.1615,media,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Proceso,False
+NUB ↔ REXPRev (mediana),nub_producto,rexprev_mediana,-0.3108,-0.0689,-0.1576,media,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Proceso,False
+NC (10 % más activo) ↔ SC (mediana),nc_share_top10pct,sc_mediana,0.31,0.1302,0.287,media,entre y dentro,Persona–Proceso,Persona; Proceso,False
+EXPRev (p90) ↔ Proporción que cierra issues,exprev_p90,prop_cierran_ratio,0.3071,0.1471,0.279,media,entre y dentro,Persona–Proceso,Persona,False
+Proporción que cierra issues ↔ REXPRev (mediana),prop_cierran_ratio,rexprev_mediana,0.2998,0.1515,0.2586,media,entre y dentro,Persona–Proceso,Persona,False
+Development Experience (mediana) ↔ Proporción que commitea,dev_exp_mediana,prop_commitean_ratio,-0.2958,-0.1974,-0.3375,media,entre y dentro,Persona–Proceso,Persona,True
+NC (10 % más activo) ↔ NCI (p90),nc_share_top10pct,nci_p90,0.2898,0.1678,0.2802,media,entre y dentro,Persona–Proceso,Proceso,False
+MTTR ↔ NCI,mttr_producto,nci_producto,0.2879,0.3527,0.3501,media,entre y dentro,Proceso–Producto,Proceso,True
+CDIV (p90) ↔ Tasa de ingreso (commits),cdiv_p90,tasa_nuevos_commits_ratio,-0.2876,-0.0023,-0.2757,media,entre y dentro,Persona–Proceso,Persona,False
+LE (mediana) ↔ REXP (mediana),le_mediana,rexp_mediana,0.2874,0.142,0.2716,media,entre y dentro,Persona–Producto,Persona,False
+CFDR ↔ EXPRev (p90),cfdr_producto,exprev_p90,-0.2784,-0.0231,-0.1232,media,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Proceso,False
+NC (10 % más activo) ↔ Proporción que cierra issues,nc_share_top10pct,prop_cierran_ratio,0.2744,0.0462,0.2467,media,entre y dentro,Persona–Proceso,Persona,False
+EXPRev (p90) ↔ NUB,exprev_p90,nub_producto,-0.274,-0.0265,-0.1174,baja,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Proceso,False
+Proporción que commitea ↔ REXPRev (mediana),prop_commitean_ratio,rexprev_mediana,0.2538,0.2216,0.1866,media,entre y dentro,Persona–Proceso,Persona,False
+Proporción que cierra issues ↔ SC (p90),prop_cierran_ratio,sc_p90,0.2461,0.0051,0.2255,media,entre y dentro,Persona–Proceso,Persona,False
+DIS ↔ REXPRev (mediana),dis_producto,rexprev_mediana,0.2397,0.0316,0.2477,baja,entre y dentro,Persona–Proceso,Proceso,False
+CDIV (p90) ↔ REXP (mediana),cdiv_p90,rexp_mediana,0.2388,0.1374,0.2309,baja,entre y dentro,Persona–Proceso,Persona,False
+Development Experience (mediana) ↔ MTTR (mediana),dev_exp_mediana,mttr_mediana,-0.2277,-0.0204,-0.2332,media,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Proceso,False
+EXPRev (p90) ↔ Process Performance,exprev_p90,process_performance_producto,0.2206,0.034,0.2247,media,entre y dentro,Persona–Proceso,Proceso,False
+EXPRev (10 % más activo) ↔ MTTR,exprev_share_top10pct,mttr_producto,0.2002,0.1745,0.1982,media,entre y dentro,Persona–Proceso; Persona–Producto; Proceso–Producto,Proceso,False
+CDIV (p90) ↔ SC (p90),cdiv_p90,sc_p90,0.1876,0.1941,0.1777,media,entre y dentro,Persona–Proceso,Persona; Proceso,True
+MTTR (mediana) ↔ NCI,mttr_mediana,nci_producto,0.1841,0.214,0.2336,media,entre y dentro,Proceso–Producto,Proceso,True
+EXPRev (p90) ↔ Jarczyk Success Rate,exprev_p90,jarczyk_success_rate_producto,0.1791,0.1017,0.2039,media,entre y dentro,Persona–Proceso,Proceso,False
+MTTR (mediana) ↔ Process Performance,mttr_mediana,process_performance_producto,-0.1786,-0.1306,-0.179,baja,entre y dentro,Proceso–Producto,Proceso,False
+ANMCC ↔ Commits que tocan documentación,anmcc_producto,commits_doc_producto,-0.1627,-0.0891,-0.1455,baja,entre y dentro,Proceso–Producto,Producto,False

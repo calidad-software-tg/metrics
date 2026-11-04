@@ -1,0 +1,95 @@
+relacion,x,y,rho,rho_canary,rho_tamano,motivo
+Activos que comentan ↔ Nuevos (interacción),activos_comentarios_conteo,nuevos_interaccion_conteo,0.9218,0.732,,escala
+Activos que cierran issues ↔ Activos que comentan,activos_cierre_conteo,activos_comentarios_conteo,0.685,0.4685,,escala
+Activos que cierran issues ↔ Nuevos (interacción),activos_cierre_conteo,nuevos_interaccion_conteo,0.6163,0.3488,,escala
+Nuevos (commits) ↔ Proporción que commitea,nuevos_commits_conteo,prop_commitean_ratio,0.5141,0.349,,escala
+Activos que commitean ↔ Activos en la interacción,activos_commits_conteo,activos_interaccion_conteo,0.4794,0.5554,,escala
+Activos que comentan ↔ Activos que commitean,activos_comentarios_conteo,activos_commits_conteo,0.4498,0.5193,,escala
+Activos que cierran issues ↔ Activos que commitean,activos_cierre_conteo,activos_commits_conteo,0.431,0.3583,,escala
+Activos en la interacción ↔ Nuevos (commits),activos_interaccion_conteo,nuevos_commits_conteo,0.4132,0.2974,,escala
+Activos que commitean ↔ Nuevos (interacción),activos_commits_conteo,nuevos_interaccion_conteo,0.4067,0.3067,,escala
+Activos que comentan ↔ Nuevos (commits),activos_comentarios_conteo,nuevos_commits_conteo,0.3976,0.2827,,escala
+Discussion Centrality (mediana) ↔ Nuevos (interacción),disc_centrality_mediana,nuevos_interaccion_conteo,0.385,0.1089,,escala
+Nuevos (commits) ↔ REXP (mediana),nuevos_commits_conteo,rexp_mediana,-0.3567,-0.2972,,escala
+Activos en la interacción ↔ Discussion Centrality (mediana),activos_interaccion_conteo,disc_centrality_mediana,0.3525,0.2436,,escala
+Activos que cierran issues ↔ Nuevos (commits),activos_cierre_conteo,nuevos_commits_conteo,0.3514,0.2345,,escala
+Activos que comentan ↔ Discussion Centrality (mediana),activos_comentarios_conteo,disc_centrality_mediana,0.3458,0.2757,,escala
+Nuevos (interacción) ↔ Proporción que commitea,nuevos_interaccion_conteo,prop_commitean_ratio,-0.3009,-0.2592,,escala
+Proporción que commitea ↔ Tasa de ingreso (commits),prop_commitean_ratio,tasa_nuevos_commits_ratio,0.2701,0.2371,0.3583,mecánico
+Activos que comentan ↔ Proporción que commitea,activos_comentarios_conteo,prop_commitean_ratio,-0.2686,-0.1579,,escala
+Proporción que commitea ↔ Tasa de ingreso (interacción),prop_commitean_ratio,tasa_nuevos_interaccion_ratio,-0.2554,-0.2384,-0.212,mecánico
+Activos que cierran issues ↔ Discussion Centrality (mediana),activos_cierre_conteo,disc_centrality_mediana,0.2501,0.1495,,escala
+Nuevos (interacción) ↔ Tasa de ingreso (commits),nuevos_interaccion_conteo,tasa_nuevos_commits_ratio,0.2499,0.1637,,escala
+Activos en la interacción ↔ Tasa de ingreso (commits),activos_interaccion_conteo,tasa_nuevos_commits_ratio,0.2491,0.2176,,escala
+Activos que commitean ↔ REXP (mediana),activos_commits_conteo,rexp_mediana,-0.2112,-0.237,,escala
+Proporción que cierra issues ↔ Tasa de ingreso (interacción),prop_cierran_ratio,tasa_nuevos_interaccion_ratio,-0.1746,-0.1138,-0.1408,mecánico
+Discussion Centrality (mediana) ↔ Proporción que comenta,disc_centrality_mediana,prop_comentan_ratio,0.1694,0.168,0.0906,no resiste tamaño
+Activos en la interacción ↔ CFDR,activos_interaccion_conteo,cfdr_producto,0.6495,0.5786,,escala
+Activos en la interacción ↔ NUB,activos_interaccion_conteo,nub_producto,0.6483,0.5799,,escala
+CFDR ↔ Nuevos (interacción),cfdr_producto,nuevos_interaccion_conteo,0.6114,0.552,,escala
+NUB ↔ Nuevos (interacción),nub_producto,nuevos_interaccion_conteo,0.6108,0.5529,,escala
+Activos que comentan ↔ CFDR,activos_comentarios_conteo,cfdr_producto,0.6068,0.4746,,escala
+Activos que comentan ↔ NUB,activos_comentarios_conteo,nub_producto,0.606,0.4753,,escala
+Activos que cierran issues ↔ NCI,activos_cierre_conteo,nci_producto,0.5454,0.7659,,escala
+Activos en la interacción ↔ NCI,activos_interaccion_conteo,nci_producto,0.5004,0.4833,,escala
+Activos que cierran issues ↔ NUB,activos_cierre_conteo,nub_producto,0.4853,0.2676,,escala
+Activos que cierran issues ↔ CFDR,activos_cierre_conteo,cfdr_producto,0.4832,0.269,,escala
+Activos que comentan ↔ NCI,activos_comentarios_conteo,nci_producto,0.4734,0.4668,,escala
+NCI ↔ Nuevos (interacción),nci_producto,nuevos_interaccion_conteo,0.4443,0.3084,,escala
+Development Experience (mediana) ↔ LE del proyecto,dev_exp_mediana,le_producto,0.4305,0.5667,0.4208,mecánico
+CDIV (mediana) ↔ Commits que tocan documentación,cdiv_mediana,commits_doc_producto,-0.4245,-0.2395,-0.3848,descartado al validar: sin los commits que solo tocan documentación
+Activos que commitean ↔ NCI,activos_commits_conteo,nci_producto,0.4187,0.4143,,escala
+Activos que commitean ↔ DLOC 2.0,activos_commits_conteo,dloc_flujo_producto,0.416,0.504,,escala
+Commits que tocan documentación ↔ Nuevos (commits),commits_doc_producto,nuevos_commits_conteo,0.4036,0.3118,,escala
+LE del proyecto ↔ Nuevos (commits),le_producto,nuevos_commits_conteo,-0.3979,-0.2078,,mecánico
+Activos que commitean ↔ LE del proyecto,activos_commits_conteo,le_producto,-0.3815,-0.1202,,escala
+NCI ↔ Nuevos (commits),nci_producto,nuevos_commits_conteo,0.3771,0.2753,,escala
+DLOC 2.0 ↔ Nuevos (commits),dloc_flujo_producto,nuevos_commits_conteo,0.3205,0.3121,,escala
+LE del proyecto ↔ Proporción que commitea,le_producto,prop_commitean_ratio,-0.2877,-0.063,-0.3479,descartado al validar: construcción de LE (los recién llegados)
+Activos en la interacción ↔ ANMCC (mediana),activos_interaccion_conteo,anmcc_mediana,-0.2741,-0.1161,,escala
+Activos que commitean ↔ ANMCC (mediana),activos_commits_conteo,anmcc_mediana,-0.2665,-0.1795,,escala
+LE del proyecto ↔ Tasa de ingreso (commits),le_producto,tasa_nuevos_commits_ratio,-0.2637,-0.2041,-0.2326,descartado al validar: construcción de LE (los recién llegados)
+Activos que cierran issues ↔ Jarczyk Success Rate,activos_cierre_conteo,jarczyk_success_rate_producto,0.2602,0.2918,,escala
+ANMCC (mediana) ↔ Nuevos (interacción),anmcc_mediana,nuevos_interaccion_conteo,-0.2538,-0.1049,,escala
+Activos en la interacción ↔ DLOC 2.0,activos_interaccion_conteo,dloc_flujo_producto,0.2382,0.3131,,escala
+Activos que comentan ↔ DLOC 2.0,activos_comentarios_conteo,dloc_flujo_producto,0.2215,0.2945,,escala
+NCI ↔ Tasa de ingreso (commits),nci_producto,tasa_nuevos_commits_ratio,0.1884,0.2219,0.076,no resiste tamaño
+Commits que tocan documentación ↔ Discussion Centrality (mediana),commits_doc_producto,disc_centrality_mediana,0.1644,0.035,0.0776,no resiste tamaño
+CFDR ↔ NUB,cfdr_producto,nub_producto,0.9993,0.9947,0.9988,mecánico
+ANMCC (mediana) ↔ CDIV (mediana),anmcc_mediana,cdiv_mediana,0.8443,0.9064,0.8338,mecánico
+Development Experience (mediana) ↔ LE (mediana),dev_exp_mediana,le_mediana,0.7362,0.7176,0.7331,mecánico
+LE (mediana) ↔ Nuevos (commits),le_mediana,nuevos_commits_conteo,-0.6837,-0.4598,,mecánico
+Development Experience (mediana) ↔ Nuevos (commits),dev_exp_mediana,nuevos_commits_conteo,-0.6322,-0.4512,,escala
+ANMCC ↔ CDIV (p90),anmcc_producto,cdiv_p90,0.5609,0.7852,0.5576,mecánico
+CDIV (mediana) ↔ Nuevos (commits),cdiv_mediana,nuevos_commits_conteo,-0.4796,-0.3263,,escala
+ANMCC (mediana) ↔ LE (mediana),anmcc_mediana,le_mediana,0.4793,0.2143,0.4532,descartado al validar: sin los recién llegados
+Activos que commitean ↔ LE (mediana),activos_commits_conteo,le_mediana,-0.4696,-0.3009,,escala
+ANMCC (mediana) ↔ Commits que tocan documentación,anmcc_mediana,commits_doc_producto,-0.4524,-0.2469,-0.4089,descartado al validar: sin los commits que solo tocan documentación
+ANMCC ↔ CDIV (10 % más activo),anmcc_producto,cdiv_share_top10pct,0.4286,0.1726,0.4459,mecánico
+Activos que commitean ↔ Development Experience (mediana),activos_commits_conteo,dev_exp_mediana,-0.3898,-0.2613,,escala
+ANMCC (mediana) ↔ Development Experience (mediana),anmcc_mediana,dev_exp_mediana,0.3839,0.2175,0.3705,descartado al validar: sin los recién llegados
+ANMCC (mediana) ↔ CDIV (p90),anmcc_mediana,cdiv_p90,0.3735,0.4302,0.365,mecánico
+ANMCC ↔ CDIV (mediana),anmcc_producto,cdiv_mediana,0.3329,0.6324,0.3229,mecánico
+Nuevos (interacción) ↔ REXPRev (mediana),nuevos_interaccion_conteo,rexprev_mediana,-0.3285,-0.2265,,escala
+Jarczyk Success Rate ↔ SC (mediana),jarczyk_success_rate_producto,sc_mediana,0.3281,0.3006,0.3494,descartado al validar: sin las issues propias cerradas en el mismo release
+Activos que commitean ↔ CDIV (mediana),activos_commits_conteo,cdiv_mediana,-0.3223,-0.1895,,escala
+Activos en la interacción ↔ REXPRev (mediana),activos_interaccion_conteo,rexprev_mediana,-0.319,-0.1608,,escala
+CFDR ↔ NCI,cfdr_producto,nci_producto,0.3039,0.3084,0.0232,no resiste tamaño
+NCI ↔ NUB,nci_producto,nub_producto,0.302,0.3013,0.0213,no resiste tamaño
+Activos que commitean ↔ EXPRev (10 % más activo),activos_commits_conteo,exprev_share_top10pct,0.2987,0.2845,,escala
+Activos que commitean ↔ SC (p90),activos_commits_conteo,sc_p90,0.2838,0.2604,,escala
+Activos que comentan ↔ REXPRev (mediana),activos_comentarios_conteo,rexprev_mediana,-0.2816,-0.1175,,escala
+ANMCC (mediana) ↔ NUB,anmcc_mediana,nub_producto,-0.259,-0.0501,-0.0833,no resiste tamaño
+ANMCC (mediana) ↔ CFDR,anmcc_mediana,cfdr_producto,-0.2588,-0.0488,-0.0826,no resiste tamaño
+Activos en la interacción ↔ CDIV (mediana),activos_interaccion_conteo,cdiv_mediana,-0.2411,-0.1012,,escala
+Activos que commitean ↔ NC (10 % más activo),activos_commits_conteo,nc_share_top10pct,0.2396,0.191,,escala
+Activos que comentan ↔ CDIV (mediana),activos_comentarios_conteo,cdiv_mediana,-0.2337,-0.093,,escala
+CDIV (mediana) ↔ Nuevos (interacción),cdiv_mediana,nuevos_interaccion_conteo,-0.2289,-0.089,,escala
+CDIV (mediana) ↔ NUB,cdiv_mediana,nub_producto,-0.2235,-0.0352,-0.0643,no resiste tamaño
+CDIV (mediana) ↔ CFDR,cdiv_mediana,cfdr_producto,-0.2209,-0.0331,-0.0603,no resiste tamaño
+Activos que comentan ↔ NC (10 % más activo),activos_comentarios_conteo,nc_share_top10pct,-0.2189,-0.0919,,escala
+Activos que commitean ↔ EXPRev (p90),activos_commits_conteo,exprev_p90,0.2163,0.3649,,escala
+CDIV (mediana) ↔ NCI,cdiv_mediana,nci_producto,-0.1949,-0.1332,-0.0883,no resiste tamaño
+Activos que commitean ↔ SC (mediana),activos_commits_conteo,sc_mediana,0.1879,0.2313,,escala
+REXP (mediana) ↔ REXPRev (mediana),rexp_mediana,rexprev_mediana,0.1838,0.1458,0.1544,mecánico
+Activos que commitean ↔ NC (p90),activos_commits_conteo,nc_p90,0.1782,0.2527,,escala

@@ -1,0 +1,58 @@
+familia,nombre,var_a,var_b
+A,Participación en el código y concentración del núcleo,prop_commitean_ratio,exprev_share_top10pct
+A,Participación en el código y concentración del núcleo,prop_commitean_ratio,nc_share_top10pct
+A,Participación en el código y concentración del núcleo,prop_commitean_ratio,sc_p90
+A,Participación en el código y concentración del núcleo,prop_commitean_ratio,sc_mediana
+A,Participación en el código y concentración del núcleo,prop_commitean_ratio,rexprev_mediana
+B,Participación en el cierre de issues y revisores más activos,prop_cierran_ratio,exprev_p90
+B,Participación en el cierre de issues y revisores más activos,prop_cierran_ratio,rexprev_mediana
+B,Participación en el cierre de issues y revisores más activos,prop_cierran_ratio,nc_share_top10pct
+B,Participación en el cierre de issues y revisores más activos,prop_cierran_ratio,sc_p90
+C,Participación en el código y experiencia de quienes commitean,prop_commitean_ratio,le_mediana
+C,Participación en el código y experiencia de quienes commitean,prop_commitean_ratio,dev_exp_mediana
+D,Medidas de la concentración del núcleo entre sí,nc_share_top10pct,sc_p90
+D,Medidas de la concentración del núcleo entre sí,cdiv_p90,sc_share_top10pct
+D,Medidas de la concentración del núcleo entre sí,nc_share_top10pct,sc_share_top10pct
+D,Medidas de la concentración del núcleo entre sí,nc_share_top10pct,sc_mediana
+D,Medidas de la concentración del núcleo entre sí,cdiv_p90,sc_p90
+E,Medidas de la experiencia entre sí,cdiv_mediana,rexp_mediana
+F,Diversidad de los más activos y experiencia,cdiv_p90,tasa_nuevos_commits_ratio
+F,Diversidad de los más activos y experiencia,cdiv_p90,rexp_mediana
+G,Resolver lo nuevo y cerrar lo viejo,nci_producto,mttr_producto
+G,Resolver lo nuevo y cerrar lo viejo,nci_producto,mttr_mediana
+G,Resolver lo nuevo y cerrar lo viejo,nci_p90,jarczyk_success_rate_producto
+G,Resolver lo nuevo y cerrar lo viejo,mttr_mediana,process_performance_producto
+H,Issues de documentación y ritmo general de las issues,dis_producto,mttr_mediana
+H,Issues de documentación y ritmo general de las issues,dis_producto,nci_producto
+H,Issues de documentación y ritmo general de las issues,dis_producto,nci_p90
+H,Issues de documentación y ritmo general de las issues,dis_producto,rexprev_mediana
+H,Issues de documentación y ritmo general de las issues,dis_mediana,jarczyk_success_rate_producto
+H,Issues de documentación y ritmo general de las issues,dis_mediana,nci_p90
+I,Dos medidas de la resolución de lo nuevo,jarczyk_success_rate_producto,process_performance_producto
+J,Experiencia y tiempo de resolución,dev_exp_mediana,mttr_mediana
+K,Concentración del núcleo y cierre de lo viejo,nc_share_top10pct,nci_p90
+K,Concentración del núcleo y cierre de lo viejo,exprev_share_top10pct,mttr_producto
+L,Revisores más activos y resolución de lo nuevo,exprev_p90,process_performance_producto
+L,Revisores más activos y resolución de lo nuevo,exprev_p90,jarczyk_success_rate_producto
+M,Revisores más activos y bugs de usuarios,rexprev_mediana,cfdr_producto
+M,Revisores más activos y bugs de usuarios,exprev_p90,cfdr_producto
+M,Revisores más activos y bugs de usuarios,rexprev_mediana,nub_producto
+M,Revisores más activos y bugs de usuarios,exprev_p90,nub_producto
+N,Flujo de documentación,commits_doc_producto,dloc_flujo_producto
+N,Flujo de documentación,commits_doc_producto,anmcc_producto
+O,Concentración del núcleo y documentación,dloc_flujo_producto,exprev_share_top10pct
+O,Concentración del núcleo y documentación,dloc_flujo_producto,nc_share_top10pct
+O,Concentración del núcleo y documentación,dloc_flujo_producto,sc_p90
+O,Concentración del núcleo y documentación,dloc_flujo_producto,prop_commitean_ratio
+O,Concentración del núcleo y documentación,cd_producto,cdiv_p90
+P,Participación en el cierre de issues y resolución de lo nuevo,prop_cierran_ratio,jarczyk_success_rate_producto
+P,Participación en el cierre de issues y resolución de lo nuevo,prop_cierran_ratio,process_performance_producto
+Q,Ingreso de nuevos contribuyentes y bugs reportados,tasa_nuevos_commits_ratio,cfdr_producto
+Q,Ingreso de nuevos contribuyentes y bugs reportados,tasa_nuevos_commits_ratio,nub_producto
+R,"Learning Ease del proyecto, participación en el código y concentración del núcleo",le_producto,exprev_share_top10pct
+R,"Learning Ease del proyecto, participación en el código y concentración del núcleo",le_producto,nc_share_top10pct
+R,"Learning Ease del proyecto, participación en el código y concentración del núcleo",le_producto,nc_p90
+R,"Learning Ease del proyecto, participación en el código y concentración del núcleo",le_producto,prop_commitean_ratio
+S,Documentación y cierre de issues,dloc_flujo_producto,nci_producto
+T,Documentación por colaborador y participación en el cierre de issues,dloc_mediana,prop_cierran_ratio
+U,Tamaño de los cambios y participación en la discusión,anmcc_producto,prop_comentan_ratio

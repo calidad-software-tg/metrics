@@ -1,0 +1,45 @@
+# Diferencias entre los datos y el texto de los capítulos 4 y 5
+
+Las figuras usan siempre el dato de `analisis/salidas/`. Esta lista marca dónde el texto afirma otra cosa.
+
+- **Fig. 3** · [≠ texto] Patrones: datos=65 · texto=57
+- **Fig. 4 / Tabla 7** · [≠ texto] Persona descartados al validar: datos=0 · texto=7
+- **Fig. 4 / Tabla 7** · [≠ texto] Persona patrones: datos=26 · texto=19
+- **Fig. 4 / Tabla 7** · [≠ texto] Proceso descartados al validar: datos=2 · texto=5
+- **Fig. 4 / Tabla 7** · [≠ texto] Proceso patrones: datos=28 · texto=25
+- **Fig. 5** · [≠ texto] patrones de Persona: datos=26 · texto=19
+- **Fig. 5** · 7 patrones de Persona en los datos no están en ninguna familia del texto (son las relaciones de medianas de experiencia que el texto da por descartadas)
+- **Fig. 6** · no hay salida de validación con las medianas de experiencia sin recién llegados frente a la proporción que commitea: la figura va sin esas dos filas
+- **Fig. 11** · NCI ↔ Jarczyk en los datos: patrón (el texto la da por descartada, +0,39 → +0,15); no hay validación nci_sin_issues_del_release en el repo, así que faltan +0,51 y +0,15
+- **Fig. 14** · [≠ texto] Persona–Proceso total: datos=37 · texto=27
+- **Fig. 14** · [≠ texto] Persona–Proceso también dentro: datos=32 · texto=22
+- **Fig. 14** · [≠ texto] Persona–Producto total: datos=22 · texto=20
+- **Fig. 14** · [≠ texto] Persona–Producto solo entre: datos=12 · texto=13
+- **Fig. 14** · [≠ texto] Persona–Producto también dentro: datos=10 · texto=7
+- **Fig. 14** · [≠ texto] Proceso–Producto total: datos=20 · texto=17
+- **Fig. 14** · [≠ texto] Proceso–Producto también dentro: datos=12 · texto=9
+- **Fig. 14** · [≠ texto] patrones entre dimensiones: datos=55 · texto=42
+- **Fig. 14** · [≠ texto] solo entre dimensiones: datos=15 · texto=16
+- **Fig. 19** · con NC (10 % más activo) también desaparece al descontar el tercero: dloc_flujo_producto ↔ nc_share_top10pct (el texto dice que los otros dos lados casi no cambian)
+- **Fig. 19** · con SC (p90) también desaparece al descontar el tercero: dloc_flujo_producto ↔ sc_p90 (el texto dice que los otros dos lados casi no cambian)
+- **Fig. 21 / Tabla 14** · LE (mediana) ↔ ANMCC (mediana): el texto informa +0,08 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 21 / Tabla 14** · Development Experience (mediana) ↔ ANMCC (mediana): el texto informa −0,01 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 21 / Tabla 14** · LE (mediana) ↔ Tasa de ingreso (commits): el texto informa +0,01 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · Development Experience (mediana) ↔ Tasa de ingreso (commits): el texto informa −0,02 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · CDIV (mediana) ↔ Tasa de ingreso (commits): el texto informa +0,01 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · REXP (mediana) ↔ Tasa de ingreso (commits): el texto informa −0,02 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · CDIV (mediana) ↔ LE (mediana): el texto informa +0,04 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · CDIV (mediana) ↔ Development Experience (mediana): el texto informa +0,06 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · LE (mediana) ↔ REXP (mediana): el texto informa +0,07 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · LE (mediana) ↔ Proporción que commitea: el texto informa −0,38 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · Development Experience (mediana) ↔ Proporción que commitea: el texto informa −0,29 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · CDIV (mediana) ↔ Commits que tocan documentación: el texto informa −0,15 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 21 / Tabla 14** · ANMCC (mediana) ↔ Commits que tocan documentación: el texto informa −0,07 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 21 / Tabla 14** · SC (mediana) ↔ Jarczyk Success Rate: el texto informa 0,00 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 21 / Tabla 14** · NCI ↔ Jarczyk Success Rate: el texto informa +0,15 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · NCI ↔ Process Performance: el texto informa +0,08 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Se mantiene (patrón))
+- **Fig. 21 / Tabla 14** · Tasa de ingreso (commits) ↔ LE del proyecto: el texto informa +0,08 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 21 / Tabla 14** · Proporción que commitea ↔ LE del proyecto: el texto informa −0,20 sin esos datos, pero no hay validación en el repo que lo calcule (estado en los datos: Descartada)
+- **Fig. 26** · [≠ texto] volumen ↔ bugs (componentes): datos=0.55 · texto=0.5
+- **Fig. 26** · [≠ texto] volumen ↔ bugs con control por tamaño: datos=-0.14 · texto=-0.15
+- **Fig. 15b** · [≠ texto] Componentes del PCA: sin escala ni mecánicos: datos=5 · texto=7

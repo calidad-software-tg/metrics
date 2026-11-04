@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="404.359292pt" height="163.7019pt" viewBox="0 0 404.359292 163.7019" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-04T20:39:58.756208</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 163.7019 
+L 404.359292 163.7019 
+L 404.359292 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 135.585435 21.227103 
+L 68.313885 123.596853 
+L 70.391551 124.962177 
+L 137.663101 22.592427 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #333333; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 137.663101 22.592427 
+L 70.391551 124.962177 
+L 83.688615 133.700247 
+L 150.960165 31.330497 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #c4c4c4; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 138.701934 29.282512 
+L 205.973484 131.652262 
+L 210.959883 128.375485 
+L 143.688333 26.005735 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #333333; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 143.688333 26.005735 
+L 210.959883 128.375485 
+L 215.115216 125.644838 
+L 147.843666 23.275088 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #c4c4c4; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 76.00125 133.620795 
+L 210.54435 133.620795 
+L 210.54435 129.642999 
+L 76.00125 129.642999 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #333333; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 76.00125 129.642999 
+L 210.54435 129.642999 
+L 210.54435 123.676305 
+L 76.00125 123.676305 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #c4c4c4; stroke: #ffffff; stroke-width: 0.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(34.918168 62.11643)">37 patrones</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(4.405473 70.490883)">5 solo entre · 32 también dentro</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(13.255473 78.865336)">CCA sobre el azar: 100 %</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(216.843838 62.11643)">22 patrones</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(184.456143 70.490883)">12 solo entre · 10 también dentro</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(197.056143 78.865336)">CCA sobre el azar: 99 %</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(125.881003 141.379865)">20 patrones</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(95.368308 149.754318)">8 solo entre · 12 también dentro</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(106.093308 158.128771)">CCA sobre el azar: 81 %</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 143.2728 42.07299 
+C 147.461468 42.07299 151.479143 40.408815 154.440979 37.446979 
+C 157.402815 34.485143 159.06699 30.467468 159.06699 26.2788 
+C 159.06699 22.090132 157.402815 18.072457 154.440979 15.110621 
+C 151.479143 12.148785 147.461468 10.48461 143.2728 10.48461 
+C 139.084132 10.48461 135.066457 12.148785 132.104621 15.110621 
+C 129.142785 18.072457 127.47861 22.090132 127.47861 26.2788 
+C 127.47861 30.467468 129.142785 34.485143 132.104621 37.446979 
+C 135.066457 40.408815 139.084132 42.07299 143.2728 42.07299 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #d9520b; stroke: #d9520b; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 76.00125 144.44274 
+C 80.189918 144.44274 84.207593 142.778565 87.169429 139.816729 
+C 90.131265 136.854893 91.79544 132.837218 91.79544 128.64855 
+C 91.79544 124.459882 90.131265 120.442207 87.169429 117.480371 
+C 84.207593 114.518535 80.189918 112.85436 76.00125 112.85436 
+C 71.812582 112.85436 67.794907 114.518535 64.833071 117.480371 
+C 61.871235 120.442207 60.20706 124.459882 60.20706 128.64855 
+C 60.20706 132.837218 61.871235 136.854893 64.833071 139.816729 
+C 67.794907 142.778565 71.812582 144.44274 76.00125 144.44274 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #3149c4; stroke: #3149c4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 210.54435 144.44274 
+C 214.733018 144.44274 218.750693 142.778565 221.712529 139.816729 
+C 224.674365 136.854893 226.33854 132.837218 226.33854 128.64855 
+C 226.33854 124.459882 224.674365 120.442207 221.712529 117.480371 
+C 218.750693 114.518535 214.733018 112.85436 210.54435 112.85436 
+C 206.355682 112.85436 202.338007 114.518535 199.376171 117.480371 
+C 196.414335 120.442207 194.75016 124.459882 194.75016 128.64855 
+C 194.75016 132.837218 196.414335 136.854893 199.376171 139.816729 
+C 202.338007 142.778565 206.355682 144.44274 210.54435 144.44274 
+z
+" clip-path="url(#p69bcc2e49c)" style="fill: #0a8263; stroke: #0a8263; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_4">
+    <g id="patch_11">
+     <path d="M 257.34195 40.112916 
+L 383.153278 40.112916 
+Q 386.153278 40.112916 386.153278 37.112916 
+L 386.153278 14.5794 
+Q 386.153278 11.5794 383.153278 11.5794 
+L 257.34195 11.5794 
+Q 254.34195 11.5794 254.34195 14.5794 
+L 254.34195 37.112916 
+Q 254.34195 40.112916 257.34195 40.112916 
+z
+" style="fill: #f6f6f4; stroke: #cccccc; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(257.34195 19.787212)">Tamaño del equipo (componentes):</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(257.34195 27.640884)">volumen de actividad ↔ bugs de usuarios</text>
+    <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; fill: #111111" transform="translate(257.34195 35.508619)">+0,55 → −0,14 con control por tamaño</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="143.2728" y="27.959855" transform="rotate(-0 143.2728 27.959855)">Persona</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="76.00125" y="130.329605" transform="rotate(-0 76.00125 130.329605)">Proceso</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: middle; fill: #ffffff" x="210.54435" y="130.329605" transform="rotate(-0 210.54435 130.329605)">Producto</text>
+   </g>
+   <g id="legend_1">
+    <g id="patch_12">
+     <path d="M 241.27812 128.100171 
+L 256.27812 128.100171 
+L 256.27812 122.850171 
+L 241.27812 122.850171 
+z
+" style="fill: #333333"/>
+    </g>
+    <g id="text_8">
+     <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="262.27812" y="128.100171" transform="rotate(-0 262.27812 128.100171)">Solo entre dimensiones</text>
+    </g>
+    <g id="patch_13">
+     <path d="M 241.27812 138.704468 
+L 256.27812 138.704468 
+L 256.27812 133.454468 
+L 241.27812 133.454468 
+z
+" style="fill: #c4c4c4"/>
+    </g>
+    <g id="text_9">
+     <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="262.27812" y="138.704468" transform="rotate(-0 262.27812 138.704468)">También dentro de una dimensión</text>
+    </g>
+    <g id="line2d_1">
+     <path d="M 241.27812 146.683765 
+L 248.77812 146.683765 
+L 256.27812 146.683765 
+" style="fill: none; stroke: #000000; stroke-opacity: 0; stroke-width: 1.5; stroke-linecap: square"/>
+    </g>
+    <g id="text_10">
+     <text style="font-size: 7.5px; font-family: 'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif; text-anchor: start; fill: #111111" x="262.27812" y="149.308765" transform="rotate(-0 262.27812 149.308765)">Ancho proporcional a la cantidad de patrones</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p69bcc2e49c">
+   <rect x="2.88" y="2.88" width="350.982" height="157.9419"/>
+  </clipPath>
+ </defs>
+</svg>

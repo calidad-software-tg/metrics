@@ -1,0 +1,19 @@
+x,y,relacion,explicacion,rho_original,rho_validado,fuente,estado_en_datos,texto_original,texto_validado,texto_resultado
+le_mediana,anmcc_mediana,LE (mediana) ↔ ANMCC (mediana),recién llegados,0.4793,,,Descartada,0.48,0.08,Descartada
+dev_exp_mediana,anmcc_mediana,Development Experience (mediana) ↔ ANMCC (mediana),recién llegados,0.3839,,,Descartada,0.38,-0.01,Descartada
+le_mediana,tasa_nuevos_commits_ratio,LE (mediana) ↔ Tasa de ingreso (commits),recién llegados,-0.7279,,,Se mantiene (patrón),-0.73,0.01,Descartada
+dev_exp_mediana,tasa_nuevos_commits_ratio,Development Experience (mediana) ↔ Tasa de ingreso (commits),recién llegados,-0.7133,,,Se mantiene (patrón),-0.71,-0.02,Descartada
+cdiv_mediana,tasa_nuevos_commits_ratio,CDIV (mediana) ↔ Tasa de ingreso (commits),recién llegados,-0.4378,,,Se mantiene (patrón),-0.44,0.01,Descartada
+rexp_mediana,tasa_nuevos_commits_ratio,REXP (mediana) ↔ Tasa de ingreso (commits),recién llegados,-0.2876,,,Se mantiene (patrón),-0.29,-0.02,Descartada
+cdiv_mediana,le_mediana,CDIV (mediana) ↔ LE (mediana),recién llegados,0.4855,,,Se mantiene (patrón),0.49,0.04,Descartada
+cdiv_mediana,dev_exp_mediana,CDIV (mediana) ↔ Development Experience (mediana),recién llegados,0.4064,,,Se mantiene (patrón),0.41,0.06,Descartada
+le_mediana,rexp_mediana,LE (mediana) ↔ REXP (mediana),recién llegados,0.2874,,,Se mantiene (patrón),0.29,0.07,Descartada
+le_mediana,prop_commitean_ratio,LE (mediana) ↔ Proporción que commitea,recién llegados,-0.3272,,,Se mantiene (patrón),-0.33,-0.38,Se mantiene
+dev_exp_mediana,prop_commitean_ratio,Development Experience (mediana) ↔ Proporción que commitea,recién llegados,-0.2958,,,Se mantiene (patrón),-0.3,-0.29,Se mantiene
+cdiv_mediana,commits_doc_producto,CDIV (mediana) ↔ Commits que tocan documentación,commits solo de documentación,-0.4245,,,Descartada,-0.42,-0.15,Descartada
+anmcc_mediana,commits_doc_producto,ANMCC (mediana) ↔ Commits que tocan documentación,commits solo de documentación,-0.4524,,,Descartada,-0.45,-0.07,Descartada
+sc_mediana,jarczyk_success_rate_producto,SC (mediana) ↔ Jarczyk Success Rate,issues del mismo release,0.3281,,,Descartada,0.33,0.0,Descartada
+nci_producto,jarczyk_success_rate_producto,NCI ↔ Jarczyk Success Rate,issues del mismo release,0.3939,,,Se mantiene (patrón),0.39,0.15,Descartada
+nci_producto,process_performance_producto,NCI ↔ Process Performance,issues del mismo release,0.2846,,,Se mantiene (patrón),0.28,0.08,Descartada
+tasa_nuevos_commits_ratio,le_producto,Tasa de ingreso (commits) ↔ LE del proyecto,recién llegados,-0.2637,,,Descartada,-0.26,0.08,Descartada
+prop_commitean_ratio,le_producto,Proporción que commitea ↔ LE del proyecto,recién llegados,-0.2877,,,Descartada,-0.29,-0.2,Se mantiene

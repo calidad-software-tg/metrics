@@ -1,0 +1,4 @@
+par,cca_principal,p,pct_asignaciones_sobre_azar,n_azar
+Persona–Proceso,0.45,0.005,99.8,500
+Persona–Producto,0.61,0.005,98.8,500
+Proceso–Producto,0.33,0.1,81.4,500

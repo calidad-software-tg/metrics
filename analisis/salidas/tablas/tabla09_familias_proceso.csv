@@ -1,0 +1,9 @@
+familia,nombre,patrones,rho,entre,no_son_patron_en_los_datos
+G,Resolver lo nuevo y cerrar lo viejo,4,"−0,18 a +0,29",Proceso–Producto,
+H,Issues de documentación y ritmo general de las issues,6,"−0,27 a +0,32",Persona–Proceso; Proceso–Producto,
+I,Dos medidas de la resolución de lo nuevo,1,"+0,83",,
+J,Experiencia y tiempo de resolución,1,"−0,23",Persona–Proceso; Persona–Producto; Proceso–Producto,
+K,Concentración del núcleo y cierre de lo viejo,2,"+0,20 y +0,29",Persona–Proceso; Persona–Proceso; Persona–Producto; Proceso–Producto,
+L,Revisores más activos y resolución de lo nuevo,2,"+0,18 y +0,22",Persona–Proceso,
+M,Revisores más activos y bugs de usuarios,4,"−0,31 a −0,27",Persona–Proceso; Persona–Producto; Proceso–Producto,
+D,Medidas de la concentración del núcleo entre sí,5,"+0,19 a +0,47",Persona–Proceso,

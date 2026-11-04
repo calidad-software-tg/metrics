@@ -1,0 +1,8 @@
+nivel,elementos,asignacion,tipo,desaparece
+variables,cdiv_mediana · le_mediana · rexp_mediana,"cdiv_mediana→Proceso, le_mediana→Producto, rexp_mediana→Persona",dos aspectos,le_mediana ↔ rexp_mediana
+variables,cdiv_mediana · le_mediana · tasa_nuevos_commits_ratio,"cdiv_mediana→Proceso, le_mediana→Producto, tasa_nuevos_commits_ratio→Persona",dos aspectos,cdiv_mediana ↔ tasa_nuevos_commits_ratio
+variables,dloc_flujo_producto · exprev_share_top10pct · prop_commitean_ratio,"dloc_flujo_producto→Producto, exprev_share_top10pct→Proceso, prop_commitean_ratio→Persona",cadena,dloc_flujo_producto ↔ prop_commitean_ratio
+variables,dloc_flujo_producto · nc_share_top10pct · prop_commitean_ratio,"dloc_flujo_producto→Producto, nc_share_top10pct→Proceso, prop_commitean_ratio→Persona",cadena,dloc_flujo_producto ↔ nc_share_top10pct; dloc_flujo_producto ↔ prop_commitean_ratio
+variables,dloc_flujo_producto · nc_share_top10pct · sc_p90,"dloc_flujo_producto→Producto, nc_share_top10pct→Persona, sc_p90→Proceso | dloc_flujo_producto→Producto, nc_share_top10pct→Proceso, sc_p90→Persona",dos aspectos,dloc_flujo_producto ↔ nc_share_top10pct; dloc_flujo_producto ↔ sc_p90
+variables,dloc_flujo_producto · prop_commitean_ratio · sc_p90,"dloc_flujo_producto→Producto, prop_commitean_ratio→Persona, sc_p90→Proceso",cadena,dloc_flujo_producto ↔ prop_commitean_ratio; dloc_flujo_producto ↔ sc_p90
+grupo,persona_g4 (concentración del núcleo) · proceso_g10 (cierre de lo viejo) · producto_g8 (Learning Ease),"persona_g4→Persona, proceso_g10→Proceso, producto_g8→Producto",cadena,persona_g4↔proceso_g10
