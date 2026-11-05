@@ -455,7 +455,7 @@ def main():
 
     # ── 5 y 7. regresión y random forest: cada variable de B con todas las de A ──
     print("  5/7. regresión multivariable y random forest…", flush=True)
-    filas_mod = []
+    filas_mod, filas_imp = [], []
     A_todo, Acan_todo = A, Acan
     Zt = extra["tamano"]
     for j, y_id in enumerate(vb):
@@ -477,6 +477,11 @@ def main():
             r2c_rf = r2(Bcan[:, j], m.predict(Acan_j))
             imp = permutation_importance(m, Acan_j, Bcan[:, j], n_repeats=5, random_state=gp.SEMILLA)
             top = [va[cols[i]] for i in np.argsort(-imp.importances_mean)[:3]]
+            # importancia de cada predictor: en canary (fuera de muestra) y en la serie estable con la que se ajustó
+            imp_est = permutation_importance(m, A, y, n_repeats=5, random_state=gp.SEMILLA)
+            for i, c in enumerate(cols):
+                filas_imp.append(dict(variable=y_id, predictor=va[c], importancia_canary=imp.importances_mean[i],
+                                      importancia_canary_sd=imp.importances_std[i], importancia_estable=imp_est.importances_mean[i]))
         else:
             top = []
         # estabilidad de los signos de la regresión: remuestreo en bloques
@@ -505,6 +510,7 @@ def main():
               f"(nula {np.percentile(nula_rf, 95):+.2f}) · canary RF {r2c_rf:+.2f}", flush=True)
     A = A_todo
     escribir(destino / "modelos.csv", filas_mod)
+    escribir(destino / "importancias_rf.csv", filas_imp)
     reg_ok = [f for f in filas_mod if f["r2_cv_regresion"] > max(0.1, f["nula_p95_regresion"]) and f["r2_canary_regresion"] > 0.05
               and f["r2_cv_regresion_tamano"] > 0.1]
     rf_ok = [f for f in filas_mod if f["r2_cv_rf"] > max(0.1, f["nula_p95_rf"]) and f["r2_canary_rf"] > 0.05

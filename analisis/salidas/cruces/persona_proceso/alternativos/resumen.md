@@ -19,7 +19,7 @@
 | ANMCC (Avg Modified Components per Commit) [mediana] | +0,24 (-0,08) | -0,15 | +0,23 | 9/28 | +0,24 (-0,01) | +0,07 | +0,24 | tasa_nuevos_commits_ratio, nuevos_commits_conteo, rexp_mediana |
 | ANMCC (Avg Modified Components per Commit) [producto] | -0,17 (-0,10) | -0,22 | -0,05 | 5/28 | -0,03 (-0,01) | -0,02 | -0,06 | prop_comentan_ratio, le_mediana, tasa_nuevos_interaccion_ratio |
 | CFDR (Customer Found Defects & Regressions) [producto] | +0,37 (-0,07) | +0,25 | -0,08 | 9/28 | +0,34 (+0,03) | +0,33 | -0,00 | activos_interaccion_conteo, nuevos_interaccion_conteo, prop_comentan_ratio |
-| Jarczyk Success Rate [producto] | -0,06 (-0,14) | -0,03 | +0,01 | 7/28 | +0,12 (+0,01) | +0,13 | +0,14 | sc_mediana, activos_cierre_conteo, prop_cierran_ratio |
+| Jarczyk Success Rate [producto] | -0,06 (-0,14) | -0,03 | +0,01 | 7/28 | +0,12 (+0,02) | +0,13 | +0,14 | sc_mediana, activos_cierre_conteo, prop_cierran_ratio |
 | MTTR (Mean Time to Repair) [mediana] | -0,16 (-0,14) | -0,20 | -0,11 | 5/28 | -0,04 (+0,01) | -0,01 | -0,01 | disc_centrality_mediana, prop_comentan_ratio, ss_mediana |
 | MTTR (Mean Time to Repair) [producto] | -0,15 (-0,12) | -0,31 | -0,07 | 10/28 | +0,00 (+0,01) | +0,01 | -0,03 | exprev_share_top10pct, ss_mediana, nc_share_top10pct |
 | NCI (Number of Closed Issues) [p90] | -0,19 (-0,17) | -0,28 | -0,09 | 6/28 | +0,08 (-0,01) | +0,00 | +0,09 | exprev_share_top10pct, rexprev_mediana, sc_mediana |
