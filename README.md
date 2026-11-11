@@ -115,9 +115,20 @@ Cuántos pares se evaluaron y cuántos patrones quedaron en cada clase se ve al 
 Requisitos: Docker y un [token de GitHub](https://github.com/settings/tokens). Alcanza con acceso de
 lectura a repositorios públicos.
 
+No hace falta clonar este repositorio: la imagen ya trae la herramienta. Alcanza con dos archivos, en
+una carpeta vacía (una por cada repositorio que se analice, así cada uno tiene su propia base):
+
+```bash
+mkdir tres-p-mi-proyecto && cd tres-p-mi-proyecto
+curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.0/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.0/.env.example
+```
+
+Después:
+
 ```bash
 cp .env.example .env            # completar GITHUB_TOKEN
-docker compose pull tres-p      # imagen publicada en ghcr.io, amd64 y arm64 (o: docker compose build)
+docker compose pull tres-p      # imagen publicada en ghcr.io, amd64 y arm64
 docker compose up -d db         # PostgreSQL 16
 docker compose run --rm tres-p iniciar --repo org/nombre
 docker compose run --rm tres-p todo
@@ -125,7 +136,9 @@ docker compose run --rm tres-p todo
 
 La imagen es la versión fijada en `docker-compose.yml` (`TRES_P_VERSION`, por defecto la última
 publicada al escribir esta guía); para usar otra, `TRES_P_VERSION=X.Y.Z` en `.env`. Las versiones están
-en [Packages](https://github.com/calidad-software-tg/metrics/pkgs/container/tres-p).
+en [Packages](https://github.com/calidad-software-tg/metrics/pkgs/container/tres-p). Para armar la
+imagen desde el código (por ejemplo, para modificar una métrica), se clona el repositorio y se corre
+`docker compose build` en su raíz.
 
 Todo lo que genera queda en `trabajo/`: `proyecto.json`, `datos/` y `salidas/`. Para usar un clon que
 ya tengas, en `.env` va `TRES_P_CLON_HOST=/ruta/al/clon` y en `trabajo/proyecto.json`, `"clon": "/repo"`.
