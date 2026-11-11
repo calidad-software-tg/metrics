@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-export_persona.py  —  Exporta métricas de persona para vercel/next.js.
+export_persona.py  —  Exporta las métricas por persona del repositorio analizado.
 
 Genera:
   metricas_persona.csv
@@ -37,9 +37,10 @@ DB = dict(host=os.environ.get("POSTGRES_HOST", "localhost"),
           user=os.environ.get("POSTGRES_USER", "metricas"),
           password=os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
-EXCLUIR_ESTABLE = frozenset({
-    "4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"
-})
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent))
+import proyecto  # noqa: E402
+EXCLUIR_ESTABLE = proyecto.EXCLUIR_ESTABLE
 
 METRICAS_COMMITS     = frozenset({"anmcc","cdiv","fexp","rexp","le"})
 METRICAS_INTERACCION = frozenset({"nc","exprev","rexprev","disc_centrality","sc","nci","mttr","dis"})

@@ -1,0 +1,38 @@
+# Base de resultados + la herramienta. Uso:
+#   docker compose up -d db
+#   docker compose run --rm tres-p iniciar --repo org/nombre
+#   docker compose run --rm tres-p todo
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-metricas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-metricas}
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-metricas}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  tres-p:
+    image: ghcr.io/calidad-software-tg/tres-p:latest   # imagen publicada; `build` la arma localmente
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      TRES_P_PROYECTO: /app/trabajo/proyecto.json
+    volumes:
+      - ./trabajo:/app/trabajo                 # proyecto.json del repo analizado
+      - ./trabajo/salidas:/app/analisis/salidas  # hallazgos y reportes
+      - ./trabajo/clones:/app/.clones          # clones descargados
+      - ${TRES_P_CLON_HOST:-./trabajo/clones}:/repo:ro   # clon propio (opcional)
+
+volumes:
+  pgdata:

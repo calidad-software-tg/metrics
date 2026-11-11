@@ -8,56 +8,21 @@
 Cómo generar el análisis de correlaciones y de componentes principales (PCA) de una
 dimensión (Persona, Proceso o Producto). Todo se corre desde la raíz del repositorio.
 
-## Antes de empezar
+## Cómo se corre
 
-- La base de datos levantada y cargada (contenedor `tg_metricas_db`), con las
-  credenciales en el `.env` de la raíz (`POSTGRES_*`).
-- Python 3 con `numpy`, `scipy`, `pandas` y `psycopg2`.
+Todo el análisis se corre con `python3 tres_p.py analizar` desde la raíz (ver el README principal),
+que ejecuta los scripts en este orden:
 
-## Pasos
+1. `generar_diccionario.py`: el diccionario de variables (métrica, nivel, estadístico, dimensiones del catálogo).
+2. `correlaciones.py`: pares dentro de cada dimensión.
+3. `pca.py` y `clustering.py` de cada dimensión.
+4. `cruces.py` para cada par de dimensiones, con la configuración de `analisis/cruces/`.
+5. `tres_dimensiones.py`, `multiverso_asignacion.py`, `relaciones.py --recalcular` y `bloques_etiquetas.py`.
+6. Los reportes HTML (`reporte_pca.py`, `reporte_cruce.py`).
 
-1. **Exportar las métricas por persona** (genera `persona_agregado_estable_canary.csv`):
-
-   ```bash
-   python3 export_persona.py
-   ```
-
-   Usa credenciales fijas en el script (`DB = ...`); si tu base usa otras, cambialas ahí.
-   Si falla en las validaciones del final, los CSV ya quedaron generados.
-
-2. **Calcular las correlaciones** dentro de cada dimensión (genera `analisis/salidas/pares_correlacion.csv`
-   y `pares_valores.csv`):
-
-   ```bash
-   python3 analisis/correlaciones.py
-   ```
-
-   Con `--periodos ambos` repite la regla de estabilidad con las épocas y compara (ver más abajo).
-
-3. **Calcular el PCA y el clustering de tu dimensión** (generan `analisis/salidas/pca/` y el reporte
-   `analisis/salidas/reportes/reporte_pca_<dimension>.html`):
-
-   ```bash
-   python3 analisis/pca.py Persona
-   python3 analisis/clustering.py Persona
-   ```
-
-   Por defecto el PCA retiene los componentes que indica el análisis paralelo de Horn; con `--k 4`
-   se fija otra cantidad.
-
-4. **Escribir tu informe.** Copiá `analisis/informes/producto_producto.md` como
-   `analisis/informes/persona_persona.md` (o `proceso_proceso.md`), cambiá en el encabezado
-   `cruce: Persona-Persona` y el título, y reemplazá el texto por tu análisis. Las líneas
-   `[[...]]` son marcas que se reemplazan por gráficos y tablas; la lista completa está al
-   principio de `analisis/generar_informe.py`.
-
-5. **Generar el informe** (también regenera el reporte interactivo de correlaciones del cruce):
-
-   ```bash
-   python3 analisis/generar_informe.py analisis/informes/persona_persona.md
-   ```
-
-   Queda en `analisis/salidas/reportes/informe_persona_persona.html`.
+Los datos salen de la base del proyecto (`POSTGRES_*` en `.env`) y de `persona_agregado_estable_canary.csv`
+(`tres_p.py exportar`). El repositorio, los tags excluidos, el calendario, las épocas y las relaciones
+descartadas al validar se leen de `proyecto.json` (`proyecto.py`).
 
 ## Cómo está organizado el código
 

@@ -285,7 +285,12 @@ def alinear_canary(r_e, r_c, j, umbral):
 def componentes(dim, cfg, duraciones):
     d, conj = cargar_pca(dim, cfg)
     enf = cfg["componentes"]["enfoque"]
-    r_e = d["resultados"][f"{conj}|estable|{enf}"]
+    r_e = d["resultados"].get(f"{conj}|estable|{enf}")
+    if r_e is None:
+        # pca.py no calcula el PCA con menos de 3 releases por variable: sin componentes para esta
+        # dimensión el cruce sigue con las variables
+        print(f"  aviso: sin PCA {conj}/{enf} de {dim} (pocos releases para sus variables); se cruza sin sus componentes")
+        return []
     r_c = d["resultados"].get(f"{conj}|canary|{enf}")
     k = r_e["k"]
     elegidos = cfg["componentes"]["elegir"].get(dim)

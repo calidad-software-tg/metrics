@@ -65,8 +65,8 @@ if env_path.exists():
             os.environ.setdefault(k.strip(), v.strip())
 
 _root = Path(__file__).resolve().parent
-for _d in ["35", "10", "16", "20", "15", "18", "23", "27", "40", "43", "28", "38", "39", "42", "Notion"]:
-    sys.path.insert(0, str(_root / _d))
+for _d in ["35", "10", "16", "20", "15", "18", "23", "27", "40", "43", "28", "38", "39", "42", "extra"]:
+    sys.path.insert(0, str(_root / "metricas" / _d))
 
 import requests
 

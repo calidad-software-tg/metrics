@@ -60,15 +60,18 @@ import pca  # noqa: E402
 
 SALIDA = corr.ROOT / "analisis" / "salidas" / "tres_dimensiones"
 DIMS = ("Persona", "Proceso", "Producto")
+# Qué componentes de cada PCA entran, cómo se llaman, cuál es tamaño (no calidad) y qué triángulo se
+# evalúa siempre: proyecto.json, clave "tres_dimensiones" (opcional).
+# Sin esa clave entran los componentes firmes (bootstrap y canary) y se nombran por su variable de mayor carga.
+sys.path.insert(0, str(corr.ROOT))
+import proyecto  # noqa: E402
+_TD = proyecto.CFG.get("tres_dimensiones") or {}
 CFG = cruces.mezclar(cruces.DEFAULTS, {"componentes": {
     "conjunto": {"Persona": "todas", "Proceso": "producto", "Producto": "producto"},
-    "elegir": {"Persona": [1, 2, 3], "Proceso": [2, 5], "Producto": [1, 4]}}})
-NOMBRES = {"persona_cp1": "renovación del equipo", "persona_cp2": "volumen de actividad",
-           "persona_cp3": "concentración del núcleo", "proceso_cp2": "resolución de lo nuevo",
-           "proceso_cp5": "cierre de lo viejo", "producto_cp1": "bugs de usuarios",
-           "producto_cp4": "flujo de documentación"}
-ESCALA = {"persona_cp2"}                     # volumen de actividad: es tamaño, no calidad
-TRIANGULO_ARTIFACT = ("persona_cp3", "proceso_cp5", "producto_cp1")
+    "elegir": {d: list(v) for d, v in (_TD.get("elegir") or {}).items()}}})
+NOMBRES = dict(_TD.get("nombres") or {})
+ESCALA = set(_TD.get("escala") or [])          # componentes de tamaño o volumen de actividad
+TRIANGULO_ARTIFACT = tuple(_TD["triangulo_destacado"]) if _TD.get("triangulo_destacado") else None
 # asignación única de las métricas que el catálogo asocia a dos dimensiones (la de los cruces de a pares)
 ASIGNACION = {
     "Persona": ["exprev", "rexprev", "cdiv", "nc", "sc", "dev_exp", "le (por colaborador)", "cd (por colaborador)"],
@@ -78,9 +81,9 @@ ASIGNACION = {
 # variantes de la medida global: sin el componente de volumen, sin tamaño (puntajes residualizados por el
 # logaritmo de los activos) y, además, sin uno de los dos componentes del único par mecánico (LE por colaborador
 # en renovación del equipo y LE del proyecto en flujo de documentación)
-VARIANTES = {"todos": {}, "sin_volumen": dict(quitar=ESCALA), "sin_tamano": dict(quitar=ESCALA, tamano=True),
-             "sin_tamano_ni_documentacion": dict(quitar=ESCALA | {"producto_cp4"}, tamano=True),
-             "sin_tamano_ni_renovacion": dict(quitar=ESCALA | {"persona_cp1"}, tamano=True)}
+VARIANTES = {"todos": {}, "sin_volumen": dict(quitar=ESCALA), "sin_tamano": dict(quitar=ESCALA, tamano=True)}
+for _nombre, _quitar in (_TD.get("variantes_extra") or {}).items():   # ej. sin uno de un par mecánico
+    VARIANTES[_nombre] = dict(quitar=ESCALA | set(_quitar), tamano=True)
 N_PERM = 1000
 N_PERM_CANARY = 300
 CARGA_MIN = CFG["carga_minima"]
@@ -350,10 +353,16 @@ def main():
                 if t[0] is not None:
                     duraciones[s].setdefault(p, t[0])
     cps = [c for d in DIMS for c in cruces.componentes(d, CFG, duraciones)]
-    cols = [c["id"] for c in cps]
-    assert cols == list(NOMBRES), cols
     sin_canary = [c["id"] for c in cps if not c["canary_serie"]]
-    assert not sin_canary, f"sin serie canary: {sin_canary}"
+    if sin_canary:
+        print(f"  aviso: sin serie canary alineada, quedan afuera: {', '.join(sin_canary)}")
+        cps = [c for c in cps if c["canary_serie"]]
+    for c in cps:   # nombre automático: la variable de mayor carga
+        NOMBRES.setdefault(c["id"], c["cargas"][0][0] if c["cargas"] else c["id"])
+    cols = [c["id"] for c in cps]
+    if len({c["dim"] for c in cps}) < 3:
+        sys.exit("tres_dimensiones: no hay componentes firmes en las tres dimensiones; "
+                 "el análisis de tres dimensiones necesita al menos uno por dimensión")
     vars_de = {c["id"]: cruces.vars_cp(c, CARGA_MIN, var_dict) for c in cps}
     dim_de = {}
     for c in cps:
@@ -422,7 +431,8 @@ def main():
     candidatos = {tuple(f["triangulo"].split(" · ")) for f in triangulos
                   if "pares sueltos" not in (f["tipo"], f["tipo_epocas"], f["tipo_red_parcial"]) or
                   f["tipo"] == "cadena" or f["tipo_epocas"] == "cadena" or f["tipo_red_parcial"] != "pares sueltos"}
-    candidatos.add(TRIANGULO_ARTIFACT)
+    if TRIANGULO_ARTIFACT and all(c in vars_de for c in TRIANGULO_ARTIFACT):
+        candidatos.add(TRIANGULO_ARTIFACT)
     trios = {}
     for tri in sorted(candidatos):
         for va, vb, vc in product(*(vars_de[c] for c in tri)):

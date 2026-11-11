@@ -1,7 +1,7 @@
 """
 db/mapear_identidades.py
 
-Construye una tabla de equivalencias nombre_git -> login_github para next.js, usando
+Construye una tabla de equivalencias nombre_git -> login_github para el repositorio analizado, usando
 exactamente la misma clave que las métricas del runner local (run_versiones_local.py
 atribuye por el nombre de git del autor, `%an`, sin mailmap).
 
@@ -17,7 +17,8 @@ Salidas:
 Uso:
     python3 db/mapear_identidades.py
 Flags:
-    --repo-dir .clones/next.js   dónde está el clon
+    --repo org/nombre            repositorio (por defecto, el de proyecto.json)
+    --repo-dir .clones/<nombre>  dónde está el clon
     --max-shas 10                cuántos SHAs probar por identidad en la fase API
     --batch 50                   alias por request GraphQL
 """
@@ -31,10 +32,18 @@ import sys
 import time
 import urllib.request
 import urllib.error
+import ssl
+
+try:  # certificados de certifi (viene con requests): el Python de macOS no trae los del sistema
+    import certifi
+    _SSL = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    _SSL = ssl.create_default_context()
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+OWNER, NOMBRE = "", ""
 _env = ROOT / ".env"
 if _env.exists():
     for _l in _env.read_text().splitlines():
@@ -78,7 +87,7 @@ def verificar_token() -> None:
         headers={"Authorization": f"Bearer {TOKEN}", "Accept": "application/vnd.github+json"},
     )
     try:
-        with urllib.request.urlopen(req, timeout=10) as r:
+        with urllib.request.urlopen(req, timeout=10, context=_SSL) as r:
             data = json.loads(r.read())
     except Exception as e:
         sys.exit(f"GITHUB_TOKEN no funciona: {e}")
@@ -97,7 +106,7 @@ def consulta_graphql(query: str, variables: dict | None = None, intento: int = 0
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
+        with urllib.request.urlopen(req, timeout=60, context=_SSL) as r:
             data = json.loads(r.read())
         if "errors" in data:
             # Error no transiente (ej. query mal armado): propagar.
@@ -164,8 +173,8 @@ def resolver_por_api(pendientes: dict[str, list[str]], batch: int, max_shas: int
                 partes_q.append(
                     f'a{j}: object(oid: "{sha}") {{ ... on Commit {{ author {{ user {{ login }} }} }} }}'
                 )
-            query = ('query { repository(owner: "vercel", name: "next.js") { '
-                     + " ".join(partes_q) + " } }")
+            query = (f'query {{ repository(owner: "{OWNER}", name: "{NOMBRE}") {{ '
+                     + " ".join(partes_q) + " } }")  # noqa: E501
             data = consulta_graphql(query)
             repo_obj = ((data or {}).get("data") or {}).get("repository") or {}
             for j, (nombre, _) in enumerate(lote):
@@ -191,12 +200,20 @@ def resolver_por_api(pendientes: dict[str, list[str]], batch: int, max_shas: int
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--repo-dir", default=".clones/next.js")
+    ap.add_argument("--repo", default=None, metavar="ORG/REPO",
+                    help="repositorio en GitHub (por defecto, el de proyecto.json)")
+    ap.add_argument("--repo-dir", default=None, help="clon local (por defecto .clones/<nombre>)")
     ap.add_argument("--max-shas", type=int, default=3)
     ap.add_argument("--batch", type=int, default=50)
     args = ap.parse_args()
+    global OWNER, NOMBRE
+    if args.repo is None:
+        sys.path.insert(0, str(ROOT))
+        import proyecto
+        args.repo = proyecto.REPO
+    OWNER, NOMBRE = args.repo.split("/", 1)
 
-    repo_dir = Path(args.repo_dir)
+    repo_dir = Path(args.repo_dir or os.environ.get("TRES_P_CLON") or ROOT / ".clones" / NOMBRE)
     if not (repo_dir / ".git").exists() and not (repo_dir / "HEAD").exists():
         sys.exit(f"No encuentro el clon en {repo_dir}")
 

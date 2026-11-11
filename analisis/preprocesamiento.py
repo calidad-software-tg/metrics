@@ -45,9 +45,11 @@ DB = dict(host=os.environ.get("POSTGRES_HOST", "localhost"),
           user=os.environ.get("POSTGRES_USER", "metricas"),
           password=os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
-EXCLUIR_ESTABLE = frozenset({
-    "4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"
-})
+import sys as _sys
+_sys.path.insert(0, str(ROOT))
+import proyecto  # noqa: E402  (repo, tags excluidos, calendario y épocas del proyecto analizado)
+
+EXCLUIR_ESTABLE = proyecto.EXCLUIR_ESTABLE
 
 DIM_ORDER = ["Persona", "Proceso", "Producto"]
 SERIES = [("estable", "versiones"), ("canary", "versiones_canary")]
@@ -70,13 +72,8 @@ RATIO_DEFS_CORR = [
 # Períodos para la estabilidad de las relaciones. El calendario es el criterio principal (se fijó antes
 # de mirar los datos); las épocas (temporal.py: todas las métricas, toda la historia, peso por dimensión)
 # se usan como prueba de sensibilidad y empiezan en estos releases.
-CALENDARIO = [
-    ("2016-2019", 2016, 2019),
-    ("2020-2022", 2020, 2022),
-    ("2023-2024", 2023, 2024),
-    ("2025-2026", 2025, 2026),
-]
-CORTES_EPOCAS = ("v9.1.7", "v12.0.5", "v14.1.1")
+CALENDARIO = proyecto.CALENDARIO          # [(etiqueta, año_desde, año_hasta)]: proyecto.json o "auto"
+CORTES_EPOCAS = proyecto.CORTES_EPOCAS    # primer release de cada época: proyecto.json o "auto"
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────

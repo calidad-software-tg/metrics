@@ -87,8 +87,10 @@ VENTANA_LOCAL        = 21    # releases por grado de libertad del spline de tend
 # las mismas issues (etiquetadas como bug y reportadas por alguien de fuera del equipo principal).
 SOLAPAMIENTO_METRICAS = {frozenset({"dloc", "rc"}), frozenset({"noi", "cfdr"}), frozenset({"noi", "nub"}),
                          frozenset({"cfdr", "nub"})}
+import proyecto  # noqa: E402  (la raíz ya está en sys.path por preprocesamiento)
 ADVERTENCIA_DLOC = ("DLOC no cuenta archivos .mdx: la documentación oficial (docs/) pasó de .md a .mdx "
-                    "en 2023 (v13.4 → v14.0) y desde entonces no se cuenta")
+                    "en 2023 (v13.4 → v14.0) y desde entonces no se cuenta") if proyecto.REPO == "vercel/next.js" else (
+                    "DLOC no cuenta archivos .mdx")
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -567,9 +569,8 @@ def write_metodo():
 
 ## Fuente y serie
 
-Datos de **vercel/next.js**, serie **estable** (`tipo_analisis = 'versiones'`),
-excluyendo las 4 releases: `4.4.0-canary.2`, `4.4.0-canary.1`,
-`v12.2.3-canary.5`, `v15.0.0-rc.1`.
+Datos de **{REPO}**, serie **estable** (`tipo_analisis = 'versiones'`),
+excluyendo las releases: {EXCLUIDAS}.
 
 Se incluye `rho_canary` calculada sobre la serie `versiones_canary`.
 
@@ -686,6 +687,8 @@ las relaciones con el tamaño).
 `pares_correlacion.par_id = pares_valores.par_id`.
 """
     with open(OUT_MD, "w", encoding="utf-8") as f:
+        md = md.replace("{REPO}", proyecto.REPO or "el repositorio analizado").replace(
+            "{EXCLUIDAS}", ", ".join(f"`{x}`" for x in sorted(proyecto.EXCLUIR_ESTABLE) if not x.startswith("__")) or "ninguna")
         f.write(md)
     print(f"  {OUT_MD.name} escrito.")
 

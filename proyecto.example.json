@@ -1,0 +1,9 @@
+{
+  "repo": "org/nombre",
+  "clon": null,
+  "hasta": null,
+  "excluir_estable": [],
+  "calendario": "auto",
+  "cortes_epocas": "auto",
+  "descartados": null
+}

@@ -33,8 +33,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _root = Path(__file__).resolve().parent
-for _d in ["10", "15", "16", "Notion"]:
-    sys.path.insert(0, str(_root / _d))
+for _d in ["10", "15", "16", "extra"]:
+    sys.path.insert(0, str(_root / "metricas" / _d))
 
 # Helpers de conteo de las propias métricas de archivos.
 from loc import _CODE_EXTENSIONS as LOC_EXT, _is_excluded, _count_lines as loc_count
@@ -80,6 +80,16 @@ def _git(dir_repo: Path, *args: str) -> str:
 
 
 def clonar_o_actualizar(org: str, repo: str) -> Path:
+    # Un clon que ya tenga el usuario (TRES_P_CLON): se usa tal cual, solo se actualizan los tags.
+    propio = os.environ.get("TRES_P_CLON")
+    if propio:
+        dest = Path(propio).expanduser().resolve()
+        if not (dest / ".git").exists():
+            print(f"TRES_P_CLON={dest} no es un clon de git", file=sys.stderr)
+            sys.exit(1)
+        print(f"Usando el clon local {dest} ...")
+        _git(dest, "fetch", "--quiet", "--tags", "--force", "origin")
+        return dest
     CLONES_DIR.mkdir(exist_ok=True)
     dest = CLONES_DIR / repo
     if (dest / ".git").exists():

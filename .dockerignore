@@ -1,0 +1,10 @@
+.git
+.env
+.clones
+trabajo
+proyecto.json
+analisis/salidas
+persona_*.csv
+metricas_persona.csv
+db/identidades_*.csv
+**/__pycache__

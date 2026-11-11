@@ -53,9 +53,10 @@ DB = dict(host=_os.environ.get("POSTGRES_HOST", "localhost"),
           user=_os.environ.get("POSTGRES_USER", "metricas"),
           password=_os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
-EXCLUIR_ESTABLE = frozenset({
-    "4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"
-})
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import proyecto  # noqa: E402
+EXCLUIR_ESTABLE = proyecto.EXCLUIR_ESTABLE
 
 # ── Dimensiones por métrica ──────────────────────────────────────────────────
 DIMS: dict[str, tuple[int, int, int]] = {
@@ -114,14 +115,20 @@ DIM_NAMES = {(1,0,0): "Persona", (1,1,0): "Persona+Proceso",
              (1,0,1): "Persona+Producto", (0,1,0): "Proceso",
              (0,1,1): "Proceso+Producto", (0,0,1): "Producto"}
 
+# Advertencias que valen para cualquier repositorio (cómo se calcula la métrica).
 ADVERTENCIAS = {
-    "nub": ("NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs "
-            "(substring match en _KEYWORDS_BUG); solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs"),
-    "cfdr": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
+    "nub": "Cuenta como bug las issues cuyas etiquetas contienen alguna de las palabras de _KEYWORDS_BUG (match de subcadena)",
     "dis": "DIS: posible falso positivo por etiquetas que contienen 'doc' (ej. 'Docker') debido a match de subcadena en _DOC_KEYWORDS",
     "ss": ("Lenguajes del usuario tomados hoy (snapshot actual de repos propios), no en cada release; "
            "tope de 15 contribuyentes activos por ventana (bots excluidos del tope)"),
 }
+# Las propias de vercel/next.js, detectadas al revisar sus datos.
+if proyecto.REPO == "vercel/next.js":
+    ADVERTENCIAS.update({
+        "nub": ("NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs "
+                "(substring match en _KEYWORDS_BUG); solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs"),
+        "cfdr": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
+    })
 
 # Métricas a incluir como producto (tienen contribuyente_login IS NULL en versiones)
 METRICAS_PRODUCTO = {
