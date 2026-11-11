@@ -39,7 +39,7 @@ def compliance_a_tiempo(milestone: dict) -> float | None:
 
     La versión original (calcular_schedule_compliance) usa open_issues/closed_issues de
     hoy, no al vencer el plazo, y no compara con la fecha límite: un milestone terminado
-    con atraso contaba como cumplido (en next.js valía 1,0 en 39 de 41 milestones)."""
+    con atraso contaba como cumplido (la métrica valía 1,0 casi siempre)."""
     cierres = milestone.get("cierres", [])
     if not cierres or not milestone.get("due_on"):
         return None
@@ -136,8 +136,8 @@ class ScheduleCompliance(GitHubMetric):
         scores = [c for c in (compliance_a_tiempo(m) for m in self._milestones_en_periodo(fecha_inicio, fecha_fin))
                   if c is not None]
         if not scores:
-            # Sin milestones con fecha límite la ventana no es observable (next.js dejó de
-            # usarlos alrededor de 2020): None, no 0.0, que se leería como incumplimiento.
+            # Sin milestones con fecha límite la ventana no es observable (hay proyectos que
+            # dejan de usarlos): None, no 0.0, que se leería como incumplimiento.
             return None
         return round(sum(scores) / len(scores), 4)
 

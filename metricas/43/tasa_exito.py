@@ -96,7 +96,7 @@ class JarczykSuccessRate(GitHubMetric):
 
         n1 tiene que ser un subconjunto de n (éxitos de n ensayos binomiales). Antes
         n1 era calcular_nci() sobre todo el repo (cierres en la ventana de issues
-        creados en cualquier fecha): en ventanas cortas (next.js, releases del mismo
+        creados en cualquier fecha): en ventanas cortas (releases del mismo
         día) cerraban más issues viejos de los que se creaban y la tasa daba > 1.
         """
         creados = [i for i in self.issues if fecha_inicio <= i["created_at"] <= fecha_fin]

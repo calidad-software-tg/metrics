@@ -55,8 +55,8 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
 
     # Nombres completos de etiqueta o tipo de issue (se comparan enteros, ignorando
     # prefijos como 'type:' o 'kind:'). Antes se buscaban como subcadena y contaban como
-    # bug las etiquetas de área 'Error Handling' y 'Error Overlay' de next.js (de 1 a 5
-    # bugs de más en 39 ventanas de 2025–26).
+    # bug etiquetas de área como 'Error Handling' (que contienen 'error' pero no son
+    # bugs).
     _KEYWORDS_BUG = {
         "defect", "error", "bug", "mistake",
         "incorrect", "fault", "flaw",
@@ -86,8 +86,8 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
                 if handles:
                     print(f"Core team detectado en '{path}': {len(handles)} usuarios")
                     return handles
-        # Fallback: miembros de la organización (funciona para orgs públicas
-        # como vercel cuando no hay MAINTAINERS.md/CODEOWNERS).
+        # Fallback: miembros de la organización (funciona para orgs con
+        # miembros públicos cuando no hay MAINTAINERS.md/CODEOWNERS).
         headers_json = {
             "Authorization": f"Bearer {self.token}",
             "Accept": "application/vnd.github+json",
@@ -162,7 +162,7 @@ class NumberOfBugsDetectedByUsers(GitHubMetric):
            el campo no está disponible se cae al fallback de la lista de core team.
         3. Tipo de issue: además de las etiquetas, cuenta como bug el tipo de issue
            de GitHub ('Bug'), que algunos proyectos usan en lugar de la etiqueta
-           (next.js pasó de la etiqueta 'bug' al tipo 'Bug' en 2025). En repos sin
+           (o pasan de una al otro en algún momento). En repos sin
            tipos de issue el resultado no cambia. Se desactiva con solo_etiquetas.
 
         Devuelve un dict con el desglose completo. `nub=None` cuando ningún issue

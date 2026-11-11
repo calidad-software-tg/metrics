@@ -16,7 +16,7 @@ class MeanTimeToRepair(GitHubMetric):
 
     Cambios respecto de la versión original:
     - Filtra bots también a nivel producto: el bot de issues inactivas cierra issues
-      viejas (en 2025, el 68 % de los cierres de next.js) y disparaba el promedio.
+      viejas (puede ser la mayoría de los cierres) y disparaba el promedio.
       Las issues cerradas sin actor registrado cuentan como cierre automático.
     - Devuelve None (no observable) cuando no se cerró ninguna issue, en vez de 0.
     - Por persona no cuenta los autocierres (quien cerró es quien abrió la issue): la

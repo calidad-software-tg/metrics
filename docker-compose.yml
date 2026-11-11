@@ -18,7 +18,9 @@ services:
       retries: 10
 
   tres-p:
-    image: ghcr.io/calidad-software-tg/tres-p:latest   # imagen publicada; `build` la arma localmente
+    # Versión fija de la imagen publicada (amd64 y arm64), para que todos corran la misma; otra con
+    # TRES_P_VERSION en .env. `docker compose build` la arma localmente desde este código.
+    image: ghcr.io/calidad-software-tg/tres-p:${TRES_P_VERSION:-1.0.0}
     build: .
     depends_on:
       db:

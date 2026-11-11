@@ -62,31 +62,27 @@ def _slim_comentario(item: dict) -> dict:
     return d
 
 
-# Cuentas de automatización detectadas al revisar cada repo candidato (ver
-# SELECCION_REPOSITORIO.md), no personas. Un commit/comentario de una de estas
+# Cuentas de automatización comunes a muchos proyectos, no personas. Las propias de un
+# proyecto van en bots_clasificados.csv (clasificar_cuentas.py), que también se consulta.
+# Las métricas locales atribuyen por nombre de autor de git, así que ahí va también el
+# nombre de git del bot, no solo su login. Un commit/comentario de una de estas
 # cuentas contamina cualquier métrica de Persona (REXP, EXPRev, FEXP, REXPRev,
 # Contribution Diversity, Skill Similarity, Development Experience) si se
 # cuenta como si fuera un colaborador más. Se completa a mano a medida que se
 # detectan nuevas — no hay forma confiable de listarlas todas de antemano.
 BOTS_CONOCIDOS = {
-    "vercel-release-bot",       # next.js: bump automático de la versión interna de React
-    # Nombres de git (no logins) de los mismos bots de next.js: las métricas
-    # locales (run_versiones_local.py) atribuyen por nombre de autor de git.
-    "Vercel Release Bot",       # next.js: 643 commits, email ...+vercel-release-bot@users.noreply
-    "nextjs-bot",               # next.js: ~600 commits de release, email it+nextjs-bot@vercel.com
     "skia-flutter-autoroll",    # flutter: autoroll de dependencias de Skia
     "engine-flutter-autoroll",  # flutter: autoroll del motor de Flutter
     "CLAassistant",             # tldr: bot de firma de CLA, comenta en casi todos los PRs
     "tldr-bot",                 # tldr: bot de bienvenida/lint automático
     # "github-actions" sin sufijo "[bot]": así lo devuelve GraphQL en
-    # ClosedEvent.actor.login (detectado en mttr sobre next.js — cierra
+    # ClosedEvent.actor.login (detectado en mttr: cierra
     # issues automáticamente, con tiempos de cierre ~0 que no son reparación
     # real). La REST API sí le pone el sufijo ("github-actions[bot]"), por
     # eso hace falta la entrada explícita acá además del chequeo de sufijo.
     "github-actions",
     # GraphQL devuelve estos logins de GitHub Apps SIN el sufijo "[bot]" (mismo
-    # caso que github-actions): detectados en exprev/nc sobre next.js.
-    "next-js-bot",
+    # caso que github-actions): detectados en exprev/nc.
     "dependabot",
     "greenkeeperio-bot",
     "codetriage-readme-bot",

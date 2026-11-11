@@ -90,7 +90,7 @@ python3 metricas/run_versiones_local.py --repo org/nombre --solo cd --no-guardar
 
 ## Correcciones al cálculo
 
-Mientras se validaban las métricas con Next.js aparecieron problemas que se corrigieron en el código.
+Mientras se validaban las métricas aparecieron problemas que se corrigieron en el código.
 Los principales, por si se compara con versiones anteriores:
 
 | Tema | Qué se corrigió |

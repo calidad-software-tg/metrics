@@ -11,8 +11,7 @@ class NumberOfClosedIssues(GitHubMetric):
     """NCI: cantidad de issues cerradas en la ventana.
 
     A nivel producto ahora descarta los cierres de bots (el bot de issues inactivas y las
-    issues cerradas sin actor registrado): en next.js eran el 23 % de los cierres en 2022,
-    el 31 % en 2024 y el 68 % en 2025. NumberOfClosedIssuesConBots conserva el conteo
+    issues cerradas sin actor registrado), que pueden ser una parte grande de los cierres. NumberOfClosedIssuesConBots conserva el conteo
     original, porque el bot es parte de la política del proyecto.
 
     Las consignas 40 y 43 reexportan esta misma clase (nci_reuse.py, nci_reuse_43.py), así

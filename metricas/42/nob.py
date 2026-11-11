@@ -42,8 +42,8 @@ class NumberOfBranches(GitHubMetric):
     """
     Number of Branches (NOB) — Jarczyk et al. (2014): branches de desarrollo activas.
 
-    La versión original guardaba la cantidad de branches que existen HOY (2.706 en
-    next.js) en todas las ventanas, así que no variaba entre releases. Además, la consigna
+    La versión original guardaba la cantidad de branches que existen HOY en todas
+    las ventanas, así que no variaba entre releases. Además, la consigna
     pide branches "activas" y se contaban todas, incluidas las obsoletas. Git no guarda la
     historia de las branches (las que se borran al mergearse no dejan rastro) y la API de
     eventos de GitHub solo guarda 90 días, así que se aproxima con los pull requests:

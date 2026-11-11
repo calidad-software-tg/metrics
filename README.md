@@ -105,7 +105,8 @@ dimensiones, medidas globales, triángulos y cadenas entre las tres, y pruebas d
 qué dimensión se asigna una métrica que el catálogo pone en dos. Todo está explicado en
 [analisis/README.md](analisis/README.md).
 
-En Next.js, de 1.431 pares evaluados quedaron 56 patrones.
+Cuántos pares se evaluaron y cuántos patrones quedaron en cada clase se ve al principio de
+`salidas/5_patrones/resumen.md` ([SALIDAS.md](SALIDAS.md)).
 
 ## 4. Levantarlo
 
@@ -116,11 +117,15 @@ lectura a repositorios públicos.
 
 ```bash
 cp .env.example .env            # completar GITHUB_TOKEN
-docker compose pull tres-p      # imagen publicada en ghcr.io (o: docker compose build)
+docker compose pull tres-p      # imagen publicada en ghcr.io, amd64 y arm64 (o: docker compose build)
 docker compose up -d db         # PostgreSQL 16
 docker compose run --rm tres-p iniciar --repo org/nombre
 docker compose run --rm tres-p todo
 ```
+
+La imagen es la versión fijada en `docker-compose.yml` (`TRES_P_VERSION`, por defecto la última
+publicada al escribir esta guía); para usar otra, `TRES_P_VERSION=X.Y.Z` en `.env`. Las versiones están
+en [Packages](https://github.com/calidad-software-tg/metrics/pkgs/container/tres-p).
 
 Todo lo que genera queda en `trabajo/`: `proyecto.json`, `datos/` y `salidas/`. Para usar un clon que
 ya tengas, en `.env` va `TRES_P_CLON_HOST=/ruta/al/clon` y en `trabajo/proyecto.json`, `"clon": "/repo"`.
@@ -160,12 +165,13 @@ el resto se ajusta después de mirar los primeros resultados.
 | `repo` | `org/nombre` del repositorio en GitHub | — (obligatoria) |
 | `clon` | ruta a un clon propio, para no volver a clonar | `null`: se clona en `.clones/` |
 | `hasta` | fecha de corte de la historia (`AAAA-MM-DD`); las releases posteriores se ignoran | `null`: hoy |
-| `excluir_estable` | tags que figuran como estables pero no lo son (por ejemplo, `"v15.0.0-rc.1"`) | `[]` |
+| `excluir_estable` | tags que figuran como estables pero no lo son (por ejemplo, `"v2.0.0-rc.1"`): no cortan ventanas ni entran en la serie estable | `[]` |
 | `calendario` | los períodos de la regla de estabilidad, como `[["2016-2019", 2016, 2019], …]` | `"auto"`: la historia repartida en cuatro tramos de años |
-| `cortes_epocas` | primer release de cada época, para la prueba de sensibilidad (`["v9.1.7", "v12.0.5", "v14.1.1"]`) | `"auto"`: la serie estable cortada en cuartos |
+| `cortes_epocas` | primer release de cada época, para la prueba de sensibilidad (`["v1.4.0", "v2.1.0", "v3.0.2"]`) | `"auto"`: la serie estable cortada en cuartos |
 | `descartados` | CSV con las relaciones descartadas al validarlas (columnas `x,y,motivo`), relativo a `proyecto.json` | `null`: los patrones quedan como candidatos |
 | `cruces` | carpeta con la configuración de cada cruce (`persona_proceso.json`, …): qué métricas compartidas van a cada lado en los cruces de componentes | `null`: `analisis/cruces/` |
 | `tres_dimensiones` | ajustes del análisis de las tres dimensiones (abajo) | `null`: automático |
+| `advertencias` | notas sobre métricas de este proyecto que se suman al diccionario de variables, como `{"nub": "antes de 2019 el repo no clasificaba bugs"}` | `null`: ninguna |
 
 `tres_dimensiones` es opcional. Sirve para fijar, después de ver los PCA, qué componentes entran y cómo
 se llaman:
@@ -228,8 +234,9 @@ que ya pasaron todo, y depende de cada proyecto, por eso no se automatiza:
    `descartados` (`x,y,motivo`, con los nombres de `patrones.csv`). Al volver a correr `analizar`, deja de
    contar como patrón en todos los niveles.
 
-En Next.js, Learning Ease y la tasa de ingreso de nuevos contribuyentes daban −0,73; sin los recién
-llegados, +0,01: la relación reflejaba la composición del equipo, no la experiencia.
+Por ejemplo, si una métrica de experiencia y la tasa de ingreso de nuevos contribuyentes dejan de
+relacionarse al recalcularlas sin los recién llegados, la relación reflejaba la composición del equipo,
+no la experiencia.
 
 ## 8. Límites
 

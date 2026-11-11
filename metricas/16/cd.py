@@ -34,8 +34,8 @@ _COMMENT_PATTERNS: dict[str, list[str]] = {
 _CODE_EXTENSIONS = set(_COMMENT_PATTERNS.keys())
 
 # Código que no es del proyecto: librerías de terceros ya compiladas y guardadas en el repo
-# (en next.js, packages/next/src/compiled concentraba la mayoría de las líneas de
-# comentario: de 49.000 a 98.000 en la v14.0.2 y a 4.000 en la v15.0.0), código
+# (pueden concentrar la mayoría de las líneas de comentario y hacerlas saltar de una
+# release a otra al agregarlas o sacarlas), código
 # vendorizado, generado o minificado, y dependencias.
 _DIRS_NO_PROPIOS = {"compiled", "vendor", "vendored", "node_modules", "dist", "build",
                     "third_party", "third-party", "generated", "__generated__"}

@@ -14,7 +14,7 @@ _NOMBRES_DOC = {"doc", "docs", "documentation", "documentación", "documentacion
 def _is_doc(labels: list[str], tipo: str | None = None, solo_etiquetas: bool = False) -> bool:
     """¿Es un issue de documentación? Alguna etiqueta es exactamente de documentación
     (ignorando prefijos como 'type:' o 'kind:'), o, salvo solo_etiquetas, el tipo de issue
-    de GitHub ('Documentation'), que next.js usa en lugar de la etiqueta desde 2025."""
+    de GitHub ('Documentation'), que algunos proyectos usan en lugar de la etiqueta."""
     return tiene_etiqueta(labels, tipo, _NOMBRES_DOC, solo_etiquetas)
 
 
@@ -23,8 +23,8 @@ class DocIssueSurvival(GitHubMetric):
     cerradas en la ventana.
 
     Cambios: comparación exacta de etiquetas; None (no observable) cuando no hay issues de
-    documentación también con solo_etiquetas (antes devolvía 0, y la corrida de next.js con
-    --solo-etiquetas dejó el 80 % de las ventanas en 0); y a nivel producto descarta los
+    documentación también con solo_etiquetas (antes devolvía 0, y con --solo-etiquetas
+    muchas ventanas quedaban en 0); y a nivel producto descarta los
     cierres de bots, igual que por persona.
     """
 

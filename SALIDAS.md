@@ -51,8 +51,8 @@ Están numeradas en el orden en que se calculan.
   - *tridimensional*: los tres lados se mantienen al descontar el tercer vértice;
   - *cadena*: un lado desaparece, así que esas dos dimensiones se relacionan solo a través de la tercera.
 
-En Next.js se evaluaron 1.431 pares y quedaron 56 patrones (16 entre dimensiones, 33 entre y dentro,
-7 dentro), más 16 descartados al validar. De los tríos, 5 resultaron cadenas y ninguno tridimensional.
+El encabezado da cuántos pares se evaluaron, cuántos patrones quedaron de cada clase, cuántos se
+descartaron al validar y cuántos tríos resultaron cadenas o tridimensionales.
 
 ## `5_patrones/patrones.csv`
 
@@ -91,9 +91,9 @@ Un par de variables por fila, los evaluados y los que no pasaron.
 - **Una correlación de 0,2 o 0,3 es débil.** Describe una tendencia que se repite de release a release,
   pero no permite predecir un release en particular.
 - **Un patrón no indica causa.** Dos métricas pueden moverse juntas porque las mueve una tercera cosa.
-- **Las relaciones más fuertes son las primeras que hay que revisar.** En el trabajo de grado, las más
-  fuertes resultaron producidas por el cálculo o por la composición del equipo (por ejemplo, Learning
-  Ease y la tasa de ingreso daban −0,73 y, sin los recién llegados, +0,01).
+- **Las relaciones más fuertes son las primeras que hay que revisar.** Pueden estar producidas por el
+  cálculo o por la composición del equipo (por ejemplo, una relación entre Learning Ease y la tasa de
+  ingreso que desaparece al recalcular sin los recién llegados).
 - **Sin validación, los patrones son candidatos.** Si `proyecto.json` no tiene un CSV de `descartados`,
   los patrones no se recalcularon sin los datos que podrían producirlos (ver el README, «Validar los
   patrones»).

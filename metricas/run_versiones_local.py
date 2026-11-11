@@ -267,8 +267,8 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
         res["cd"] = {"producto": prod, "por_archivo": por_archivo}
 
     if quiere_rc:
-        # El README de la raíz puede ser un enlace simbólico (en next.js, readme.md apunta a
-        # packages/next/README.md): el blob tiene la ruta destino, no el texto. Se sigue el enlace.
+        # El README de la raíz puede ser un enlace simbólico (por ejemplo, a
+        # packages/<paquete>/README.md en un monorepo): el blob tiene la ruta destino, no el texto. Se sigue el enlace.
         por_path = {p: s for s, p in blobs}
         textos = {}
         for s, p in sel_rc:

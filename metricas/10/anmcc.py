@@ -34,9 +34,9 @@ class AverageNumberOfModifiedComponentsPerCommit(GitHubMetric):
     Cambios respecto de la versión original:
     - Se descartan los commits de merge y los commits de los que GitHub no informa los
       archivos (changedFilesIfAvailable = None): antes entraban como 0 y bajaban el promedio.
-    - A nivel producto se descartan los commits de bots (los bots de release de next.js
-      son entre el 8 % y el 19 % de los commits desde 2023 y tocan unos 20 archivos cada
-      uno), igual que por persona.
+    - A nivel producto se descartan los commits de bots (en un proyecto con bots de release
+      pueden ser una parte importante de los commits, y cada uno toca muchos archivos),
+      igual que por persona.
     - None (no observable) cuando no hay commits en la ventana, en vez de 0.
     - fetch acepta max_commits (antes run_versiones.py pasaba --max-commits y se ignoraba).
 

@@ -15,7 +15,7 @@ Solo leen la base. Las épocas que usan los otros scripts están en preprocesami
 
 releases — clustering temporal de releases (antes validaciones/clustering_temporal.py)
 --------------------------------------------------------------------------------------
-Clustering temporal: ¿hubo momentos de la historia de next.js en los que los datos se comportaron igual?
+Clustering temporal: ¿hubo momentos de la historia del proyecto en los que los datos se comportaron igual?
 
 Complementa el clustering de releases de cruce_alternativos.py agregando el eje del tiempo. Usa los
 mismos datos y la misma transformación que el PCA (generar_pca.tabla / transformar) y los mismos

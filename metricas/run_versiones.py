@@ -175,18 +175,26 @@ def _gh(path: str, token: str, params: dict = None) -> requests.Response:
 
 # --- criterio de ventanas ------------------------------------------------------
 # Releases marcados como estables en GitHub que en realidad son prereleases (mal
-# etiquetados en next.js): no cortan ventanas.
-EXCLUIR_VERSIONES = frozenset({"4.4.0-canary.2", "4.4.0-canary.1", "v12.2.3-canary.5", "v15.0.0-rc.1"})
+# etiquetados): no cortan ventanas. Se listan en "excluir_estable" de proyecto.json.
+def _excluir_del_proyecto() -> frozenset:
+    ruta = Path(os.environ.get("TRES_P_PROYECTO") or Path(__file__).resolve().parent.parent / "proyecto.json")
+    try:
+        return frozenset(json.loads(ruta.read_text(encoding="utf-8")).get("excluir_estable") or [])
+    except (OSError, ValueError):
+        return frozenset()
+
+
+EXCLUIR_VERSIONES = _excluir_del_proyecto()
 
 # excluir_backports: un release cuya versión mayor es menor que la más alta publicada hasta
-#   ese momento (ej. una v14.2.x de 2025, cuando la principal ya es v15/v16) es un parche de
+#   ese momento (ej. una v2.4.x publicada cuando la principal ya es v3) es un parche de
 #   una rama de mantenimiento: no corta ventanas. Con backports, las ventanas de la línea
 #   principal quedaban partidas por releases de otra rama y las métricas de foto saltaban
 #   entre dos árboles de código.
 # min_dias: un release publicado menos de min_dias después del anterior que quedó no corta
-#   ventana: su lapso se suma a la ventana anterior. En next.js, 88 de 369 ventanas estables
-#   duraban menos de un día (releases de varias líneas a la vez, hotfixes a las pocas horas)
-#   y casi no tenían actividad. None = 1 día en estables y 0 (sin unir) en canary.
+#   ventana: su lapso se suma a la ventana anterior. Las ventanas de menos de un día (releases de
+#   varias líneas a la vez, hotfixes a las pocas horas) casi no tienen actividad.
+#   None = 1 día en estables y 0 (sin unir) en canary.
 # hasta: fecha de corte. Los releases posteriores se ignoran y la última ventana termina ahí
 #   (sin corte, termina "ahora"). Sirve para que corridas hechas en días distintos (por
 #   ejemplo, cada integrante con sus métricas) den exactamente las mismas ventanas.
@@ -248,7 +256,7 @@ def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
     """Una ventana [inicio, fin) por cada versión estable consecutiva. El último va hasta ahora.
 
     Usa /releases, no /tags: trae el flag `prerelease` para descartar versiones
-    de prueba (ej. canary de next.js, ~88% de sus tags) sin adivinar por el
+    de prueba (ej. canary o nightly, que en algunos proyectos son la mayoría de los tags) sin adivinar por el
     nombre, y ya incluye `published_at`, así que no hace falta una llamada
     extra a /commits/{sha} por versión como en la implementación anterior
     basada en tags (para un repo con miles de tags, esa llamada extra por
@@ -310,7 +318,7 @@ def ventanas_por_version(token: str, org: str, repo: str) -> list[dict]:
 def ventanas_por_version_todas(token: str, org: str, repo: str) -> list[dict]:
     """Igual que ventanas_por_version, pero SIN filtrar prerelease/canary --
     una ventana por cada release publicada, estable o no. Para un repo con
-    cadencia canary diaria (ej. next.js) esto multiplica por ~10 la cantidad
+    cadencia canary diaria esto multiplica por ~10 la cantidad
     de ventanas y las angosta a horas en vez de semanas/meses -- guardar bajo
     tipo_analisis='versiones_canary', nunca pisa a 'versiones' (estables).
     """
@@ -594,8 +602,8 @@ SLICEABLE = {
     # evita repetirlo una vez por ventana sin cambiar el resultado.
     "nob_42":          [],
     # nub: un fetch global descarga todos los issues del rango completo; SLICEABLE
-    # los filtra por ventana usando 'created'. Evita ~373 fetches completos del
-    # issue tracker de next.js (que tiene >40k issues).
+    # los filtra por ventana usando 'created'. Evita un fetch completo del issue
+    # tracker por ventana (en repos con decenas de miles de issues).
     "nub":             [("_issues", "created")],
 }
 

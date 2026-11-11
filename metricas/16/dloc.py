@@ -6,9 +6,8 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
 
-# .mdx incluido: en junio de 2023 la documentación oficial de next.js (docs/) pasó a .mdx
-# (PR #50701) y en julio los mensajes de error (errors/, PR #52038); sin .mdx, DLOC caía de
-# 33.698 a 17.461 líneas sin que se hubiera perdido documentación.
+# .mdx incluido: hay proyectos que migran su documentación de .md a .mdx; sin .mdx, DLOC
+# caería a la mitad sin que se hubiera perdido documentación.
 _DOC_EXTENSIONS = {'.md', '.mdx', '.txt', '.rst'}
 
 # Carpetas que no son documentación del proyecto: ejemplos (cientos de README de proyectos

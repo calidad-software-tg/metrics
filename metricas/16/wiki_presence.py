@@ -23,8 +23,8 @@ class WikiPresence(GitHubMetric):
     último momento en que se sabe que estaba en uso). Si el repo de la wiki no existe,
     vale 0 en todas las ventanas.
 
-    En next.js la wiki tuvo 167 commits entre octubre de 2016 y enero de 2020, y hoy
-    está deshabilitada.
+    Así, una wiki que se usó unos años y después se deshabilitó vale 1 en esas ventanas
+    y 0 en las demás.
     """
 
     def __init__(self, token: str, org: str, repo: str):

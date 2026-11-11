@@ -9,8 +9,8 @@ from base_metric import GitHubMetric
 # Carpetas que por convención de monorepo agrupan sub-proyectos independientes
 # (JS/TS: packages/, apps/; Rust: crates/; VS Code: extensions/; etc.). Cuando
 # aparecen en los primeros dos niveles de la ruta, el componente es el
-# sub-proyecto (packages/next, turbopack/crates/turbopack-core) y no la carpeta
-# contenedora entera -- si no, en next.js 20 paquetes contaban como uno solo.
+# sub-proyecto (packages/<paquete>, crates/<crate>) y no la carpeta
+# contenedora entera -- si no, en un monorepo todos los paquetes contaban como uno solo.
 _CONTENEDORES = {"packages", "crates", "apps", "libs", "modules",
                  "plugins", "extensions", "services", "projects"}
 
@@ -43,7 +43,7 @@ def calcular_learning_easy(commits_componente: list[dict],
         (la última define hasta dónde se mide).
     primera_contribucion: primera contribución del autor a ese componente en toda la
         historia del repo. Sin ella el lapso quedaría acotado por la duración de la
-        ventana (en next.js, mediana 13,6 días -> 75% de los valores daban 0).
+        ventana (con ventanas cortas, la mayoría de los valores daban 0).
         None = se usa la primera contribución dentro de la ventana.
     """
     if not commits_componente:

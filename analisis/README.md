@@ -4,8 +4,7 @@ Busca patrones entre las métricas de Persona, Proceso y Producto en tres nivele
 (dentro de cada dimensión), **bidimensional** (entre pares de dimensiones) y **tridimensional** (las tres
 a la vez). Este documento explica qué se corre, qué técnica aplica cada paso, con qué criterios y qué
 reporte la muestra. Resume el capítulo 3 (*Metodología*, Fase 2) del informe del trabajo *Descubrimiento
-de Patrones de Calidad en repositorios CVS*; los ejemplos con números son del caso de estudio,
-`vercel/next.js`.
+de Patrones de Calidad en repositorios CVS*.
 
 Cómo leer los resultados: [SALIDAS.md](../SALIDAS.md).
 
@@ -68,10 +67,9 @@ así lo que pasa en el equipo y en el proceso puede relacionarse con el estado d
 
 Se arman dos series (`metricas/run_versiones.py`):
 
-- la **serie estable**, con las ventanas entre versiones estables. Es la base del análisis (en Next.js,
-  271 ventanas, mediana de 8,2 días);
-- la **serie canary**, que también incluye las prereleases. Cubre la misma historia con ventanas mucho
-  más cortas (3.785, mediana de 0,6 días) y se usa como **réplica**.
+- la **serie estable**, con las ventanas entre versiones estables. Es la base del análisis;
+- la **serie canary**, que también incluye las prereleases. Cubre la misma historia con más ventanas y
+  mucho más cortas, y se usa como **réplica**.
 
 Criterios de construcción:
 
@@ -114,8 +112,8 @@ pasos:
    - la **duración de la ventana**, como log(días), porque las ventanas más largas acumulan más
      actividad.
 
-En el caso de estudio, de 64 variables construidas se excluyeron 6, quedaron 4 de control y 54 entraron
-en la búsqueda. Como 25 variables pertenecen a dos dimensiones, por dimensión suman 79.
+Las variables que el catálogo asigna a dos dimensiones se cuentan en las dos, así que la suma por
+dimensión es mayor que la cantidad de variables.
 
 ## 4. Análisis de correlaciones
 
@@ -124,7 +122,7 @@ en la búsqueda. Como 25 variables pertenecen a dos dimensiones, por dimensión 
 `salidas/5_patrones/correlaciones/` (todos los pares).
 
 Evalúa, par por par, si dos variables se mueven juntas de un release al siguiente. **Todos los pares se
-evalúan una sola vez** (1.431 en el caso de estudio), con el mismo procedimiento. Después cada uno se
+evalúan una sola vez**, con el mismo procedimiento. Después cada uno se
 clasifica según las dimensiones que puede conectar (sección 9).
 
 - **Correlación.** Correlación parcial de Spearman, sin la tendencia ni la duración de la ventana. No
@@ -192,8 +190,8 @@ misma métrica), y solo las ventanas con dato en todas ellas.
 - **Estabilidad:** 500 remuestreos por bloques de releases consecutivos, comparados con la congruencia
   de Tucker. Un componente es **firme** si la congruencia mediana es de al menos 0,85 en los remuestreos
   y de al menos 0,70 con la serie canary.
-- No se usan entre dimensiones los componentes formados por métricas casi constantes en la historia (en
-  Next.js: README Completeness, Wiki Presence y Number of Branches).
+- No se usan entre dimensiones los componentes formados por métricas casi constantes en la historia (por
+  ejemplo, una métrica que vale lo mismo en casi todas las releases).
 
 El PCA necesita bastantes más ventanas que variables (n ≥ 3p). Con pocas releases una dimensión puede
 quedar sin componentes. En ese caso, los pasos que dependen de ellos (tres dimensiones, multiverso,
@@ -330,8 +328,8 @@ Para cada hallazgo:
 3. Si sin esos datos la correlación queda en ±0,15 o menos, la relación la producía el cálculo y se
    **descarta en todos los niveles**.
 
-Ejemplo: Learning Ease y ANMCC daban +0,48. Sin los recién llegados la relación cayó a +0,07: la producía
-la diferencia entre los recién llegados, que hacen cambios chicos, y el resto.
+Ejemplo: si Learning Ease y ANMCC se relacionan, pero sin los recién llegados la correlación cae cerca de 0,
+la producía la diferencia entre los recién llegados, que hacen cambios chicos, y el resto.
 
 Esta validación depende de cada proyecto y no se automatiza. Sin un CSV de `descartados`, los patrones se
 informan como **candidatos a validar**.

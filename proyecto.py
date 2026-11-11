@@ -2,7 +2,7 @@
 Configuración del proyecto analizado.
 
 Lee el archivo de proyecto (por defecto `proyecto.json` en la raíz, o el que indique la variable
-TRES_P_PROYECTO) y expone los valores que antes estaban fijos para vercel/next.js:
+TRES_P_PROYECTO) y expone los valores propios del repositorio analizado:
 
     repo             "org/nombre" del repositorio analizado
     hasta            fecha de corte de las ventanas (AAAA-MM-DD) o null = hoy

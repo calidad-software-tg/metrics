@@ -103,6 +103,7 @@ def cmd_iniciar(a):
         "descartados": None,
         "cruces": None,
         "tres_dimensiones": None,
+        "advertencias": None,
     }
     PROYECTO.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Proyecto creado en {PROYECTO}:\n{json.dumps(cfg, ensure_ascii=False, indent=2)}")

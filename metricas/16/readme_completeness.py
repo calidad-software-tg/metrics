@@ -22,8 +22,7 @@ _TOTAL = len(_SECCIONES)
 def es_readme_raiz(path: str) -> bool:
     """Solo el README de la raíz del repositorio. Antes se promediaban todos los README.md
     del árbol (raíz, packages/, examples/, test/), así que un README de ejemplo de 3 líneas
-    pesaba lo mismo que el principal, y la métrica cambiaba al agregar o borrar ejemplos
-    (en next.js, 341 de 381 README eran de examples/)."""
+    pesaba lo mismo que el principal, y la métrica cambiaba al agregar o borrar ejemplos."""
     return "/" not in path and path.lower() == "readme.md"
 
 
@@ -64,7 +63,7 @@ class ReadmeCompleteness(GitHubMetric):
             except Exception:
                 continue
             # Enlace simbólico (modo 120000): el blob tiene la ruta destino, no el texto.
-            # En next.js, readme.md apunta a packages/next/README.md.
+            # Ej.: en un monorepo, readme.md puede apuntar a packages/<paquete>/README.md.
             destino = por_path.get(content.strip()) if entry.get("mode") == "120000" else None
             if destino:
                 blob = self._rest(f"/repos/{self.org}/{self.repo}/git/blobs/{destino['sha']}")

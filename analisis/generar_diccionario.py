@@ -127,12 +127,9 @@ ADVERTENCIAS = {
     "ss": ("Lenguajes del usuario tomados hoy (snapshot actual de repos propios), no en cada release; "
            "tope de 15 contribuyentes activos por ventana (bots excluidos del tope)"),
 }
-# Las propias de vercel/next.js, detectadas al revisar sus datos.
-if proyecto.REPO == "vercel/next.js":
-    ADVERTENCIAS.update({
-        "nub": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
-        "cfdr": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
-    })
+# Las propias del proyecto analizado ("advertencias" en proyecto.json: {"metrica": "texto"}),
+# detectadas al revisar sus datos.
+ADVERTENCIAS.update(proyecto.CFG.get("advertencias") or {})
 
 # Métricas a incluir como producto (tienen contribuyente_login IS NULL en versiones)
 METRICAS_PRODUCTO = {

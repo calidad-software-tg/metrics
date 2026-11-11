@@ -7,5 +7,6 @@
   "cortes_epocas": "auto",
   "descartados": null,
   "cruces": null,
-  "tres_dimensiones": null
+  "tres_dimensiones": null,
+  "advertencias": null
 }

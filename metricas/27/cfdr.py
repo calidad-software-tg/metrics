@@ -31,8 +31,7 @@ def _es_defecto(issue: dict, solo_etiquetas: bool = False) -> bool:
 
     Algoritmo original: alguna etiqueta coincide con KEYWORDS_ERROR.
     Además (salvo solo_etiquetas): el tipo de issue de GitHub ('Bug'), que algunos
-    proyectos usan en lugar de la etiqueta. next.js pasó de la etiqueta 'bug' al
-    tipo 'Bug' en 2025; en repos sin tipos de issue el resultado no cambia.
+    proyectos usan en lugar de la etiqueta o adoptan a partir de cierta fecha; en repos sin tipos de issue el resultado no cambia.
     """
     # Normalizamos etiquetas para una búsqueda robusta
     etiquetas = {et.lower() for et in issue.get("labels", [])}
