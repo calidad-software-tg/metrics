@@ -15,7 +15,10 @@ RUN git config --system --add safe.directory '*'
 
 # Todo lo que genera la herramienta (proyecto.json, datos/ y salidas/) vive en /app/trabajo, montado
 # desde el host, así cada `docker compose run` encuentra lo que dejó el anterior.
-ENV TRES_P_PROYECTO=/app/trabajo/proyecto.json \
+# git no pide usuario y contraseña: un repo inexistente (como la wiki de un proyecto que no la usa)
+# falla en vez de dejar la corrida esperando en la terminal.
+ENV GIT_TERMINAL_PROMPT=0 \
+    TRES_P_PROYECTO=/app/trabajo/proyecto.json \
     TRES_P_DATOS=/app/trabajo/datos \
     TRES_P_SALIDAS=/app/trabajo/salidas
 RUN mkdir -p /app/trabajo

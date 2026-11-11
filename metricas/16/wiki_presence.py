@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -36,7 +37,10 @@ class WikiPresence(GitHubMetric):
     def _historia_wiki(self) -> tuple[datetime | None, datetime | None]:
         """(primer commit, último commit) del repo de la wiki, o (None, None) si no existe."""
         url = f"https://github.com/{self.org}/{self.repo}.wiki.git"
-        r = subprocess.run(["git", "ls-remote", url], capture_output=True, text=True)
+        # Sin wiki, GitHub responde pidiendo credenciales: GIT_TERMINAL_PROMPT=0 hace que git falle
+        # en lugar de preguntar usuario y contraseña (también fuera de Docker).
+        r = subprocess.run(["git", "ls-remote", url], capture_output=True, text=True,
+                           env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
         if r.returncode != 0 or not r.stdout.strip():
             return None, None
         dest = _CLONES / f"{self.repo}.wiki.git"
