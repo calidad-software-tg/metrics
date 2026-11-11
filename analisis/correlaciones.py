@@ -18,9 +18,9 @@ Uso (desde la raíz del repo):
 --entre-dimensiones     agrega los pares entre dos dimensiones, sin repartir las métricas compartidas
                         (como antes de cruces.py; para comparar, no para interpretar)
 
-Genera (con el calendario, en analisis/salidas/; con épocas, en analisis/salidas/periodos/epocas/):
+Genera (con el calendario, en salidas/2_dimensiones/correlaciones/; con épocas, en salidas/complementarios/periodos/epocas/):
   pares_correlacion.csv, pares_valores.csv (o _persona / _resto si > 90 MB), metodo_correlaciones.md,
-  revision_persona.csv; con ambos, además analisis/salidas/periodos/comparacion.csv y resumen.md.
+  revision_persona.csv; con ambos, además salidas/complementarios/periodos/comparacion.csv y resumen.md.
 
 Además de la correlación corregida, cada par incluye chequeos de sensibilidad:
 sin ventanas de menos de 1 día, con tendencia local (escala de la relación),
@@ -44,7 +44,8 @@ from preprocesamiento import (  # noqa: E402,F401  (se reexportan para los scrip
     safe_log, natural_spline_basis, load_dict, load_producto, load_persona_agg, compute_ratio_agg,
     es_backport, excluir_backports, cargar_datos, cortes_epocas, con_epoca)
 
-SALIDA     = ROOT / "analisis" / "salidas"
+import rutas  # noqa: E402
+SALIDA     = rutas.CORRELACIONES
 OUT_PARES  = SALIDA / "pares_correlacion.csv"
 OUT_VALS   = SALIDA / "pares_valores.csv"
 OUT_VALS_P = SALIDA / "pares_valores_persona.csv"
@@ -1283,12 +1284,12 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if args.periodos == "ambos":
         dir_cal = args.salida / "calendario" if args.salida else SALIDA
-        dir_ep = args.salida / "epocas" if args.salida else SALIDA / "periodos" / "epocas"
+        dir_ep = args.salida / "epocas" if args.salida else rutas.COMPLEMENTARIOS / "periodos" / "epocas"
         correr(dir_cal, "calendario", args.entre_dimensiones)
         correr(dir_ep, "epocas", args.entre_dimensiones)
-        comparar_periodos(dir_cal, dir_ep, args.salida or SALIDA / "periodos")
+        comparar_periodos(dir_cal, dir_ep, args.salida or rutas.COMPLEMENTARIOS / "periodos")
     elif args.periodos == "epocas":
-        correr(args.salida or SALIDA / "periodos" / "epocas", "epocas", args.entre_dimensiones)
+        correr(args.salida or rutas.COMPLEMENTARIOS / "periodos" / "epocas", "epocas", args.entre_dimensiones)
     else:
         correr(args.salida or SALIDA, "calendario", args.entre_dimensiones)
 

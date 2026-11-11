@@ -4,15 +4,15 @@ analisis/reporte_cruce.py
 
 Genera un reporte HTML de un cruce de dimensiones a partir de las salidas de
 generar_correlaciones.py:
-  analisis/salidas/pares_correlacion.csv
-  analisis/salidas/pares_valores.csv   (valores por release, para los gráficos de dispersión)
+  salidas/2_dimensiones/correlaciones/pares_correlacion.csv
+  salidas/2_dimensiones/correlaciones/pares_valores.csv   (valores por release, para los gráficos de dispersión)
 
 Uso:
     python3 analisis/reporte_cruce.py Producto-Producto
     python3 analisis/reporte_cruce.py "persona-proceso"
     python3 analisis/reporte_cruce.py producto          # = Producto-Producto
 
-El reporte (analisis/salidas/reportes/reporte_<cruce>.html) tiene:
+El reporte (en salidas/reportes/_partes/; reportes.py lo suma a intradimensional.html) tiene:
   - cantidad de pares, pares evaluados (sin los de control), con relación,
     robustos, robustos que pasan el control por tamaño, sin solapamiento de
     definición y hallazgos candidatos;
@@ -35,8 +35,9 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-PARES = ROOT / "analisis" / "salidas" / "pares_correlacion.csv"
-VALORES = ROOT / "analisis" / "salidas" / "pares_valores.csv"
+import rutas  # noqa: E402
+PARES = rutas.CORRELACIONES / "pares_correlacion.csv"
+VALORES = rutas.CORRELACIONES / "pares_valores.csv"
 
 
 def archivos_valores(carpeta: Path = VALORES.parent) -> list:
@@ -52,8 +53,8 @@ def leer_valores(columnas: list, carpeta: Path = VALORES.parent) -> pd.DataFrame
     if not archivos:
         return pd.DataFrame(columns=columnas)
     return pd.concat([pd.read_csv(a, usecols=columnas) for a in archivos], ignore_index=True)
-DICCIONARIO = ROOT / "analisis" / "salidas" / "diccionario_variables.csv"
-SALIDA = ROOT / "analisis" / "salidas" / "reportes"
+DICCIONARIO = rutas.DICCIONARIO
+SALIDA = rutas.REPORTES
 
 DIMENSIONES = ["Persona", "Proceso", "Producto"]
 UMBRAL_FUERZA = 0.1
@@ -1268,7 +1269,9 @@ signo en todos los períodos y en canary, y sin depender de las ventanas de meno
 
 
 def archivo_reporte(cruce: str) -> Path:
-    return SALIDA / f"reporte_{cruce.replace('–', '_').lower()}.html"
+    a, b = cruce.lower().split("–")
+    return (rutas.REPORTES_DIMENSIONES / f"{a}_correlaciones.html" if a == b
+            else rutas.REPORTES_CRUCES / f"{a}_{b}_correlaciones.html")
 
 
 def escribir_reporte(cruce: str, r: dict | None = None) -> Path:
@@ -1281,7 +1284,7 @@ def escribir_reporte(cruce: str, r: dict | None = None) -> Path:
 <title>{esc(titulo)}</title><style>{ESTILO}</style></head>
 <body><main>
 <h1>{esc(titulo)}</h1>
-<p class="sub">Fuente: analisis/salidas/pares_correlacion.csv y pares_valores.csv · correlación corregida por tiempo y duración · serie estable de next.js</p>
+<p class="sub">Fuente: salidas/2_dimensiones/correlaciones · correlación corregida por tiempo y duración · serie estable de {rutas.proyecto.REPO}</p>
 {r["kpis"]}
 {r["tabla_pares"]}
 
@@ -1293,8 +1296,8 @@ def escribir_reporte(cruce: str, r: dict | None = None) -> Path:
 {NOTA_FINAL}
 </main></body></html>
 """
-    SALIDA.mkdir(parents=True, exist_ok=True)
     destino = archivo_reporte(cruce)
+    destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(doc, encoding="utf-8")
     return destino
 

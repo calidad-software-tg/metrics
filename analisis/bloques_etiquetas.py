@@ -26,7 +26,7 @@ relaciones.py para las variables: la dimensión es una etiqueta de la relación)
 Uso (después de pca.py y clustering.py de las tres dimensiones):
     POSTGRES_DB=resultados_metricas_fixes python3 analisis/bloques_etiquetas.py
 
-Salidas en analisis/salidas/bloques_etiquetas/: resumen.md, pares.csv, triangulos.csv.
+Salidas en salidas/6_robustez/metricas_compartidas/: resumen.md, pares.csv, triangulos.csv.
 """
 import csv
 import sys
@@ -43,7 +43,8 @@ import multiverso_asignacion as mv  # noqa: E402
 import pca  # noqa: E402
 import tres_dimensiones as td  # noqa: E402
 
-SALIDA = corr.ROOT / "analisis" / "salidas" / "bloques_etiquetas"
+import rutas  # noqa: E402
+SALIDA = rutas.METRICAS_COMPARTIDAS
 DIMS = ("Persona", "Proceso", "Producto")
 CFG = cruces.mezclar(cruces.DEFAULTS, {"componentes": {"conjunto": {d: "todas" for d in DIMS}}})
 CARGA = CFG["carga_minima"]

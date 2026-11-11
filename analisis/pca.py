@@ -24,10 +24,10 @@ codo del scree, varianza acumulada y análisis paralelo de Horn), cargas sin rot
 con rotación varimax, comunalidades, puntajes por release y solidez por bootstrap
 de bloques. Compara las soluciones entre enfoques y series con la congruencia de Tucker.
 
-Salidas (analisis/salidas/pca/):
-  pca_<dim>_autovalores.csv, pca_<dim>_cargas.csv, pca_<dim>_puntajes.csv,
-  pca_<dim>_comparacion.csv y pca_<dim>.json, y el reporte
-  analisis/salidas/reportes/reporte_pca_<dim>.html (reporte_pca.py).
+Salidas (salidas/2_dimensiones/<dim>/):
+  pca_autovalores.csv, pca_cargas.csv, pca_puntajes.csv,
+  pca_comparacion.csv y pca.json, y el reporte
+  el reporte del PCA (reporte_pca.py), que reportes.py suma a intradimensional.html.
 """
 import argparse
 import csv
@@ -45,7 +45,8 @@ from preprocesamiento import (  # noqa: E402,F401  (se reexportan para los scrip
     ROOT, DIM_ORDER, SERIES, VARIABLE_TAMANO, VARIANTES, MIN_COBERTURA, SEMILLA,
     cargar_datos, es_backport, tabla, transformar)
 
-SALIDA = ROOT / "analisis" / "salidas" / "pca"
+import rutas  # noqa: E402
+SALIDA = rutas.DIMENSIONES  # una carpeta por dimensión: rutas.dimension(dim)
 
 ENFOQUES = ["crudo", "ajustado", "tamano"]
 NOMBRE_ENFOQUE = {"crudo": "Crudo", "ajustado": "Ajustado", "tamano": "Ajustado y sin tamaño"}
@@ -306,11 +307,12 @@ def main():
                                         congruencia=r(tucker(Lal[:, j], L_ref[:, j]), 3),
                                         cargas=[r(x, 3) for x in Lal[:, j]]))
 
-    SALIDA.mkdir(parents=True, exist_ok=True)
-    base = f"pca_{dim.lower()}"
+    destino = rutas.dimension(dim)
+    destino.mkdir(parents=True, exist_ok=True)
+    base = "pca"
     nombre = {v: var_dict[v]["nombre_legible"] for v in de_dim}
 
-    with open(SALIDA / f"{base}_autovalores.csv", "w", newline="", encoding="utf-8") as f:
+    with open(destino / f"{base}_autovalores.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["conjunto", "serie", "enfoque", "componente", "autovalor", "varianza", "varianza_acumulada",
                     "horn_p95", "supera_kaiser", "supera_horn", "autovalor_boot_p025", "autovalor_boot_p975"])
@@ -320,7 +322,7 @@ def main():
                             r(res["horn95"][j]), res["val"][j] > 1, res["val"][j] > res["horn95"][j],
                             r(res["boot"]["autoval_p025"][j]), r(res["boot"]["autoval_p975"][j])])
 
-    with open(SALIDA / f"{base}_cargas.csv", "w", newline="", encoding="utf-8") as f:
+    with open(destino / f"{base}_cargas.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["conjunto", "serie", "enfoque", "variable_id", "variable", "componente", "carga_sin_rotar",
                     "carga_varimax", "boot_p025", "boot_p975", "comunalidad", "componente_dominante_estable"])
@@ -333,7 +335,7 @@ def main():
                                 r(b["cargas_p025"][i, j]), r(b["cargas_p975"][i, j]), r(com[i]),
                                 r(b["dominante_estable"][i], 3)])
 
-    with open(SALIDA / f"{base}_puntajes.csv", "w", newline="", encoding="utf-8") as f:
+    with open(destino / f"{base}_puntajes.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         kmax = max(res["k"] for res in resultados.values())
         w.writerow(["conjunto", "serie", "enfoque", "periodo_num", "version", "fecha_hora", "anio"]
@@ -344,7 +346,7 @@ def main():
                 w.writerow([conj, serie, enf, pnum, fl["version"], fl["fecha"], fl["anio"]]
                            + [r(x) for x in res["sol"]["Fr"][i]] + [""] * (kmax - res["k"]))
 
-    with open(SALIDA / f"{base}_comparacion.csv", "w", newline="", encoding="utf-8") as f:
+    with open(destino / f"{base}_comparacion.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["conjunto", "serie", "enfoque", "componente", "k_propio", "k_comparado", "congruencia_con_estable_ajustado"])
         for c in comparacion:
@@ -381,8 +383,8 @@ def main():
             puntajes=[[int(p), res["filas"][p]["version"], res["filas"][p]["fecha"][:8]]
                       + [r(x, 3) for x in res["sol"]["Fr"][i]] for i, p in enumerate(res["pnums"])],
         )
-    (SALIDA / f"{base}.json").write_text(json.dumps(js, ensure_ascii=False), encoding="utf-8")
-    print(f"Salidas en {SALIDA}/{base}_*.csv y {base}.json")
+    (destino / f"{base}.json").write_text(json.dumps(js, ensure_ascii=False), encoding="utf-8")
+    print(f"Salidas en {destino}/{base}_*.csv y {base}.json")
     import reporte_pca
     destino = reporte_pca.escribir(dim)
     print(f"Reporte: {destino} ({destino.stat().st_size / 1e6:.1f} MB)")

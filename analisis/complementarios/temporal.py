@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-analisis/temporal.py
+analisis/complementarios/temporal.py
 
 Análisis temporal: agrupa releases (no métricas) para ver cuándo cambia el proyecto y si las relaciones
 entre métricas se mantienen en el tiempo. No es una técnica principal: da contexto y define las épocas
 que correlaciones.py y cruces.py usan como prueba de sensibilidad de los períodos (--periodos epocas).
 
 Uso (desde la raíz del repo):
-    POSTGRES_DB=resultados_metricas_fixes python3 analisis/temporal.py releases [carpeta_salida]
-    POSTGRES_DB=resultados_metricas_fixes python3 analisis/temporal.py epocas [carpeta_salida]
+    python3 analisis/complementarios/temporal.py releases [carpeta_salida]
+    python3 analisis/complementarios/temporal.py epocas [carpeta_salida]
 
-Por defecto escriben en analisis/salidas/validaciones/clustering_temporal/ y .../epocas_todas/.
+Por defecto escriben en salidas/complementarios/clustering_temporal/ y .../epocas_todas/.
 Solo leen la base. Las épocas que usan los otros scripts están en preprocesamiento.CORTES_EPOCAS.
 
 releases — clustering temporal de releases (antes validaciones/clustering_temporal.py)
@@ -82,11 +82,12 @@ from scipy.stats import spearmanr, rankdata
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pca  # noqa: E402
 from preprocesamiento import ROOT, CALENDARIO  # noqa: E402
 
-SALIDA = ROOT / "analisis" / "salidas" / "validaciones"
+import rutas  # noqa: E402
+SALIDA = rutas.COMPLEMENTARIOS
 
 
 def clustering_releases(salida=None):
@@ -606,7 +607,7 @@ def epocas(salida=None):
     KS = range(2, 7)
     N_NULA = 200
     SOLO_DESDE_2019 = {"cfdr_producto", "nub_producto"}
-    ASIGNAR = json.loads((ROOT / "analisis" / "cruces" / "proceso_producto_asignado.json").read_text(encoding="utf-8"))["asignar"]
+    ASIGNAR = json.loads((ROOT / "analisis" / "cruces" / "proceso_producto.json").read_text(encoding="utf-8"))["asignar"]
     SERIES = {"estable": "versiones", "canary": "versiones_canary"}
 
 

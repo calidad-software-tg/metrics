@@ -24,6 +24,11 @@ import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+# Lo que genera el pipeline queda fuera de las carpetas de código:
+#   datos/    métricas por persona e identidades unificadas (export_persona, mapear_identidades)
+#   salidas/  resultados del análisis (ver salidas/LEEME.md)
+DATOS = Path(os.environ.get("TRES_P_DATOS") or ROOT / "datos")
+SALIDAS = Path(os.environ.get("TRES_P_SALIDAS") or ROOT / "salidas")
 
 _env = ROOT / ".env"
 if _env.exists():

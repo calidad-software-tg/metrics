@@ -3,8 +3,7 @@
 .clones
 trabajo
 proyecto.json
+datos
+salidas
 analisis/salidas
-persona_*.csv
-metricas_persona.csv
-db/identidades_*.csv
 **/__pycache__

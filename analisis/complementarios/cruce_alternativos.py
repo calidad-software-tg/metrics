@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-analisis/cruce_alternativos.py
+analisis/complementarios/cruce_alternativos.py
 
 Corre sobre un cruce entre dimensiones los métodos que cruce_dimensiones.md deja como alternativas
 descartadas, para comprobar con los datos si aportan algo que el análisis principal no ve:
@@ -21,11 +21,11 @@ un criterio fijado de antemano para decir si aporta:
   - lo que encuentra tiene que repetirse en canary, que es una muestra independiente de ventanas;
   - y tiene que ser algo que el cruce de variables y de componentes no haya encontrado ya.
 
-Uso (después de cruce_dimensiones.py, porque compara con sus resultados):
-    POSTGRES_DB=resultados_metricas_fixes python3 analisis/cruce_alternativos.py Persona Producto \\
+Uso (después de cruces.py, porque compara con sus resultados):
+    python3 analisis/complementarios/complementarios/cruce_alternativos.py Persona Producto \\
         --config analisis/cruces/persona_producto.json
 
-Salidas en analisis/salidas/cruces/<dima>_<dimb>/alternativos/:
+Salidas en salidas/complementarios/alternativos/<dima>_<dimb>/:
     resumen.md (veredicto por método), resumen.json y un CSV por método.
 """
 import argparse
@@ -39,10 +39,10 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import norm, rankdata, spearmanr
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import cruce_dimensiones as cd  # noqa: E402
-import generar_correlaciones as gc  # noqa: E402
-import generar_pca as gp  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import cruces as cd  # noqa: E402
+import correlaciones as gc  # noqa: E402
+import pca as gp  # noqa: E402
 
 os.environ.setdefault("PYTHONWARNINGS", "ignore")  # también en los procesos de joblib
 try:
@@ -262,7 +262,8 @@ def main():
     base = cd.SALIDA / f"{dim_a.lower()}_{dim_b.lower()}"
     if not (base / "pares_variables.csv").exists():
         sys.exit(f"Falta {base / 'pares_variables.csv'}: corré antes cruce_dimensiones.py {dim_a} {dim_b}.")
-    destino = base / "alternativos"
+    import rutas
+    destino = rutas.COMPLEMENTARIOS / "alternativos" / f"{dim_a.lower()}_{dim_b.lower()}"
     destino.mkdir(parents=True, exist_ok=True)
     NP = args.permutaciones
 

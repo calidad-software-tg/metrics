@@ -37,7 +37,7 @@ Uso:
 Criterio de hallazgo entre dimensiones: un patrón de variables cuyas dos variables no comparten ninguna dimensión
 del catálogo, o sea, que relaciona dimensiones distintas con cualquier asignación (hallazgos_entre_dimensiones.md).
 
-Salidas en analisis/salidas/multiverso_asignacion/: resumen.md, hallazgos_entre_dimensiones.md y .csv,
+Salidas en salidas/6_robustez/multiverso_asignacion/: resumen.md, hallazgos_entre_dimensiones.md y .csv,
 patrones_variables.csv, patrones_cruces.csv, universos.csv.
 """
 import csv
@@ -56,7 +56,8 @@ import correlaciones as corr  # noqa: E402
 import pca  # noqa: E402
 import tres_dimensiones as td  # noqa: E402
 
-SALIDA = corr.ROOT / "analisis" / "salidas" / "multiverso_asignacion"
+import rutas  # noqa: E402
+SALIDA = rutas.MULTIVERSO
 DIMS = ("Persona", "Proceso", "Producto")
 CRUCES = [("Persona", "Proceso"), ("Persona", "Producto"), ("Proceso", "Producto")]
 N_MUESTRA = 500
@@ -142,7 +143,7 @@ def patrones_variables(var_dict):
         if r.get("hallazgo_candidato") == "True":
             pares.setdefault(frozenset((r["x_id"], r["y_id"])), dict(x=r["x_id"], y=r["y_id"], rho=float(r["rho_corregida"]), origen=r["cruce"]))
     for a, b in CRUCES:
-        ruta = corr.SALIDA / "cruces" / f"{a.lower()}_{b.lower()}" / "pares_variables.csv"
+        ruta = rutas.cruce(a, b) / "pares_variables.csv"
         if ruta.exists():
             for r in csv.DictReader(open(ruta, encoding="utf-8")):
                 if r["tipo"] == "patrón":
@@ -440,7 +441,7 @@ DESCARTADOS_AL_VALIDAR = {
 def hallazgos_entre_dimensiones(pares_var, var_dict):
     cruces_de = defaultdict(list)
     for a, b in CRUCES:
-        ruta = corr.SALIDA / "cruces" / f"{a.lower()}_{b.lower()}" / "pares_variables.csv"
+        ruta = rutas.cruce(a, b) / "pares_variables.csv"
         if ruta.exists():
             for r in csv.DictReader(open(ruta, encoding="utf-8")):
                 if r["tipo"] == "patrón":

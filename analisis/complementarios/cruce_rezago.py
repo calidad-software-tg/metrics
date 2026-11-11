@@ -17,9 +17,9 @@ import numpy as np
 
 W = Path(sys.argv[1]); CFG = Path(sys.argv[2]); OUT = Path(sys.argv[3])
 sys.path.insert(0, str(W / "analisis"))
-import generar_correlaciones as gc
-import generar_pca as gp
-import cruce_dimensiones as cd
+import correlaciones as gc
+import pca as gp
+import cruces as cd
 
 warnings.filterwarnings("ignore")
 cfg = cd.mezclar(cd.DEFAULTS, json.loads(CFG.read_text(encoding="utf-8")))

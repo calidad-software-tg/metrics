@@ -58,7 +58,7 @@ from run_versiones import (
 )
 
 CD_SKIP = frozenset({".md"})          # igual que el default de cd.fetch
-CLONES_DIR = _root / ".clones"        # donde viven los clones locales
+CLONES_DIR = _root.parent / ".clones"        # donde viven los clones locales
 
 ARCHIVOS = {"loc_notion", "dloc", "cd", "rc"}
 # dloc_flujo y commits_doc: versiones de flujo de la documentación (lo que pasó en la

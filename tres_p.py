@@ -14,7 +14,7 @@ Uso:
     python3 tres_p.py calcular [--series estable,canary] [--solo k1,k2] [--solo-locales]
     python3 tres_p.py identidades          # nombre de git -> login de GitHub
     python3 tres_p.py exportar             # métricas por persona (CSV)
-    python3 tres_p.py analizar             # análisis completo y reportes
+    python3 tres_p.py analizar             # análisis completo y reportes (--sin-complementarios, --sin-reportes)
     python3 tres_p.py estado               # qué hay calculado en la base
 
 La configuración del proyecto está en proyecto.json (ver proyecto.example.json); las credenciales
@@ -144,19 +144,19 @@ def cmd_calcular(a):
     for serie in series:
         canary = ["--con-canary"] if serie == "canary" else []
         if locales:
-            correr("run_versiones_local.py", "--repo", repo, "--solo", ",".join(locales), *hasta, *canary)
+            correr("calculo/run_versiones_local.py", "--repo", repo, "--solo", ",".join(locales), *hasta, *canary)
         if remotas:
-            correr("run_versiones.py", ",".join(remotas), "--repo", repo, *hasta, *canary)
+            correr("calculo/run_versiones.py", ",".join(remotas), "--repo", repo, *hasta, *canary)
 
 
 def cmd_identidades(a):
     cfg = leer_proyecto()
-    correr("db/mapear_identidades.py", "--repo", cfg["repo"])
+    correr("calculo/mapear_identidades.py", "--repo", cfg["repo"])
 
 
 def cmd_exportar(a):
     leer_proyecto()
-    correr("export_persona.py")
+    correr("calculo/export_persona.py")
 
 
 MIN_RELEASES = 30   # preprocesamiento excluye las variables con datos en menos de 30 releases
@@ -173,7 +173,9 @@ def cmd_analizar(a):
         sys.exit(f"La serie estable tiene {n} ventanas entre releases y el análisis necesita al menos "
                  f"{MIN_RELEASES}: cada correlación se calcula sobre las ventanas, y con menos no es "
                  "confiable. Elegí un repositorio con más releases (o un --hasta posterior).")
-    (ROOT / "analisis" / "salidas").mkdir(parents=True, exist_ok=True)
+    sys.path.insert(0, str(ROOT / "analisis"))
+    import rutas
+    rutas.VARIABLES.mkdir(parents=True, exist_ok=True)
     correr("analisis/generar_diccionario.py")
     correr("analisis/correlaciones.py")
     for d in DIMS:
@@ -183,20 +185,40 @@ def cmd_analizar(a):
     for x, y in CRUCES:
         cfg = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / f"{x.lower()}_{y.lower()}.json"
         correr("analisis/cruces.py", x, y, "--config", cfg)
+        correr("analisis/cruces.py", x, y, "--config", cfg, "--grupos", "propio", opcional=True)
     # Con pocas releases para las variables de una dimensión no hay componentes y estos pasos se saltean.
     correr("analisis/tres_dimensiones.py", opcional=True)
     correr("analisis/multiverso_asignacion.py", opcional=True)
     correr("analisis/relaciones.py", "--recalcular")
     correr("analisis/bloques_etiquetas.py", opcional=True)
+    if not getattr(a, "sin_complementarios", False):
+        # Análisis que no son técnica principal (metodologia.md, secciones 10 y 12); son los más lentos.
+        comp = rutas.COMPLEMENTARIOS
+        correr("analisis/correlaciones.py", "--periodos", "ambos", "--salida", comp / "periodos", opcional=True)
+        correr("analisis/complementarios/temporal.py", "releases", opcional=True)
+        correr("analisis/complementarios/temporal.py", "epocas", opcional=True)
+        for x, y in CRUCES:
+            cfg = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / f"{x.lower()}_{y.lower()}.json"
+            correr("analisis/cruces.py", x, y, "--config", cfg, "--periodos", "epocas", opcional=True)
+            correr("analisis/complementarios/cruce_alternativos.py", x, y, "--config", cfg, opcional=True)
+        cfg_pp = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / "proceso_producto.json"
+        correr("analisis/complementarios/cruce_rezago.py", ROOT, cfg_pp, comp / "rezago", opcional=True)
+        correr("analisis/complementarios/pesos_catalogo.py", opcional=True)
     if not a.sin_reportes:
         for d in DIMS:
             correr("analisis/reporte_pca.py", d, opcional=True)
         for d in DIMS:
             correr("analisis/reporte_cruce.py", f"{d}-{d}", opcional=True)
         for x, y in CRUCES:
-            correr("analisis/reporte_cruce.py", f"{x}-{y}", opcional=True)
-    resumen = ROOT / "analisis" / "salidas" / "relaciones" / "resumen.md"
-    print(f"\nListo. Patrones: {resumen}\nReportes: {ROOT / 'analisis' / 'salidas' / 'reportes'}")
+            correr("analisis/reporte_cruce_dimensiones.py", x, y, opcional=True)
+        correr("analisis/reporte_tres_dimensiones.py", opcional=True)
+        correr("analisis/reporte_resultados.py", opcional=True)
+        if not getattr(a, "sin_complementarios", False):
+            correr("analisis/reporte_complementarios.py", opcional=True)
+        correr("analisis/reportes.py")
+    correr("analisis/indice.py")
+    print(f"\nListo. Índice de las salidas: {rutas.SALIDAS / 'LEEME.md'}\n"
+          f"Patrones: {rutas.PATRONES / 'resumen.md'}")
 
 
 def cmd_estado(a):
@@ -253,10 +275,12 @@ def main():
         p.add_argument("--solo-locales", action="store_true",
                        help="solo las métricas que salen del clon (sin la API de GitHub)")
         p.add_argument("--sin-reportes", action="store_true")
+        p.add_argument("--sin-complementarios", action="store_true", help="saltea los análisis complementarios (los más lentos)")
         p.set_defaults(f=f)
 
     p = sub.add_parser("analizar", help="análisis completo y reportes")
     p.add_argument("--sin-reportes", action="store_true")
+    p.add_argument("--sin-complementarios", action="store_true", help="saltea los análisis complementarios (los más lentos)")
     p.set_defaults(f=cmd_analizar)
 
     a = ap.parse_args()

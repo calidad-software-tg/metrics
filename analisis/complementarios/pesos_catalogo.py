@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-analisis/pesos_catalogo.py
+analisis/complementarios/pesos_catalogo.py
 
 Pertenencia ponderada: cada variable cuenta para las dimensiones que le asigna el catálogo (diccionario de
 variables), repartida en partes iguales. EXPRev, de Persona y Proceso, cuenta mitad para cada una; MTTR, de
@@ -22,9 +22,9 @@ lados:
   3. El factor común del análisis de tres dimensiones (tres_dimensiones.py), con la misma composición.
 
 Uso (después de cruces.py y tres_dimensiones.py):
-    POSTGRES_DB=resultados_metricas_fixes python3 analisis/pesos_catalogo.py
+    python3 analisis/complementarios/pesos_catalogo.py
 
-Salidas en analisis/salidas/pesos_catalogo/: resumen.md, patrones_cruces.csv, componentes_conjuntos.csv.
+Salidas en salidas/complementarios/pesos_catalogo/: resumen.md, patrones_cruces.csv, componentes_conjuntos.csv.
 """
 import csv
 import json
@@ -33,12 +33,13 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import correlaciones as corr  # noqa: E402
 import cruces  # noqa: E402
 import pca  # noqa: E402
 
-SALIDA = corr.ROOT / "analisis" / "salidas" / "pesos_catalogo"
+import rutas  # noqa: E402
+SALIDA = rutas.COMPLEMENTARIOS / "pesos_catalogo"
 DIMS = ("Persona", "Proceso", "Producto")
 CRUCES = ("persona_proceso", "persona_producto", "proceso_producto")
 MINIMO_DIMENSION = 0.20
@@ -140,7 +141,7 @@ def main():
 
     # ── 3. factor común de tres_dimensiones.py ──
     factores = []
-    ruta = corr.ROOT / "analisis" / "salidas" / "tres_dimensiones" / "resumen.json"
+    ruta = rutas.TRES_DIMENSIONES / "resumen.json"
     if ruta.exists():
         R = json.loads(ruta.read_text(encoding="utf-8"))
         comp_cat = {}

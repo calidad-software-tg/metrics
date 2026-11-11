@@ -22,7 +22,7 @@ from pathlib import Path
 import psycopg2
 import psycopg2.extras
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 # Credenciales: variables POSTGRES_* del entorno o del .env (así se puede apuntar a otra
 # base, ej. POSTGRES_DB=resultados_metricas_fixes).
 _env = ROOT / ".env"
@@ -38,8 +38,10 @@ DB = dict(host=os.environ.get("POSTGRES_HOST", "localhost"),
           password=os.environ.get("POSTGRES_PASSWORD", "metricas"))
 
 import sys as _sys
-_sys.path.insert(0, str(Path(__file__).resolve().parent))
+_sys.path.insert(0, str(ROOT))
 import proyecto  # noqa: E402
+DATOS = proyecto.DATOS
+DATOS.mkdir(parents=True, exist_ok=True)
 EXCLUIR_ESTABLE = proyecto.EXCLUIR_ESTABLE
 
 METRICAS_COMMITS     = frozenset({"anmcc","cdiv","fexp","rexp","le"})
@@ -52,7 +54,7 @@ NON_HUMAN = frozenset({"bot","agente_ia","desconocido"})
 
 _LOGIN_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$')
 
-# ── Tabla de alias nombre_git -> login (ver db/mapear_identidades.py) ────────
+# ── Tabla de alias nombre_git -> login (ver calculo/mapear_identidades.py) ────────
 #
 # Las métricas del runner local (run_versiones_local.py) atribuyen por el nombre
 # de git del autor (%an, sin mailmap), mientras que las de la API atribuyen por
@@ -76,9 +78,9 @@ _ALIAS_N_COMMITS: dict[str, int] = {}
 _ALIAS_ACTIVO = True
 
 def load_alias(path: Path = None) -> None:
-    """Carga db/identidades_git.csv en _ALIAS. Llamar una vez al inicio."""
+    """Carga datos/identidades_git.csv en _ALIAS. Llamar una vez al inicio."""
     global _ALIAS, _ALIAS_N_COMMITS
-    path = path or (ROOT / "db" / "identidades_git.csv")
+    path = path or (DATOS / "identidades_git.csv")
     if not path.exists():
         print(f"  ⚠ No encuentro {path}, canon() no traducirá nada", flush=True)
         return
@@ -165,7 +167,7 @@ def agg_stats(vals: list[float]) -> dict:
 
 def load_bots() -> dict[str, str]:
     out: dict[str,str] = {}
-    with open(ROOT / 'bots_clasificados.csv', newline='', encoding='utf-8') as f:
+    with open(Path(__file__).resolve().parent / 'bots_clasificados.csv', newline='', encoding='utf-8') as f:
         for row in csv.DictReader(f):
             out[row['login']] = row['tipo_cuenta']
     return out
@@ -261,7 +263,7 @@ METRICAS_META = [
 ]
 
 def write_metricas():
-    p = ROOT / "metricas_persona.csv"
+    p = DATOS / "metricas_persona.csv"
     cols = ["metrica_id","nombre","grupo","familia_identidad","agregacion","unidad","advertencia"]
     with open(p, 'w', newline='', encoding='utf-8') as f:
         csv.writer(f).writerows([cols] + [list(m) for m in METRICAS_META])
@@ -273,7 +275,7 @@ def write_detalle(cur, bots, pf_commits, pf_interac, exclude_cd=False):
     """Escribe persona_detalle_estable.csv con canon() aplicado a contribuyente_login.
     El filtro de dev_exp con anmcc se hace en Python sobre identidades canonizadas,
     no por EXISTS SQL (que compara login exacto)."""
-    p = ROOT / "persona_detalle_estable.csv"
+    p = DATOS / "persona_detalle_estable.csv"
     metricas_a_exportar = (TODAS_PERSONA - METRICAS_ACUM)
     if exclude_cd:
         metricas_a_exportar = metricas_a_exportar - {"cd"}
@@ -420,7 +422,7 @@ def _agrupar_con_dedupe(crudo, dedupe_log, serie, metrica):
 
 
 def write_agregado(cur, bots, pf_commits_v, pf_interac_v, pf_commits_c, pf_interac_c, dedupe_log):
-    p = ROOT / "persona_agregado_estable_canary.csv"
+    p = DATOS / "persona_agregado_estable_canary.csv"
     excl = tuple(EXCLUIR_ESTABLE)
     cols = ["serie","periodo_num","version","fecha_hora","anio","duracion_dias",
             "metrica_id","alcance","n_contribuyentes","suma","media","mediana",
@@ -626,7 +628,7 @@ def validar(cur, bots):
     print("── [V1] Tamaños de archivos ──")
     for fn in ["metricas_persona.csv","persona_detalle_estable.csv",
                "persona_agregado_estable_canary.csv"]:
-        p = ROOT / fn
+        p = DATOS / fn
         if p.exists():
             rows = sum(1 for _ in open(p, encoding='utf-8')) - 1
             print(f"  {fn}: {rows:,} filas, {p.stat().st_size/1024**2:.1f} MB")
@@ -825,7 +827,7 @@ def main():
 
     # Volcar casos de dedupe (dos identidades crudas → mismo canónico en la misma métrica/ventana)
     if dedupe_log:
-        dp = ROOT / "persona_duplicados_canon.csv"
+        dp = DATOS / "persona_duplicados_canon.csv"
         with open(dp, 'w', newline='', encoding='utf-8') as f:
             w = csv.writer(f)
             w.writerow(["serie","metrica","periodo_id","canon",

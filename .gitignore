@@ -7,8 +7,5 @@ __pycache__/
 *.log
 
 # generados por la herramienta
-analisis/salidas/
-persona_*.csv
-metricas_persona.csv
-db/identidades_git.csv
-db/identidades_ambiguas.csv
+datos/
+salidas/

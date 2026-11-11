@@ -40,7 +40,7 @@ Pasos:
      diferencia de los componentes de las otras dos dimensiones (en desvíos) contra la nula por corrimiento y su
      signo en canary. Rezago de un release entre componentes de dimensiones distintas (descriptivo).
 
-Salidas en analisis/salidas/tres_dimensiones/: resumen.md, resumen.json, red.csv, triangulos.csv,
+Salidas en salidas/4_tres_dimensiones/: resumen.md, resumen.json, red.csv, triangulos.csv,
 triangulacion_variables.csv, perfiles.csv, rezago.csv.
 """
 import csv
@@ -58,7 +58,8 @@ import correlaciones as corr  # noqa: E402
 import cruces  # noqa: E402
 import pca  # noqa: E402
 
-SALIDA = corr.ROOT / "analisis" / "salidas" / "tres_dimensiones"
+import rutas  # noqa: E402
+SALIDA = rutas.TRES_DIMENSIONES
 DIMS = ("Persona", "Proceso", "Producto")
 # Qué componentes de cada PCA entran, cómo se llaman, cuál es tamaño (no calidad) y qué triángulo se
 # evalúa siempre: proyecto.json, clave "tres_dimensiones" (opcional).
@@ -501,7 +502,9 @@ def main():
     escribir_csv(SALIDA / "perfiles.csv", perf, list(perf[0]))
     escribir_csv(SALIDA / "rezago.csv", rez, ["antes", "despues", "rho", "p", "q", "rho_canary", "replica"])
     resumen = dict(componentes={c["id"]: dict(nombre=NOMBRES[c["id"]], dimension=c["dim"], n=c["n"],
-                                              variables=vars_de[c["id"]]) for c in cps},
+                                              variables=vars_de[c["id"]],
+                                              cargas=[[v, round(float(x), 3)] for v, x in c["cargas"] if abs(x) >= CARGA_MIN])
+                              for c in cps},
                    asignacion=ASIGNACION, releases=dict(estable=E.n, canary=C.n), global_=glob,
                    conjunto=conj)
     (SALIDA / "resumen.json").write_text(json.dumps(resumen, ensure_ascii=False, indent=1, default=float), encoding="utf-8")

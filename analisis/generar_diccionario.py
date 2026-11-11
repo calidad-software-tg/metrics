@@ -2,7 +2,7 @@
 """
 analisis/generar_diccionario.py
 
-Genera analisis/salidas/diccionario_variables.csv:
+Genera salidas/1_variables/diccionario_variables.csv:
   - Variables de producto: resultado con contribuyente_login IS NULL, serie estable.
   - Variables de persona agregada: persona_agregado_estable_canary.csv,
     alcance='humanos', serie=versiones (estable).
@@ -35,8 +35,11 @@ import psycopg2
 from scipy.stats import spearmanr
 
 ROOT   = Path(__file__).resolve().parent.parent
-SALIDA = ROOT / "analisis" / "salidas" / "diccionario_variables.csv"
-AGG_CSV = ROOT / "persona_agregado_estable_canary.csv"
+import sys as _s
+_s.path.insert(0, str(Path(__file__).resolve().parent))
+import rutas  # noqa: E402
+SALIDA = rutas.DICCIONARIO
+AGG_CSV = rutas.AGREGADO_PERSONA
 
 # Credenciales: variables POSTGRES_* del entorno o del .env de la raíz (así se puede apuntar
 # a otra base, ej. POSTGRES_DB=resultados_metricas_fixes).

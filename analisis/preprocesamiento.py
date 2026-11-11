@@ -6,7 +6,7 @@ Preprocesamiento común a todos los análisis (sección 3.2.3 del informe). No s
 correlaciones.py, pca.py, clustering.py, cruces.py y temporal.py, así todos usan los mismos datos y la
 misma transformación.
 
-  1. Variables: lee el diccionario (analisis/salidas/diccionario_variables.csv, que arma
+  1. Variables: lee el diccionario (salidas/1_variables/diccionario_variables.csv, que arma
      generar_diccionario.py con la limpieza de variables y las familias).
   2. Datos: las métricas del proyecto desde la base y las de Persona desde
      persona_agregado_estable_canary.csv (export_persona.py: identidades unificadas y sin bots), en las
@@ -29,8 +29,11 @@ import psycopg2
 from scipy.stats import rankdata
 
 ROOT      = Path(__file__).resolve().parent.parent
-DICT_CSV  = ROOT / "analisis" / "salidas" / "diccionario_variables.csv"
-AGG_CSV   = ROOT / "persona_agregado_estable_canary.csv"
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import rutas  # noqa: E402
+DICT_CSV  = rutas.DICCIONARIO
+AGG_CSV   = rutas.AGREGADO_PERSONA
 
 # Credenciales: variables POSTGRES_* del .env de la raíz si existen.
 _env = ROOT / ".env"

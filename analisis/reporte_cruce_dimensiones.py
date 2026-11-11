@@ -3,14 +3,14 @@
 analisis/reporte_cruce_dimensiones.py
 
 Reporte interactivo (HTML autocontenido) del análisis entre dos dimensiones que calcula
-cruce_dimensiones.py. Reutiliza el estilo y los nombres cortos de reporte_cruce.py.
+cruces.py. Reutiliza el estilo y los nombres cortos de reporte_cruce.py.
 
 Uso:
     python3 analisis/reporte_cruce_dimensiones.py Persona Producto
 
-Lee analisis/salidas/cruces/<dima>_<dimb>/ (pares_variables.csv, pares_componentes.csv,
+Lee salidas/3_cruces/<dima>_<dimb>/ (pares_variables.csv, pares_componentes.csv,
 triangulacion.csv, resumen.json y valores.json) y escribe
-analisis/salidas/reportes/reporte_cruce_<dima>_<dimb>.html.
+el reporte en salidas/reportes/_partes/ (reportes.py lo suma a bidimensional.html).
 
 Secciones:
   1. Resumen: variables por lado, pares por tipo, componentes cruzados.
@@ -35,8 +35,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reporte_cruce as rc  # noqa: E402  (estilo, nombres cortos)
 
 ROOT = Path(__file__).resolve().parent.parent
-CRUCES = ROOT / "analisis" / "salidas" / "cruces"
-SALIDA = ROOT / "analisis" / "salidas" / "reportes"
+import rutas  # noqa: E402
+CRUCES = rutas.CRUCES
+SALIDA = rutas.REPORTES
 PERIODOS = ["2016_2019", "2020_2022", "2023_2024", "2025_2026"]
 TIPOS = [("patrón", "Patrón"), ("escala", "Escala"), ("mecánico", "Mecánico"), ("no resiste tamaño", "No resiste tamaño")]
 
@@ -408,7 +409,7 @@ def escribir(dim_a, dim_b):
     titulo = f"Cruce {dim_a}–{dim_b}"
     cuerpo = f"""<main>
 <h1>{esc(titulo)}</h1>
-<p class="sub">Correlaciones entre las variables y entre los componentes principales de {esc(dim_a)} y de {esc(dim_b)} · serie estable de next.js, con la réplica en canary · mismo método que el análisis dentro de cada dimensión</p>
+<p class="sub">Correlaciones entre las variables y entre los componentes principales de {esc(dim_a)} y de {esc(dim_b)} · serie estable de {esc(rutas.proyecto.REPO or "el repositorio")}, con la réplica en canary · mismo método que el análisis dentro de cada dimensión</p>
 <div class="kpis">{kpis}</div>{nota_compart}
 
 <h2>1. Mapa de las correlaciones cruzadas</h2>
@@ -460,8 +461,8 @@ def escribir(dim_a, dim_b):
               f'<title>{esc(titulo)}</title><style>{rc.ESTILO}{ESTILO_EXTRA}</style></head><body>{cuerpo}'
               f'<script type="application/json" id="datos">{json.dumps(datos, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")}</script>'
               f"<script>{SCRIPT}</script></body></html>")
-    SALIDA.mkdir(parents=True, exist_ok=True)
-    destino = SALIDA / f"reporte_cruce_{dim_a.lower()}_{dim_b.lower()}.html"
+    destino = rutas.REPORTES_CRUCES / f"{dim_a.lower()}_{dim_b.lower()}.html"
+    destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(pagina, encoding="utf-8")
     return destino
 

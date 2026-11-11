@@ -32,15 +32,18 @@ docker compose run --rm tres-p iniciar --repo org/nombre
 docker compose run --rm tres-p todo
 ```
 
-Los hallazgos quedan en `trabajo/salidas/`:
+Los resultados quedan en `trabajo/salidas/` (sin Docker, en `salidas/`). Empezar por **`LEEME.md`**,
+el índice que se genera en cada corrida:
 
-| Archivo | Qué tiene |
+| Carpeta | Qué tiene |
 |---|---|
-| `relaciones/resumen.md` | los patrones, por par de dimensiones, y las cadenas entre las tres |
-| `relaciones/patrones.csv` | cada par evaluado, con su correlación, sus controles y por qué es o no patrón |
-| `tres_dimensiones/resumen.md` | asociación global de las tres dimensiones frente al azar |
-| `multiverso_asignacion/resumen.md` | qué conexiones dependen de a qué dimensión se asignan las métricas compartidas |
-| `reportes/*.html` | reportes interactivos de cada dimensión y de cada cruce |
+| `5_patrones/` | **el resultado**: los patrones (`resumen.md`, `patrones.csv`) y las cadenas entre las tres dimensiones |
+| `1_variables/` | qué se mide: el diccionario de variables |
+| `2_dimensiones/` | cada dimensión por separado: correlaciones internas, PCA y agrupamiento |
+| `3_cruces/` | cada par de dimensiones |
+| `4_tres_dimensiones/` | las tres a la vez: asociación global frente al azar y triángulos |
+| `6_robustez/` | si los hallazgos dependen de a qué dimensión se asignan las métricas compartidas |
+| `reportes/` | tres reportes HTML interactivos: `intradimensional.html`, `bidimensional.html` y `tridimensional.html` |
 
 Para usar un clon que ya tengas: en `.env`, `TRES_P_CLON_HOST=/ruta/al/clon`, y en
 `trabajo/proyecto.json`, `"clon": "/repo"`.
@@ -62,9 +65,9 @@ python3 tres_p.py todo
 python3 tres_p.py base          # crea la base del proyecto (POSTGRES_DB) con el esquema
 python3 tres_p.py calcular      # métricas por ventana; --series estable, --solo k1,k2, --solo-locales
 python3 tres_p.py estado        # qué ventanas y métricas hay en la base
-python3 tres_p.py identidades   # nombre de git -> login de GitHub (db/identidades_git.csv)
-python3 tres_p.py exportar      # métricas por persona (persona_agregado_estable_canary.csv)
-python3 tres_p.py analizar      # análisis completo; --sin-reportes para saltear los HTML
+python3 tres_p.py identidades   # nombre de git -> login de GitHub (datos/identidades_git.csv)
+python3 tres_p.py exportar      # métricas por persona (datos/persona_agregado_estable_canary.csv)
+python3 tres_p.py analizar      # análisis completo; --sin-complementarios / --sin-reportes para saltearlos
 ```
 
 `calcular` es lo que más tarda: las métricas de la API de GitHub están limitadas a 5.000 consultas
@@ -92,19 +95,25 @@ Cada proyecto usa su propia base (`POSTGRES_DB`): el análisis no filtra por rep
   un CSV de `descartados`, los patrones se informan como candidatos a validar.
 - **Réplica.** Si el repositorio no publica prereleases, la serie de réplica coincide con la estable
   y no aporta una réplica independiente.
-- **Bots.** Se descartan los logins con `[bot]`, los conocidos (`base_metric.py`) y los de
-  `bots_clasificados.csv`; conviene revisar los más activos de cada proyecto.
+- **Bots.** Se descartan los logins con `[bot]`, los conocidos (`calculo/base_metric.py`) y los de
+  `calculo/bots_clasificados.csv`; conviene revisar los más activos de cada proyecto.
 
 ## Estructura
 
 ```
-tres_p.py              CLI que encadena los pasos
-proyecto.py            lee proyecto.json (repo, períodos, épocas, descartados)
-run_versiones.py       métricas desde la API de GitHub, por ventana
-run_versiones_local.py métricas desde el clon (git), por ventana
-export_persona.py      métricas por persona, agregadas por ventana
-metricas/              las métricas, por consigna, cada una con su ficha (.md)
-analisis/              preprocesamiento, correlaciones, PCA, clustering, cruces, 3D, multiverso, relaciones
-db/                    esquema de la base, catálogo de métricas y unificación de identidades
-docs/                  cómo se calcula cada métrica, correcciones y selección del caso
+tres_p.py           CLI que encadena los pasos
+proyecto.py         lee proyecto.json y .env (repo, períodos, épocas, descartados, carpetas)
+calculo/            paso 1: métricas por ventana, identidades y exportación por persona
+  run_versiones.py        métricas desde la API de GitHub
+  run_versiones_local.py  métricas desde el clon (git)
+  mapear_identidades.py   nombre de git -> login de GitHub
+  export_persona.py       métricas por persona, agregadas por ventana
+  metricas/               las métricas, por consigna, cada una con su ficha (.md)
+analisis/           paso 2: correlaciones, PCA, agrupamiento, cruces, tres dimensiones, patrones
+  metodologia.md          las técnicas y sus criterios
+db/                 esquema de la base y catálogo de métricas
+docs/               el proceso completo, cómo se calcula cada métrica y sus correcciones
+
+datos/              (generado) métricas por persona e identidades
+salidas/            (generado) resultados del análisis
 ```

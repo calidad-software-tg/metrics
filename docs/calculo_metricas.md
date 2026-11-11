@@ -28,7 +28,7 @@ Ojo: esto **no** es el repo de este proyecto (que ya clonaste en el paso 0) — 
 **No hace falta clonarlo a mano.** El script que corre las métricas locales lo clona solo la primera vez que lo necesita:
 
 ```bash
-python3 run_versiones_local.py --solo cd --repo org/nombre
+python3 calculo/run_versiones_local.py --solo cd --repo org/nombre
 ```
 
 Al llamarlo así, si no existe todavía, hace un `git clone` completo de `https://github.com/org/nombre.git` dentro de `.clones/next.js/` (relativo a la raíz del proyecto). **Pesa ~2.7 GB y tarda entre 15 y 20 minutos** — es un clon completo con toda la historia, no superficial, porque las métricas necesitan recorrer commits viejos. Se hace una sola vez; las corridas siguientes solo actualizan (`git fetch`) en segundos.
@@ -46,8 +46,8 @@ git clone https://github.com/org/nombre.git .clones/next.js
 
 Hay dos scripts distintos, y **no es intercambiable** — cada métrica solo puede correr por una de las dos vías, según qué datos necesita:
 
-- **Local** (`run_versiones_local.py`, lee de `.clones/next.js` con `git log` / `git ls-tree` / `git blame`): solo para métricas que se calculan a partir del **contenido de archivos o del historial de commits** — cosas que existen dentro del propio repositorio git. Más rápido, sin límite de rate, sin necesidad de token (aunque igual lo usa para armar las ventanas).
-- **Remoto** (`run_versiones.py`, vía API/GraphQL de GitHub): para métricas que necesitan **issues, pull requests, comentarios, milestones, wiki o cualquier metadata de la plataforma GitHub** — eso no vive en el git, solo existe en los servidores de GitHub.
+- **Local** (`calculo/run_versiones_local.py`, lee de `.clones/next.js` con `git log` / `git ls-tree` / `git blame`): solo para métricas que se calculan a partir del **contenido de archivos o del historial de commits** — cosas que existen dentro del propio repositorio git. Más rápido, sin límite de rate, sin necesidad de token (aunque igual lo usa para armar las ventanas).
+- **Remoto** (`calculo/run_versiones.py`, vía API/GraphQL de GitHub): para métricas que necesitan **issues, pull requests, comentarios, milestones, wiki o cualquier metadata de la plataforma GitHub** — eso no vive en el git, solo existe en los servidores de GitHub.
 
 | Métrica | Clave | Dónde corre | Motivo |
 |---|---|---|---|
@@ -87,28 +87,28 @@ Hay dos scripts distintos, y **no es intercambiable** — cada métrica solo pue
 ### Métricas locales
 
 ```bash
-python3 run_versiones_local.py --solo <clave> --repo org/nombre
+python3 calculo/run_versiones_local.py --solo <clave> --repo org/nombre
 ```
 
 Ejemplos reales:
 ```bash
-python3 run_versiones_local.py --solo cd --repo org/nombre
-python3 run_versiones_local.py --solo anmcc --repo org/nombre
-python3 run_versiones_local.py --solo dloc,rc --repo org/nombre   # varias juntas, separadas por coma
-python3 run_versiones_local.py --repo org/nombre                  # TODAS las locales de una
+python3 calculo/run_versiones_local.py --solo cd --repo org/nombre
+python3 calculo/run_versiones_local.py --solo anmcc --repo org/nombre
+python3 calculo/run_versiones_local.py --solo dloc,rc --repo org/nombre   # varias juntas, separadas por coma
+python3 calculo/run_versiones_local.py --repo org/nombre                  # TODAS las locales de una
 ```
 
 ### Métricas remotas
 
 ```bash
-python3 run_versiones.py <clave> --repo org/nombre
+python3 calculo/run_versiones.py <clave> --repo org/nombre
 ```
 
 Ejemplos reales:
 ```bash
-python3 run_versiones.py mttr --repo org/nombre
-python3 run_versiones.py sc --repo org/nombre
-python3 run_versiones.py nci,noi,dis --repo org/nombre   # varias juntas, separadas por coma
+python3 calculo/run_versiones.py mttr --repo org/nombre
+python3 calculo/run_versiones.py sc --repo org/nombre
+python3 calculo/run_versiones.py nci,noi,dis --repo org/nombre   # varias juntas, separadas por coma
 ```
 
 ### Para incluir también las ventanas canary (opcional)
@@ -116,23 +116,23 @@ python3 run_versiones.py nci,noi,dis --repo org/nombre   # varias juntas, separa
 Por defecto las dos formas de arriba calculan sobre las **373 ventanas estables** (`tipo_analisis='versiones'`). Si además querés la serie más granular con canary (~4.228 ventanas), agregá `--con-canary` — guarda en una categoría separada (`versiones_canary`), nunca pisa la serie estable:
 
 ```bash
-python3 run_versiones.py mttr --repo org/nombre --con-canary
-python3 run_versiones_local.py --solo cd --repo org/nombre --con-canary
+python3 calculo/run_versiones.py mttr --repo org/nombre --con-canary
+python3 calculo/run_versiones_local.py --solo cd --repo org/nombre --con-canary
 ```
 
 Ojo: con canary son ~10x más ventanas — tarda bastante más (para las métricas remotas que hacen un fetch por cada ventana, como `sc`, puede ser un salto grande de tiempo).
 
 ### Filtro de bots
 
-No requiere ninguna acción — está integrado en el código (`base_metric.py`, función `es_bot`). Cuentas de automatización conocidas (bots de release, `github-actions`, `dependabot`, agentes de IA) se excluyen solas de los resultados por persona.
+No requiere ninguna acción — está integrado en el código (`calculo/base_metric.py`, función `es_bot`). Cuentas de automatización conocidas (bots de release, `github-actions`, `dependabot`, agentes de IA) se excluyen solas de los resultados por persona.
 
 ### Probar sin guardar en la base
 
 Para ver el resultado impreso en pantalla sin tocar la base de datos (útil para probar antes de correr en serio):
 
 ```bash
-python3 run_versiones.py mttr --repo org/nombre --no-guardar
-python3 run_versiones_local.py --solo cd --repo org/nombre --no-guardar
+python3 calculo/run_versiones.py mttr --repo org/nombre --no-guardar
+python3 calculo/run_versiones_local.py --solo cd --repo org/nombre --no-guardar
 ```
 
 ---

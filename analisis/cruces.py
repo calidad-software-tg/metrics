@@ -42,9 +42,9 @@ Uso (todo con la base corregida):
              de variables, porque usa sus patrones). --asignado saca de cada grupo las métricas que la
              config asigna al otro lado (salida en clustering_<corte>_asignado/).
 
-Requisitos: analisis/salidas/diccionario_variables.csv (generar_diccionario.py) y
-analisis/salidas/pca/pca_<dim>.json de las dos dimensiones (pca.py <Dim>); para --grupos, también
-clustering_<dim>.json (clustering.py <Dim>).
+Requisitos: salidas/1_variables/diccionario_variables.csv (generar_diccionario.py) y
+salidas/2_dimensiones/<dim>/pca.json de las dos dimensiones (pca.py <Dim>); para --grupos, también
+agrupamiento.json (clustering.py <Dim>).
 
 Configuración (JSON, todo opcional; ver analisis/cruces/*.json):
     lados.<Dim>.niveles      niveles de variable que aporta cada lado ("producto", "persona_agregada").
@@ -72,7 +72,7 @@ Configuración (JSON, todo opcional; ver analisis/cruces/*.json):
     pca_conjunto_variables   "componentes" (por defecto: las variables con |carga| >= carga_minima en los
                              componentes elegidos de cada lado) o "todas" (necesita 3 releases por variable).
 
-Salidas en analisis/salidas/cruces/<dima>_<dimb>/:
+Salidas en salidas/3_cruces/<dima>_<dimb>/:
     pares_variables.csv, pares_componentes.csv, pares_reducido.csv, triangulacion.csv, red_nodos.csv, red_aristas.csv,
 
 Cruce con los grupos del clustering (--grupos)
@@ -98,7 +98,7 @@ Cada grupo se convierte en una serie por release de tres formas, y el cruce se h
   representativa  la métrica más parecida al resto del grupo (mayor |correlación| promedio), con la
                   misma transformación que el PCA, como las variables marcadoras del conjunto reducido.
 
-Los grupos, las variables y los releases salen de clustering_<dim>.json (clustering.py), que
+Los grupos, las variables y los releases salen de agrupamiento.json (clustering.py), que
 a su vez usa las mismas variables y la misma transformación que el PCA de la dimensión. La serie
 canary de cada grupo se arma con las mismas métricas y los mismos signos o pesos que la estable.
 
@@ -109,7 +109,7 @@ Uso (después de pca.py y clustering.py de las dos dimensiones y del cruce de va
 --grupos propio usa la cantidad de grupos que elige el clustering; --grupos pca, la misma
 cantidad que componentes del PCA.
 
-Salidas en analisis/salidas/cruces/<dima>_<dimb>/clustering_<corte>/:
+Salidas en salidas/3_cruces/<dima>_<dimb>/clustering_<corte>/:
     <metodo>/pares_grupos.csv, <metodo>/pares_reducido.csv, <metodo>/triangulacion.csv,
     resumen.json y comparacion.md (los tres métodos entre sí y frente al cruce con el PCA).
 """
@@ -129,8 +129,8 @@ import correlaciones as corr  # noqa: E402
 import pca  # noqa: E402
 
 ROOT = corr.ROOT
-SALIDA = ROOT / "analisis" / "salidas" / "cruces"
-PCA_DIR = ROOT / "analisis" / "salidas" / "pca"
+import rutas  # noqa: E402
+SALIDA = rutas.CRUCES
 
 DEFAULTS = {
     "lados": {},
@@ -249,7 +249,7 @@ def clasificar(pares, claves_control):
 # ── 3. componentes ───────────────────────────────────────────────────────────
 
 def cargar_pca(dim, cfg):
-    archivo = PCA_DIR / f"pca_{dim.lower()}.json"
+    archivo = rutas.dimension(dim) / "pca.json"
     if not archivo.exists():
         sys.exit(f"Falta {archivo}: corré pca.py {dim} sobre la misma base.")
     d = json.loads(archivo.read_text(encoding="utf-8"))
@@ -798,7 +798,7 @@ SERIE_DB = dict(pca.SERIES)
 
 
 def cargar_clustering(dim):
-    archivo = PCA_DIR / f"clustering_{dim.lower()}.json"
+    archivo = rutas.dimension(dim) / "agrupamiento.json"
     if not archivo.exists():
         sys.exit(f"Falta {archivo}: corré antes clustering.py {dim}.")
     return json.loads(archivo.read_text(encoding="utf-8"))
@@ -825,7 +825,7 @@ def grupos_de(dim, cfg, datos, duraciones, corte, var_dict, permitidas=None):
     enf = cfg["componentes"]["enfoque"]
     ke, kc = f"{conj}|estable|{enf}", f"{conj}|canary|{enf}"
     if ke not in C["resultados"] or corte not in C["resultados"][ke]["soluciones"]:
-        sys.exit(f"{dim}: no hay corte '{corte}' para {ke} en clustering_{dim.lower()}.json.")
+        sys.exit(f"{dim}: no hay corte '{corte}' para {ke} en {archivo}.")
     Ce = C["resultados"][ke]
     sol = Ce["soluciones"][corte]
     vs = Ce["variables"]
@@ -1128,9 +1128,11 @@ def main(argv=None):
     if args.periodos in ("calendario", "ambos"):
         cruzar(dim_a, dim_b, cfg, base, "calendario")
     if args.periodos in ("epocas", "ambos"):
-        cruzar(dim_a, dim_b, cfg, base / "epocas", "epocas")
-    if args.periodos == "ambos":
-        comparar_periodos(base, base / "epocas", base)
+        # prueba de sensibilidad (complementaria): queda en salidas/complementarios/periodos/<dima>_<dimb>/
+        ep = rutas.COMPLEMENTARIOS / "periodos" / f"{dim_a.lower()}_{dim_b.lower()}"
+        cruzar(dim_a, dim_b, cfg, ep, "epocas")
+        if (base / "pares_variables.csv").exists():
+            comparar_periodos(base, ep, ep)
 
 
 if __name__ == "__main__":

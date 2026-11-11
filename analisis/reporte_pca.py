@@ -7,8 +7,8 @@ Reporte HTML del análisis de componentes principales de una dimensión.
 Uso:
     python3 analisis/reporte_pca.py Producto
 
-Lee analisis/salidas/pca/pca_<dim>.json (lo genera generar_pca.py, que además llama a
-este script al terminar) y escribe analisis/salidas/reportes/reporte_pca_<dim>.html.
+Lee salidas/2_dimensiones/<dim>/pca.json (lo genera pca.py, que además llama a
+este script al terminar) y escribe el reporte en salidas/reportes/_partes/ (reportes.py lo suma a intradimensional.html).
 El reporte no tiene texto de análisis fijo: todo sale de los datos. Arriba se eligen
 el conjunto de variables, la serie (estables o canary) y el enfoque (crudo, ajustado o
 ajustado y sin tamaño), y todas las secciones se actualizan.
@@ -22,8 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reporte_cruce as rc  # noqa: E402
 
-ENTRADA = rc.ROOT / "analisis" / "salidas" / "pca"
-SALIDA = rc.ROOT / "analisis" / "salidas" / "reportes"
+import rutas  # noqa: E402
+SALIDA = rutas.REPORTES
 
 NOMBRE_CONJUNTO = {"producto": "Métricas a nivel producto", "todas": "Todas las variables de la dimensión"}
 
@@ -337,11 +337,11 @@ todo();
 
 
 def archivo(dim: str) -> Path:
-    return SALIDA / f"reporte_pca_{dim.lower()}.html"
+    return rutas.REPORTES_DIMENSIONES / f"{dim.lower()}_pca.html"
 
 
 def escribir(dim: str) -> Path:
-    entrada = ENTRADA / f"pca_{dim.lower()}.json"
+    entrada = rutas.dimension(dim) / "pca.json"
     if not entrada.exists():
         sys.exit(f"No existe {entrada}. Corré primero: python3 analisis/generar_pca.py {dim}")
     d = json.loads(entrada.read_text(encoding="utf-8"))
@@ -373,7 +373,7 @@ grupos como componentes retiene el PCA, para compararlos.</p>
 <title>{html.escape(titulo)}</title><style>{rc.ESTILO}{ESTILO_PCA}</style></head>
 <body><main>
 <h1>{html.escape(titulo)}</h1>
-<p class="sub">Fuente: analisis/salidas/pca/pca_{d['dimension'].lower()}.json (generar_pca.py) · rangos estandarizados · sin backports</p>
+<p class="sub">Fuente: salidas/2_dimensiones/{d['dimension'].lower()}/pca.json (pca.py) · rangos estandarizados · sin backports</p>
 <div class="barra-sel" id="barraSel"></div>
 <nav class="indice"><b>Contenido</b><ol>{"".join(f'<li><a href="#{a}">{t}</a></li>' for a, t in secciones)}</ol></nav>
 <div class="kpis" id="kpis"></div>
@@ -443,8 +443,8 @@ ella por la congruencia de Tucker, después de emparejar los componentes.</p>
 <p class="nota">Semilla {p['semilla']} · {p['permutaciones']} permutaciones (Horn) · {p['bootstrap']} remuestreos bootstrap.</p>
 </main></body></html>
 """
-    SALIDA.mkdir(parents=True, exist_ok=True)
     destino = archivo(d["dimension"])
+    destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(doc, encoding="utf-8")
     return destino
 
@@ -461,7 +461,7 @@ def main():
 # ── Piezas estáticas para el informe (generar_informe.py: marcas [[pca ...]]) ─────────────────
 
 def cargar(dim: str) -> dict | None:
-    entrada = ENTRADA / f"pca_{dim.lower()}.json"
+    entrada = rutas.dimension(dim) / "pca.json"
     if not entrada.exists():
         return None
     d = json.loads(entrada.read_text(encoding="utf-8"))
@@ -486,7 +486,7 @@ NOMBRE_SOLUCION = {"propio": "Corte elegido por el clustering", "pca": "Corte co
 
 
 def cargar_clustering(dim: str) -> dict | None:
-    entrada = ENTRADA / f"clustering_{dim.lower()}.json"
+    entrada = rutas.dimension(dim) / "agrupamiento.json"
     return json.loads(entrada.read_text(encoding="utf-8")) if entrada.exists() else None
 
 

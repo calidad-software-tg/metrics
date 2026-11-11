@@ -7,7 +7,7 @@ Clustering jerárquico de las métricas de una dimensión, comparado con el PCA.
 Uso:
     python3 analisis/clustering.py Producto
 
-Corre después de pca.py, porque toma del pca_<dim>.json qué variables y qué releases
+Corre después de pca.py, porque toma del pca.json de la dimensión qué variables y qué releases
 usó cada combinación (conjunto, serie y enfoque) y reconstruye la misma matriz con las mismas
 funciones (tabla y transformar). El clustering se calcula por separado: no usa los componentes
 ni las cargas, solo los datos de entrada. Para cada combinación:
@@ -25,9 +25,9 @@ ni las cargas, solo los datos de entrada. Para cada combinación:
     retiene Horn: ARI frente al componente dominante de cada variable (|carga| ≥ 0,4) y, para cada
     grupo, el componente con el que comparte más variables.
 
-Salidas (analisis/salidas/pca/):
-  clustering_<dim>.json  (lo lee reporte_pca.py y generar_informe.py)
-  clustering_<dim>_grupos.csv
+Salidas (salidas/2_dimensiones/<dim>/):
+  agrupamiento.json  (lo leen reporte_pca.py y cruces.py --grupos)
+  agrupamiento_grupos.csv
 """
 import argparse
 import csv
@@ -44,7 +44,7 @@ from scipy.spatial.distance import squareform
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import pca  # noqa: E402
 
-SALIDA = pca.SALIDA
+import rutas  # noqa: E402
 K_MAX = 10
 N_PERM = 200          # datos permutados para la nula de la silueta
 N_BOOT = 200          # remuestreos de bloques para la estabilidad
@@ -187,10 +187,10 @@ def analizar(clave, R, datos, rng):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dimension", help="Persona, Proceso o Producto")
-    ap.add_argument("--sin-reporte", action="store_true", help="no regenera reporte_pca_<dim>.html")
+    ap.add_argument("--sin-reporte", action="store_true", help="no regenera el reporte del PCA de la dimensión")
     args = ap.parse_args()
     dim = args.dimension.strip().capitalize()
-    entrada = SALIDA / f"pca_{dim.lower()}.json"
+    entrada = rutas.dimension(dim) / "pca.json"
     if not entrada.exists():
         sys.exit(f"No existe {entrada}. Corré primero: python3 analisis/pca.py {dim}")
     res_pca = json.loads(entrada.read_text(encoding="utf-8"))
@@ -233,7 +233,8 @@ def main():
                                                 carga_minima=CARGA_MINIMA, semilla=pca.SEMILLA,
                                                 distancia="1 − |correlación|", enlace="promedio"),
           "resultados": res}
-    base = f"clustering_{dim.lower()}"
+    base = "agrupamiento"
+    SALIDA = rutas.dimension(dim)
     (SALIDA / f"{base}.json").write_text(json.dumps(js, ensure_ascii=False), encoding="utf-8")
     with open(SALIDA / f"{base}_grupos.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)

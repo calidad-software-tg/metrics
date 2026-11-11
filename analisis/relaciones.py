@@ -30,7 +30,7 @@ Uso:
     POSTGRES_DB=resultados_metricas_fixes python3 analisis/relaciones.py [--recalcular]
 
 --recalcular vuelve a calcular todos los pares (correlaciones.correr) antes de clasificarlos.
-Salidas en analisis/salidas/relaciones/: resumen.md, patrones.csv, triangulos.csv.
+Salidas en salidas/5_patrones/: resumen.md, patrones.csv, cadenas.csv.
 """
 import csv
 import math
@@ -48,8 +48,9 @@ import multiverso_asignacion as mv  # noqa: E402
 import pca  # noqa: E402
 import tres_dimensiones as td  # noqa: E402
 
-SALIDA = corr.ROOT / "analisis" / "salidas" / "relaciones"
-BASE = SALIDA / "base"
+import rutas  # noqa: E402
+SALIDA = rutas.PATRONES
+BASE = rutas.PATRONES_BASE
 DIMS = ("Persona", "Proceso", "Producto")
 PARES_DIM = [("Persona", "Proceso"), ("Persona", "Producto"), ("Proceso", "Producto")]
 # Relaciones descartadas al validarlas en el proyecto analizado (recalculando las variables sin los
@@ -214,7 +215,7 @@ def main():
     tris = triangulos(filas, var_dict, datos)
     print(f"  {len(tris)} triángulos con tres dimensiones posibles", flush=True)
     escribir_csv(SALIDA / "patrones.csv", sorted(filas, key=lambda f: (not f["patron"], f["tipo"], -abs(f["rho"]) if not np.isnan(f["rho"]) else 0)))
-    escribir_csv(SALIDA / "triangulos.csv", tris)
+    escribir_csv(SALIDA / "cadenas.csv", tris)
     escribir_md(filas, patrones, tris)
     print(f"  listo: {SALIDA}")
 

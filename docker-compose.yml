@@ -27,10 +27,8 @@ services:
     environment:
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
-      TRES_P_PROYECTO: /app/trabajo/proyecto.json
     volumes:
-      - ./trabajo:/app/trabajo                 # proyecto.json del repo analizado
-      - ./trabajo/salidas:/app/analisis/salidas  # hallazgos y reportes
+      - ./trabajo:/app/trabajo                 # proyecto.json, datos/ y salidas/ (hallazgos y reportes)
       - ./trabajo/clones:/app/.clones          # clones descargados
       - ${TRES_P_CLON_HOST:-./trabajo/clones}:/repo:ro   # clon propio (opcional)
 

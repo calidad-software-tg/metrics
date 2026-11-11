@@ -1,5 +1,5 @@
 """
-db/mapear_identidades.py
+calculo/mapear_identidades.py
 
 Construye una tabla de equivalencias nombre_git -> login_github para el repositorio analizado, usando
 exactamente la misma clave que las métricas del runner local (run_versiones_local.py
@@ -11,11 +11,11 @@ Fuentes de resolución, en este orden:
        3 SHAs por identidad (el más reciente primero).
 
 Salidas:
-    db/identidades_git.csv       nombre_git, login, fuente, n_commits
-    db/identidades_ambiguas.csv  nombre_git, logins (|-separados), n_commits
+    datos/identidades_git.csv      nombre_git, login, fuente, n_commits
+    datos/identidades_ambiguas.csv  nombre_git, logins (|-separados), n_commits
 
 Uso:
-    python3 db/mapear_identidades.py
+    python3 calculo/mapear_identidades.py
 Flags:
     --repo org/nombre            repositorio (por defecto, el de proyecto.json)
     --repo-dir .clones/<nombre>  dónde está el clon
@@ -43,6 +43,9 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+import proyecto  # noqa: E402
+DATOS = proyecto.DATOS
 OWNER, NOMBRE = "", ""
 _env = ROOT / ".env"
 if _env.exists():
@@ -208,8 +211,6 @@ def main():
     args = ap.parse_args()
     global OWNER, NOMBRE
     if args.repo is None:
-        sys.path.insert(0, str(ROOT))
-        import proyecto
         args.repo = proyecto.REPO
     OWNER, NOMBRE = args.repo.split("/", 1)
 
@@ -261,14 +262,15 @@ def main():
     print(f"  Fase b: {len(api_resueltos):,} resueltos por API, {len(api_ambiguos):,} ambiguos")
 
     # Guardar
-    out_csv = ROOT / "db" / "identidades_git.csv"
+    DATOS.mkdir(parents=True, exist_ok=True)
+    out_csv = DATOS / "identidades_git.csv"
     with open(out_csv, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["nombre_git", "login", "fuente", "n_commits"])
         for nombre, (lg, fuente) in sorted(resueltos.items(), key=lambda x: -por_nombre[x[0]]["n"]):
             w.writerow([nombre, lg, fuente, por_nombre[nombre]["n"]])
 
-    out_amb = ROOT / "db" / "identidades_ambiguas.csv"
+    out_amb = DATOS / "identidades_ambiguas.csv"
     ambiguos: dict[str, set[str]] = {}
     ambiguos.update(ambiguos_noreply)
     for n, logins in api_ambiguos.items():
@@ -314,7 +316,7 @@ def main():
 
     # Deduplicar revisar
     revisar = sorted(set(revisar))
-    out_rev = ROOT / "db" / "identidades_revisar.csv"
+    out_rev = DATOS / "identidades_revisar.csv"
     with open(out_rev, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["nombre_git", "login", "motivo", "n_commits"])

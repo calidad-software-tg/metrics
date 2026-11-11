@@ -49,7 +49,7 @@ Al armar las ventanas:
 
 ### 2.2 Las métricas
 
-Se calculan 26 métricas del catálogo, cada una con su ficha en `metricas/<consigna>/`. Hay dos tipos:
+Se calculan 26 métricas del catálogo, cada una con su ficha en `calculo/metricas/<consigna>/`. Hay dos tipos:
 
 - **Desde el clon** (git): documentación, densidad de comentarios, README, experiencia en los archivos
   y componentes, componentes por commit, diversidad de contribución. No tienen límite de consultas.
@@ -65,9 +65,9 @@ cada ventana; las de actividad (cuántas issues se cerraron), con los eventos de
 Algunas métricas se calculan por persona. Para eso:
 
 - se unifican las identidades: el mismo contribuyente puede aparecer con su nombre de git y con su
-  login de GitHub (`db/mapear_identidades.py`);
+  login de GitHub (`calculo/mapear_identidades.py`, que deja `datos/identidades_git.csv`);
 - se descarta la actividad de cuentas que no son personas: logins con `[bot]`, bots conocidos
-  (`base_metric.py`) y los de `bots_clasificados.csv`. Conviene revisar los más activos de cada
+  (`calculo/base_metric.py`) y los de `calculo/bots_clasificados.csv`. Conviene revisar los más activos de cada
   proyecto y sumarlos a esa lista.
 
 ### 2.4 De métricas a variables
@@ -168,9 +168,20 @@ proporción de ellas las dimensiones aparecen conectadas.
 
 ## 5. Cómo leer las salidas
 
-Todo queda en `analisis/salidas/` (o en `trabajo/salidas/` con Docker).
+Todo queda en `salidas/` (o en `trabajo/salidas/` con Docker), en carpetas numeradas en el orden en que
+se calculan. `salidas/LEEME.md` es el índice: dice cuántos patrones quedaron y qué hay en cada carpeta.
 
-**`relaciones/resumen.md`** es el resultado principal:
+| Carpeta | Qué tiene |
+|---|---|
+| `1_variables/` | el diccionario de variables |
+| `2_dimensiones/` | correlaciones dentro de cada dimensión y, por dimensión, PCA y agrupamiento |
+| `3_cruces/` | cada par de dimensiones: variables, componentes, grupos y red |
+| `4_tres_dimensiones/` | asociación global de las tres dimensiones y triángulos de componentes |
+| `5_patrones/` | **el resultado**: patrones validados y cadenas entre las tres dimensiones |
+| `6_robustez/` | multiverso de asignaciones y cruces sin las métricas compartidas |
+| `reportes/` | reportes HTML interactivos, uno por nivel: intradimensional, bidimensional y tridimensional |
+
+**`5_patrones/resumen.md`** es el resultado principal:
 
 - arriba, cuántos pares se evaluaron y cuántos son patrón, por tipo:
   - *entre dimensiones*: sus variables no comparten ninguna dimensión del catálogo;
@@ -180,7 +191,7 @@ Todo queda en `analisis/salidas/` (o en `trabajo/salidas/` con Docker).
   en la réplica y con el control por tamaño;
 - al final, los triángulos: tridimensionales, cadenas y los que no conectan aspectos distintos.
 
-**`relaciones/patrones.csv`** tiene los pares evaluados (uno por fila). Las columnas más útiles:
+**`5_patrones/patrones.csv`** tiene los pares evaluados (uno por fila). Las columnas más útiles:
 
 | Columna | Qué es |
 |---|---|
@@ -195,10 +206,10 @@ Todo queda en `analisis/salidas/` (o en `trabajo/salidas/` con Docker).
 | `entre`, `dentro` | qué pares de dimensiones puede conectar y en cuál puede leerse dentro |
 | `fuerza`, `nivel` | fuerza de la relación y nivel de evidencia |
 
-**`tres_dimensiones/resumen.md`** trae la medida global frente al azar.
-**`multiverso_asignacion/resumen.md`** muestra, para cada par de dimensiones, en qué proporción de
-asignaciones aparecen conectadas. **`reportes/*.html`** son reportes interactivos de cada dimensión
-y de cada cruce, para explorar cada relación release por release.
+**`4_tres_dimensiones/resumen.md`** trae la medida global frente al azar.
+**`6_robustez/multiverso_asignacion/resumen.md`** muestra, para cada par de dimensiones, en qué proporción de
+asignaciones aparecen conectadas. **`reportes/`** tiene tres reportes interactivos, uno por nivel de análisis
+(intradimensional, bidimensional y tridimensional), para explorar cada relación release por release.
 
 Al interpretar, conviene tener en cuenta que:
 
