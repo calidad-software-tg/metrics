@@ -56,7 +56,7 @@ except ImportError:
 
 MIN_COBERTURA = 0.6      # parte de los releases estables en que una variable tiene que tener dato
 MAX_PCT_MODA = 0.8       # casi constante: el valor más repetido ocupa más del 80 % (como el diccionario)
-PERIODOS = [(2016, 2019), (2020, 2022), (2023, 2024), (2025, 2026)]
+PERIODOS = [(y0, y1) for _, y0, y1 in (gc.CALENDARIO or [])]   # períodos del calendario del proyecto
 SOPORTE_MIN, LIFT_MIN = 0.10, 1.5
 MIN_DISTINTOS = 10       # menos valores distintos: la información mutua (k vecinos) se sesga con los empates
 PLIEGUES = 5             # validación cruzada en bloques contiguos (sin mezclar el orden en el tiempo)

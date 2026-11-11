@@ -132,6 +132,10 @@ def ps(x, y, s, idx=None, ctrl=(), tamano=False):
     return corr.partial_spearman(list(x[idx]), list(y[idx]), list(s.pn[idx]), list(s.du[idx]), extra_controls=extra or None)
 
 
+# Épocas: tantas como cortes + 1 (con "auto", tantas como períodos del calendario)
+N_EPOCAS = len(corr.CORTES_EPOCAS) + 1 if corr.CORTES_EPOCAS else len(corr.CALENDARIO or ())
+
+
 def evaluar(i, j, ctrl, E, C):
     """Un par de componentes (columnas i, j) con los controles ctrl: global, por período (calendario y épocas),
     canary y con tamaño. Mismos criterios que cruces.evaluar_par."""
@@ -140,7 +144,7 @@ def evaluar(i, j, ctrl, E, C):
                p=g["p_corr"])
     for nombre, etiquetas in (("cal", [(lab, lambda a, y0=y0, y1=y1: a is not None and y0 <= a <= y1)
                                        for lab, y0, y1 in corr.CALENDARIO]),
-                              ("ep", [(f"E{k}", lambda e, k=k: e == k) for k in (1, 2, 3, 4)])):
+                              ("ep", [(f"E{k}", lambda e, k=k: e == k) for k in range(1, N_EPOCAS + 1)])):
         valores = E.anio if nombre == "cal" else E.epoca
         rhos = {}
         for lab, en in etiquetas:
@@ -486,8 +490,7 @@ def main():
 
     # ── escribir ──
     cols_red = ["condicion", "par", "tipo", "categoria", "fuerza", "rho", "ic_inf", "ic_sup", "q", "n", "n_efectiva",
-                "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026", "estable_cal", "rho_E1", "rho_E2",
-                "rho_E3", "rho_E4", "estable_ep", "rho_canary", "rho_tamano", "resiste_tamano", "robusta",
+                *corr.COLS_RHO_PERIODO, "estable_cal", *[f"rho_E{k}" for k in range(1, N_EPOCAS + 1)], "estable_ep", "rho_canary", "rho_tamano", "resiste_tamano", "robusta",
                 "robusta_epocas", "escala", "mecanico", "patron", "patron_epocas"]
     filas_red = []
     for cond, pares in red.items():

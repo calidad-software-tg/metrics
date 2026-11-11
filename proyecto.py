@@ -11,9 +11,11 @@ TRES_P_PROYECTO) y expone los valores propios del repositorio analizado:
     cortes_epocas    [tag, tag, tag] (primer release de cada época) o "auto"
     descartados      CSV con las relaciones descartadas al validarlas (x, y, motivo) o null
 
-Con "auto", el calendario reparte los años de la historia en cuatro períodos contiguos y las
-épocas cortan la serie estable en cuartos (por número de release). Los dos se calculan desde la
-base, que tiene que tener las ventanas de la serie estable ya calculadas.
+Con "auto", el calendario reparte los años de la historia en hasta cuatro períodos contiguos con al
+menos MIN_RELEASES_PERIODO releases estables cada uno (la regla de estabilidad necesita al menos
+MIN_PERIODOS períodos evaluables), lo más parejos posible; las épocas cortan la serie estable en
+tantas partes iguales (por número de release) como períodos tenga el calendario. Los dos se calculan
+desde la base, que tiene que tener las ventanas de la serie estable ya calculadas.
 
 Cada proyecto usa su propia base (POSTGRES_DB): los scripts de análisis no filtran por repositorio.
 """
@@ -21,6 +23,8 @@ Cada proyecto usa su propia base (POSTGRES_DB): los scripts de análisis no filt
 import csv
 import json
 import os
+from collections import Counter
+from itertools import combinations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -45,6 +49,12 @@ HASTA = CFG.get("hasta")
 # Nunca vacío: las consultas usan "etiqueta NOT IN %s" y () no es SQL válido.
 EXCLUIR_ESTABLE = frozenset(CFG.get("excluir_estable") or ["__sin_tags_excluidos__"])
 
+# Regla de estabilidad: la correlación se calcula en cada período del calendario con al menos
+# MIN_RELEASES_PERIODO releases, y hacen falta al menos MIN_PERIODOS períodos evaluables.
+MIN_RELEASES_PERIODO = 15
+MIN_PERIODOS = 3
+MAX_PERIODOS = 4
+
 
 def db_config():
     return dict(host=os.environ.get("POSTGRES_HOST", "localhost"),
@@ -68,12 +78,13 @@ def _es_backport(versiones):
 
 
 def _serie_estable():
-    """[(periodo_num, etiqueta, año_inicio)] de la serie estable, sin excluidos ni backports."""
+    """[(periodo_num, etiqueta, año)] de la serie estable, sin excluidos ni backports. El año es el del
+    cierre de la ventana, el mismo que usa el análisis para asignar cada release a un período."""
     import psycopg2
     con = psycopg2.connect(**db_config())
     try:
         cur = con.cursor()
-        cur.execute("""SELECT periodo_num, etiqueta, EXTRACT(YEAR FROM fecha_inicio)::int
+        cur.execute("""SELECT periodo_num, etiqueta, EXTRACT(YEAR FROM fecha_fin)::int
                        FROM periodo WHERE tipo_analisis = 'versiones' ORDER BY periodo_num""")
         filas = [f for f in cur.fetchall() if f[1] not in EXCLUIR_ESTABLE]
     finally:
@@ -86,24 +97,38 @@ def _calendario_auto():
     filas = _serie_estable()
     if not filas:
         raise RuntimeError("calendario 'auto': la base no tiene ventanas de la serie estable")
-    y0, y1 = min(f[2] for f in filas), max(f[2] for f in filas)
-    anios = list(range(y0, y1 + 1))
-    n = min(4, len(anios))
-    grupos, i = [], 0
-    for k in range(n):
-        tam = len(anios) // n + (1 if k < len(anios) % n else 0)
-        g = anios[i:i + tam]
-        i += tam
-        grupos.append((f"{g[0]}-{g[-1]}" if len(g) > 1 else str(g[0]), g[0], g[-1]))
-    return grupos
+    por_anio = Counter(f[2] for f in filas)
+    anios = list(range(min(por_anio), max(por_anio) + 1))
+    cuenta = [por_anio.get(a, 0) for a in anios]
+    # La mayor cantidad de períodos (hasta MAX_PERIODOS) en que todos tienen al menos
+    # MIN_RELEASES_PERIODO releases; entre esas particiones, la más pareja.
+    for n in range(min(MAX_PERIODOS, len(anios), sum(cuenta) // MIN_RELEASES_PERIODO), 0, -1):
+        mejor = None
+        for cortes in combinations(range(1, len(anios)), n - 1):
+            lim = (0, *cortes, len(anios))
+            sumas = [sum(cuenta[lim[i]:lim[i + 1]]) for i in range(n)]
+            if min(sumas) < MIN_RELEASES_PERIODO:
+                continue
+            clave = (min(sumas), -max(sumas))
+            if mejor is None or clave > mejor[0]:
+                mejor = (clave, lim)
+        if mejor:
+            lim = mejor[1]
+            grupos = [anios[lim[i]:lim[i + 1]] for i in range(n)]
+            return [(f"{g[0]}-{g[-1]}" if len(g) > 1 else str(g[0]), g[0], g[-1]) for g in grupos]
+    # Ni un período llega al mínimo: toda la historia en uno (la estabilidad no se puede evaluar)
+    return [(f"{anios[0]}-{anios[-1]}" if len(anios) > 1 else str(anios[0]), anios[0], anios[-1])]
 
 
 def _cortes_auto():
     filas = _serie_estable()
-    if len(filas) < 8:
-        raise RuntimeError("cortes_epocas 'auto': hacen falta al menos 8 releases estables")
+    k = len(CALENDARIO) if CALENDARIO else MAX_PERIODOS
+    if k < 2:
+        raise RuntimeError("cortes_epocas 'auto': el calendario tiene un solo período, no hay épocas que cortar")
+    if len(filas) < 2 * k:
+        raise RuntimeError(f"cortes_epocas 'auto': hacen falta al menos {2 * k} releases estables para {k} épocas")
     n = len(filas)
-    return tuple(filas[int(n * q)][1] for q in (0.25, 0.5, 0.75))
+    return tuple(filas[int(n * q / k)][1] for q in range(1, k))
 
 
 def _resolver(clave, auto):
@@ -136,3 +161,9 @@ def descartados():
         ruta = next((p for p in (RUTA.parent / ruta, ROOT / ruta) if p.exists()), RUTA.parent / ruta)
     with open(ruta, newline="", encoding="utf-8") as f:
         return {frozenset((r["x"], r["y"])): r["motivo"] for r in csv.DictReader(f)}
+
+
+def releases_por_periodo():
+    """[(etiqueta, releases estables)] de cada período del calendario."""
+    filas = _serie_estable()
+    return [(lab, sum(1 for f in filas if y0 <= f[2] <= y1)) for lab, y0, y1 in (CALENDARIO or [])]

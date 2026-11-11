@@ -176,6 +176,19 @@ def cmd_analizar(a):
         sys.exit(f"La serie estable tiene {n} ventanas entre releases y el análisis necesita al menos "
                  f"{MIN_RELEASES}: cada correlación se calcula sobre las ventanas, y con menos no es "
                  "confiable. Elegí un repositorio con más releases (o un --hasta posterior).")
+    # Regla de estabilidad: al menos MIN_PERIODOS períodos del calendario con MIN_RELEASES_PERIODO releases
+    import proyecto
+    por_periodo = proyecto.releases_por_periodo()
+    evaluables = [lab for lab, k in por_periodo if k >= proyecto.MIN_RELEASES_PERIODO]
+    if len(evaluables) < proyecto.MIN_PERIODOS:
+        detalle = ", ".join(f"{lab}: {k}" for lab, k in por_periodo) or "sin períodos"
+        sys.exit(f"Un patrón tiene que mantener el signo en al menos {proyecto.MIN_PERIODOS} períodos de la historia, "
+                 f"con {proyecto.MIN_RELEASES_PERIODO} releases estables o más en cada uno "
+                 f"(al menos {proyecto.MIN_PERIODOS * proyecto.MIN_RELEASES_PERIODO} en total). Este proyecto tiene "
+                 f"{n} ({detalle}), así que ninguna relación podría ser patrón. Elegí un repositorio con más releases "
+                 "o, si el calendario de proyecto.json es manual, revisá sus períodos.")
+    print("Períodos de la regla de estabilidad: "
+          + ", ".join(f"{lab} ({k} releases)" for lab, k in por_periodo), flush=True)
     sys.path.insert(0, str(ROOT / "analisis"))
     import rutas
     rutas.VARIABLES.mkdir(parents=True, exist_ok=True)

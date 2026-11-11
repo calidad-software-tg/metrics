@@ -222,7 +222,7 @@ def main():
         todos[tipo] = pares
     tris = triangulos(els, todos["componente"], var_dict, size) + triangulos(els, todos["grupo"], var_dict, size, "grupo")
     cols = ["tipo_elemento", "par_id", "x_tema", "y_tema", "comparten", "evaluado", "vars_x", "vars_y", "lect_x", "lect_y", "entre", "dentro",
-            "rho_corregida", "p_fdr", "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026", "rho_canary", "rho_corregida_tamano",
+            "rho_corregida", "p_fdr", *corr.COLS_RHO_PERIODO, "rho_canary", "rho_corregida_tamano",
             "robusta", "escala", "mecanico", "patron", "motivo"]
     with open(SALIDA / "pares.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")

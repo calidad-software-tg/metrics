@@ -10,9 +10,9 @@ Uso (desde la raíz del repo):
     POSTGRES_DB=resultados_metricas_fixes python3 analisis/correlaciones.py
     POSTGRES_DB=resultados_metricas_fixes python3 analisis/correlaciones.py --periodos ambos
 
---periodos calendario   (por defecto) estabilidad con los cuatro períodos de calendario
---periodos epocas       estabilidad con las épocas de temporal.py (prueba de sensibilidad); las columnas
-                        rho_2016_2019 … rho_2025_2026 pasan a ser las épocas E1 … E4
+--periodos calendario   (por defecto) estabilidad con los períodos del calendario del proyecto
+--periodos epocas       estabilidad con las épocas (prueba de sensibilidad); las columnas
+                        rho_<período> pasan a ser las épocas E1, E2, … en el mismo orden
 --periodos ambos        las dos, y la comparación: firme si el patrón pasa con los dos cortes,
                         depende del corte si pasa con uno
 --entre-dimensiones     agrega los pares entre dos dimensiones, sin repartir las métricas compartidas
@@ -54,8 +54,25 @@ OUT_MD     = SALIDA / "metodo_correlaciones.md"
 OUT_REV    = SALIDA / "revision_persona.csv"
 
 # Períodos de la estabilidad: el calendario por defecto; usar_periodos("epocas", datos) los cambia por las épocas
+import proyecto  # noqa: E402  (la raíz ya está en sys.path por preprocesamiento)
+
 ETAPAS = CALENDARIO
 _CORTES_PNUM = None   # con épocas: número de release del primer release de cada época
+
+
+def nombre_periodo(etiqueta):
+    """'2018-2021' → '2018–21' (para tablas y reportes)."""
+    a, _, b = str(etiqueta).partition("-")
+    return f"{a}–{b[-2:]}" if b else a
+
+
+# Columnas por período, con las etiquetas del calendario del proyecto (rho_2018_2021, …). Con épocas
+# las columnas son las mismas y cada una es la época de esa posición (E1, E2, …).
+CLAVES_PERIODO = [lab.replace("-", "_") for lab, *_ in (CALENDARIO or [])]
+NOMBRES_PERIODO = [nombre_periodo(lab) for lab, *_ in (CALENDARIO or [])]
+COLS_RHO_PERIODO = [f"rho_{c}" for c in CLAVES_PERIODO]
+COLS_IC_PERIODO = [f"ic_{c}" for c in CLAVES_PERIODO]
+COLS_ESTADO_PERIODO = [f"estado_{c}" for c in CLAVES_PERIODO]
 
 # por_construccion: activos ↔ nuevos del mismo canal, activos_comentarios/cierre ↔ activos_interaccion
 ACTIVOS_NUEVOS = {
@@ -78,7 +95,7 @@ K_CONTROLS_SPL = 5   # 4 spline df + log(dur)
 
 # Chequeos de sensibilidad
 UMBRAL_FUERZA        = 0.1   # |rho| mínimo para que una relación "exista"
-MIN_VENTANAS_PERIODO = 15    # ventanas mínimas para evaluar un período
+MIN_VENTANAS_PERIODO = proyecto.MIN_RELEASES_PERIODO   # ventanas mínimas para evaluar un período (15)
 DIAS_MINIMOS         = 1.0   # ventanas más cortas se excluyen en rho_corregida_sin_cortas
 VENTANA_LOCAL        = 21    # releases por grado de libertad del spline de tendencia local
 
@@ -88,7 +105,6 @@ VENTANA_LOCAL        = 21    # releases por grado de libertad del spline de tend
 # las mismas issues (etiquetadas como bug y reportadas por alguien de fuera del equipo principal).
 SOLAPAMIENTO_METRICAS = {frozenset({"dloc", "rc"}), frozenset({"noi", "cfdr"}), frozenset({"noi", "nub"}),
                          frozenset({"cfdr", "nub"})}
-import proyecto  # noqa: E402  (la raíz ya está en sys.path por preprocesamiento)
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -116,7 +132,7 @@ def partial_spearman(x_vals, y_vals, pnums, durs, extra_controls=None):
     if n < 5:
         return nan_r
     # una variable constante no tiene correlación: sin esto, dos variables constantes
-    # en un período (ej. Wiki Presence y README Completeness en 2025–26) daban ρ = 1,00
+    # en un período (ej. Wiki Presence y README Completeness cuando las dos quedan fijas) daban ρ = 1,00
     if len(set(x_vals)) < 2 or len(set(y_vals)) < 2:
         return nan_r
 
@@ -465,6 +481,9 @@ def usar_periodos(periodos, datos=None):
     elif periodos == "epocas":
         ETAPAS = [(n, i + 1, i + 1) for i, (n, *_) in enumerate(CALENDARIO)]
         _CORTES_PNUM = cortes_epocas(datos)
+        if len(_CORTES_PNUM) + 1 != len(ETAPAS):
+            print(f"  aviso: {len(_CORTES_PNUM) + 1} épocas y {len(ETAPAS)} períodos de calendario; "
+                  "las columnas por período usan las primeras", flush=True)
     else:
         raise ValueError(f"períodos desconocidos: {periodos}")
 
@@ -512,7 +531,7 @@ def compute_pair(x_data_e, y_data_e, x_data_c, y_data_c):
     rho_per = {}
     for label, y0, y1 in ETAPAS:
         idx = [i for i, a in enumerate(anios) if a is not None and y0 <= a <= y1]
-        if len(idx) < 15:
+        if len(idx) < MIN_VENTANAS_PERIODO:
             continue
         xp = [x_vals[i] for i in idx]; yp = [y_vals[i] for i in idx]
         pp = [pnums[i] for i in idx];  dp = [durs[i] for i in idx]
@@ -651,7 +670,7 @@ Fuerza: débil [0.1,0.3), moderada [0.3,0.5), fuerte ≥ 0.5.
 | `escala_relacion` | Solo pares significativos. "release a release" si con la tendencia local mantiene el signo, \\|rho\\| ≥ 0,1 y su IC95 no incluye el 0; si no, "cambio de etapa" |
 | `ic_AAAA_AAAA`, `estado_AAAA_AAAA` | Por período, IC95 de la correlación corregida y estado: `+` / `-` si \\|rho\\| ≥ 0,1 y el IC95 no incluye el 0, `0` si no, vacío si no es evaluable |
 | `alcance_temporal` | Toda la historia, desde AAAA, solo AAAA-AAAA, intermitente, cambia de signo o sin relación en ningún período |
-| `anio_desde`, `anio_hasta` | Años que cubren las ventanas del par (los pares con CFDR / NUB empiezan en 2019–2020) |
+| `anio_desde`, `anio_hasta` | Años que cubren las ventanas del par (una métrica con datos solo desde cierta fecha acorta el par) |
 
 ## estable, robusta y robusta_tamano
 
@@ -851,7 +870,7 @@ def _calcular(periodos, entre_dimensiones):
         "rho_corregida", "ic_inf", "ic_sup", "p_corregida",
         "r1x", "r1y", "n_efectiva",
         "p_fdr",
-        "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026",
+        *COLS_RHO_PERIODO,
         "n_periodos_evaluables", "n_periodos_mismo_signo", "estable",
         "rho_canary", "rho_corregida_tamano",
         "categoria", "fuerza", "robusta", "robusta_tamano", "advertencia",
@@ -861,15 +880,13 @@ def _calcular(periodos, entre_dimensiones):
         "depende_ventanas_cortas",
         "df_tendencia_local", "rho_corregida_local", "ic_local_inf", "ic_local_sup",
         "escala_relacion",
-        "ic_2016_2019", "ic_2020_2022", "ic_2023_2024", "ic_2025_2026",
-        "estado_2016_2019", "estado_2020_2022", "estado_2023_2024", "estado_2025_2026",
+        *COLS_IC_PERIODO,
+        *COLS_ESTADO_PERIODO,
         "alcance_temporal", "tamano_aplica",
         "hallazgo_candidato", "relacion_tamano", "nivel_evidencia", "motivo_descarte",
     ]
     COLS_CHEQUEOS = ["anio_desde", "anio_hasta", "n_sin_cortas", "df_tendencia_local",
-                     "ic_2016_2019", "ic_2020_2022", "ic_2023_2024", "ic_2025_2026",
-                     "estado_2016_2019", "estado_2020_2022", "estado_2023_2024", "estado_2025_2026",
-                     "alcance_temporal"]
+                     *COLS_IC_PERIODO, *COLS_ESTADO_PERIODO, "alcance_temporal"]
     COLS_CHEQUEOS_NUM = ["rho_corregida_sin_cortas", "ic_sin_cortas_inf", "ic_sin_cortas_sup",
                          "rho_corregida_local", "ic_local_inf", "ic_local_sup"]
     n_pares_rows = 0
@@ -971,10 +988,7 @@ def _calcular(periodos, entre_dimensiones):
                     "r1y":             fmt(pr["r1y"]),
                     "n_efectiva":      pr["n_efectiva"],
                     "p_fdr":    fmt(p_fdr) if isinstance(p_fdr, float) else "",
-                    "rho_2016_2019":  fmt(rho_per.get("2016-2019", np.nan)),
-                    "rho_2020_2022":  fmt(rho_per.get("2020-2022", np.nan)),
-                    "rho_2023_2024":  fmt(rho_per.get("2023-2024", np.nan)),
-                    "rho_2025_2026":  fmt(rho_per.get("2025-2026", np.nan)),
+                    **{f"rho_{lab.replace('-', '_')}": fmt(rho_per.get(lab, np.nan)) for lab, *_ in ETAPAS},
                     "n_periodos_evaluables":  pr["n_periodos_evaluables"],
                     "n_periodos_mismo_signo": pr["n_periodos_mismo_signo"],
                     "estable":          pr["estable"],
@@ -1067,7 +1081,7 @@ def _calcular(periodos, entre_dimensiones):
         "solapamiento_definicion",
         "n", "n_efectiva", "rho_cruda", "rho_corregida", "rho_corregida_tamano",
         "ic_inf", "ic_sup",
-        "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026",
+        *COLS_RHO_PERIODO,
         "rho_canary", "categoria", "robusta", "robusta_tamano",
         "alcance_temporal", "escala_relacion", "hallazgo_candidato", "relacion_tamano", "nivel_evidencia",
         "motivo_descarte",
@@ -1191,9 +1205,9 @@ def _calcular(periodos, entre_dimensiones):
 # ── Comparación entre calendario y épocas ────────────────────────────────────
 
 INTRA = ["Persona–Persona", "Proceso–Proceso", "Producto–Producto"]
-PERIODOS = ["2016_2019", "2020_2022", "2023_2024", "2025_2026"]
-NOMBRES = {"calendario": ["2016–19", "2020–22", "2023–24", "2025–26"],
-           "epocas": ["E1 ≤ ene 2020", "E2 ≤ dic 2021", "E3 ≤ feb 2024", "E4 ≥ mar 2024"]}
+PERIODOS = CLAVES_PERIODO
+NOMBRES = {"calendario": NOMBRES_PERIODO,
+           "epocas": [f"E{i + 1}" for i in range(len(CLAVES_PERIODO))]}
 
 
 def leer(carpeta):

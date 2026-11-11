@@ -82,7 +82,14 @@ CATEGORIAS = [  # (valor en el csv, etiqueta)
     ("insuficiente", "Insuficiente"),
 ]
 ETIQUETA_CATEGORIA = dict(CATEGORIAS) | {"control": "Control"}
-PERIODOS = ["2016_2019", "2020_2022", "2023_2024", "2025_2026"]
+import proyecto  # noqa: E402  (rutas ya puso la raíz en sys.path)
+
+# Períodos del calendario del proyecto: id ('2018-2021'), clave de columna ('2018_2021'), nombre corto
+# ('2018–21') y años [desde, hasta+1) para ubicar cada release en el gráfico temporal.
+_CAL = proyecto.CALENDARIO or []
+PERIODOS = [lab.replace("-", "_") for lab, *_ in _CAL]
+PERIODOS_JS = [dict(id=lab, nombre=(f"{lab.split('-')[0]}–{lab.split('-')[1][-2:]}" if "-" in lab else lab),
+                    desde=int(y0), hasta=int(y1) + 1) for lab, y0, y1 in _CAL]
 
 
 def normalizar_cruce(texto: str) -> str:
@@ -176,6 +183,7 @@ def datos_reporte(p: pd.DataFrame, nombres: dict) -> dict:
         }
     variables = sorted(set(p.x_id) | set(p.y_id), key=lambda k: nombres.get(k, k).lower())
     return {
+        "periodos": PERIODOS_JS,
         "con_valores": con_valores,
         "variables": [{"id": k, "nombre": nombres.get(k, k)} for k in variables],
         "releases": {int(n): [r.version, int(r.anio), r.etapa, _num(r.duracion_dias, 2),
@@ -626,7 +634,7 @@ function renderForest(cont = document.getElementById('vForest')) {
 function renderEstab(cont = document.getElementById('vEstab')) {
   const filas = filasSignif().sort((a, b) => Math.abs(b[1].corr) - Math.abs(a[1].corr));
   if (!filas.length) { cont.innerHTML = '<p class="vacio">Ningún par significativo con estos filtros.</p>'; return; }
-  const cols = ['Toda la historia', '2016–19', '2020–22', '2023–24', '2025–26'];
+  const cols = ['Toda la historia', ...D.periodos.map(q => q.nombre)];
   const LW = anchoEtiquetas(filas), cw = 120, fila = 26, top = 30, W = LW + cw * cols.length + 10, H = top + filas.length * fila + 4;
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Estabilidad por período de las relaciones significativas">`;
   cols.forEach((c, j) => { s += `<text x="${LW + cw * j + cw / 2}" y="${top - 12}" class="tick" style="font-weight:600">${c}</text>`; });
@@ -738,7 +746,7 @@ function dispersion(contenedor, pts, etiqX, etiqY, centrado) {
 function barrasPeriodo(cont, p) {
   const W = 980, H = 300, m = { l: 56, r: 16, t: 20, b: 40 };
   const items = [
-    ...['2016–19', '2020–22', '2023–24', '2025–26'].map((et, i) => ({ et, v: p.per[i], ic: p.icp[i], est: p.est[i], tipo: 'per' })),
+    ...D.periodos.map((q, i) => ({ et: q.nombre, v: p.per[i], ic: p.icp[i], est: p.est[i], tipo: 'per' })),
     { et: 'Canary', v: p.canary, ic: null, est: '', tipo: 'can' },
   ];
   const vals = [0, p.corr, ...items.flatMap(o => [o.v, ...(o.ic || [])])].filter(v => v !== null && v !== undefined);
@@ -791,7 +799,7 @@ function barrasPeriodo(cont, p) {
 
 let modoTiempo = 'original';
 let periodoSel = null;   // índice de ETAPAS_T o null = toda la historia
-const ETAPA_ID = ['2016-2019', '2020-2022', '2023-2024', '2025-2026'];
+const ETAPA_ID = D.periodos.map(q => q.id);
 function elegirPeriodo(i) { periodoSel = (i === null || periodoSel === i) ? null : i; mostrar(); }
 // a quién le toca elegir el período al hacer clic en una franja: el explorador del reporte, el análisis
 // particular de un informe (elegirPeriodoLocal, si existe) o nadie (gráficos insertados en el texto)
@@ -800,7 +808,7 @@ function periodoPara(cont) {
   if (det && cont.closest('.graficos-par') && window.elegirPeriodoLocal) return i => window.elegirPeriodoLocal(det, i);
   return cont.closest('.inserto') ? null : elegirPeriodo;
 }
-const ETAPAS_T = [[2016, 2020, '2016–19'], [2020, 2023, '2020–22'], [2023, 2025, '2023–24'], [2025, 2027, '2025–26']];
+const ETAPAS_T = D.periodos.map(q => [q.desde, q.hasta, q.nombre]);
 const fechaMs = n => Date.parse(D.releases[n][4] + 'T00:00:00Z');
 
 function temporal(cont, x, y, p, inv, leyenda = document.getElementById('leyendaTiempo')) {

@@ -670,8 +670,8 @@ def _cruzar(dim_a, dim_b, cfg, destino, periodos):
 
     # ── escribir ──
     cols = ["par_id", "x_id", "y_id", "x_nombre", "y_nombre", "tipo", "categoria", "fuerza", "n", "n_efectiva",
-            "rho_cruda", "rho_corregida", "ic_inf", "ic_sup", "p_corregida", "p_fdr", "rho_2016_2019", "rho_2020_2022",
-            "rho_2023_2024", "rho_2025_2026", "estable", "rho_canary", "rho_corregida_tamano", "resiste_tamano",
+            "rho_cruda", "rho_corregida", "ic_inf", "ic_sup", "p_corregida", "p_fdr", *corr.COLS_RHO_PERIODO,
+            "estable", "rho_canary", "rho_corregida_tamano", "resiste_tamano",
             "rho_corregida_sin_cortas", "rho_corregida_local", "alcance_temporal", "robusta", "escala", "misma_familia",
             "solapamiento", "control", "patron"]
     escribir_csv(destino / "pares_variables.csv", sorted(pares.values(), key=lambda p: -abs(p["rho_corregida"]) if num(p["rho_corregida"]) else 0), cols)
@@ -783,8 +783,8 @@ def comparar_periodos(dir_calendario, dir_epocas, destino):
             filas.append(dict(archivo=archivo, par_id=pid, x=r.get("x_nombre", ""), y=r.get("y_nombre", ""),
                               estado=estado, tipo_calendario=a.get("tipo", ""), tipo_epocas=b.get("tipo", ""),
                               rho_corregida=r.get("rho_corregida", ""),
-                              **{f"cal_{p}": a.get(f"rho_{p}", "") for p in ("2016_2019", "2020_2022", "2023_2024", "2025_2026")},
-                              **{f"ep_E{i + 1}": b.get(f"rho_{p}", "") for i, p in enumerate(("2016_2019", "2020_2022", "2023_2024", "2025_2026"))}))
+                              **{f"cal_{p}": a.get(f"rho_{p}", "") for p in corr.CLAVES_PERIODO},
+                              **{f"ep_E{i + 1}": b.get(f"rho_{p}", "") for i, p in enumerate(corr.CLAVES_PERIODO)}))
     escribir_csv(Path(destino) / "comparacion_periodos.csv", filas, list(filas[0]) if filas else ["archivo", "par_id"])
     for archivo, c in conteo.items():
         print(f"  {archivo}: firmes {c['firme']} · solo calendario {c['solo_calendario']} · solo épocas {c['solo_epocas']}")
@@ -1022,7 +1022,7 @@ def cruzar_grupos(dim_a, dim_b, cfg, corte="propio", asignado=False):
     pca_red = leer_csv(base / "pares_reducido.csv")
 
     cols = ["par_id", "x_nombre", "y_nombre", "tipo", "categoria", "n", "rho_corregida", "ic_inf", "ic_sup", "p_fdr",
-            "rho_2016_2019", "rho_2020_2022", "rho_2023_2024", "rho_2025_2026", "estable", "rho_canary",
+            *corr.COLS_RHO_PERIODO, "estable", "rho_canary",
             "rho_corregida_tamano", "resiste_tamano", "robusta", "escala", "comparten"]
     res = {}
     for metodo in METODOS:

@@ -125,8 +125,8 @@ def clasificar(var_dict):
             motivo = "descartado al validar: " + validacion
         filas.append(dict(par_id=k, x=x, y=y, x_nombre=r["x_nombre"], y_nombre=r["y_nombre"], dims_x="+".join(dx), dims_y="+".join(dy),
                           rho=rho, q=p_fdr, categoria=cat, fuerza=fuerza, rho_canary=num(r["rho_canary"]),
-                          rho_tamano=num(r["rho_corregida_tamano"]), rho_2016_2019=num(r["rho_2016_2019"]), rho_2020_2022=num(r["rho_2020_2022"]),
-                          rho_2023_2024=num(r["rho_2023_2024"]), rho_2025_2026=num(r["rho_2025_2026"]),
+                          rho_tamano=num(r["rho_corregida_tamano"]),
+                          **{c: num(r.get(c, "")) for c in corr.COLS_RHO_PERIODO},
                           robusta=robusta, patron=patron, nivel=nivel if patron else "", motivo=motivo,
                           tipo=tipo, entre="; ".join(f"{a}–{b}" for a, b in entre), dentro="; ".join(dentro),
                           mismo_tema=mv.tema(x) == mv.tema(y), tema_x=mv.tema(x), tema_y=mv.tema(y)))

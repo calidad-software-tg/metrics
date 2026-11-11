@@ -38,7 +38,14 @@ ROOT = Path(__file__).resolve().parent.parent
 import rutas  # noqa: E402
 CRUCES = rutas.CRUCES
 SALIDA = rutas.REPORTES
-PERIODOS = ["2016_2019", "2020_2022", "2023_2024", "2025_2026"]
+import proyecto  # noqa: E402  (rutas ya puso la raíz en sys.path)
+
+# Períodos del calendario del proyecto: id ('2018-2021'), clave de columna ('2018_2021'), nombre corto
+# ('2018–21') y años [desde, hasta+1) para ubicar cada release en el gráfico temporal.
+_CAL = proyecto.CALENDARIO or []
+PERIODOS = [lab.replace("-", "_") for lab, *_ in _CAL]
+PERIODOS_JS = [dict(id=lab, nombre=(f"{lab.split('-')[0]}–{lab.split('-')[1][-2:]}" if "-" in lab else lab),
+                    desde=int(y0), hasta=int(y1) + 1) for lab, y0, y1 in _CAL]
 TIPOS = [("patrón", "Patrón"), ("escala", "Escala"), ("mecánico", "Mecánico"), ("no resiste tamaño", "No resiste tamaño")]
 
 
@@ -98,6 +105,7 @@ def construir(dim_a, dim_b):
             nom.setdefault(v, nombres.get(v, v))
 
     datos = dict(
+        periodos=PERIODOS_JS,
         dims=[dim_a, dim_b], varsA=sorted(va, key=lambda v: nom[v].lower()), varsB=sorted(vb, key=lambda v: nom[v].lower()),
         nombres=nom, dimDe={**{v: dim_a for v in va}, **{v: dim_b for v in vb}},
         pares={r.par_id: par_json(r) for _, r in pv.iterrows()},
@@ -255,8 +263,8 @@ function graficoDispersion(res, nx, ny) {
   return SVG(W, H, s, 'Dispersión corregida') + `<p class="nota">Cada punto es un release; el eje vertical es ${escH(ny)}.</p>`;
 }
 function graficoPeriodos(p) {
-  const et = ['2016–19', '2020–22', '2023–24', '2025–26', 'Canary'], vals = p.per.concat([p.can]);
-  const W = 520, H = 200, ml = 34, mr = 8, mt = 22, mb = 26, bw = (W - ml - mr) / 5;
+  const et = [...D.periodos.map(q => q.nombre), 'Canary'], vals = p.per.concat([p.can]);
+  const W = 520, H = 200, ml = 34, mr = 8, mt = 22, mb = 26, bw = (W - ml - mr) / et.length;
   const Y = v => mt + (1 - (v + 1) / 2) * (H - mt - mb);
   let s = `<text x="${ml}" y="13" class="titulo-panel">ρ corregida por período y en canary</text>`;
   [-1, -.5, 0, .5, 1].forEach(v => s += `<line x1="${ml}" x2="${W - mr}" y1="${Y(v)}" y2="${Y(v)}" class="${v === 0 ? 'cero' : 'grid'}"/><text x="${ml - 5}" y="${Y(v)}" class="ticky">${fmt(v, 1)}</text>`);
