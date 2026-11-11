@@ -113,8 +113,8 @@ Cuántos pares se evaluaron y cuántos patrones quedaron en cada clase se ve al 
 ### Con Docker (recomendado)
 
 Requisitos: Docker y un [token de GitHub](https://github.com/settings/tokens). Alcanza con acceso de
-lectura a repositorios públicos. El repositorio a analizar necesita al menos 30 releases estables
-(sección 6).
+lectura a repositorios públicos. El repositorio a analizar necesita al menos 45 releases estables,
+repartidas en la historia (sección 6); para todos los análisis, unas 90.
 
 No hace falta clonar este repositorio: la imagen ya trae la herramienta. Alcanza con dos archivos, en
 una carpeta vacía (una por cada repositorio que se analice, así cada uno tiene su propia base):
@@ -180,8 +180,8 @@ el resto se ajusta después de mirar los primeros resultados.
 | `clon` | ruta a un clon propio, para no volver a clonar | `null`: se clona en `.clones/` |
 | `hasta` | fecha de corte de la historia (`AAAA-MM-DD`); las releases posteriores se ignoran | `null`: hoy |
 | `excluir_estable` | tags que figuran como estables pero no lo son (por ejemplo, `"v2.0.0-rc.1"`): no cortan ventanas ni entran en la serie estable | `[]` |
-| `calendario` | los períodos de la regla de estabilidad, como `[["2016-2019", 2016, 2019], …]` | `"auto"`: la historia repartida en cuatro tramos de años |
-| `cortes_epocas` | primer release de cada época, para la prueba de sensibilidad (`["v1.4.0", "v2.1.0", "v3.0.2"]`) | `"auto"`: la serie estable cortada en cuartos |
+| `calendario` | los períodos de la regla de estabilidad, como `[["2016-2019", 2016, 2019], …]` | `"auto"`: hasta cuatro tramos de años con al menos 15 releases cada uno |
+| `cortes_epocas` | primer release de cada época, para la prueba de sensibilidad (`["v1.4.0", "v2.1.0", "v3.0.2"]`) | `"auto"`: la serie estable cortada en tantas partes como períodos |
 | `descartados` | CSV con las relaciones descartadas al validarlas (columnas `x,y,motivo`), relativo a `proyecto.json` | `null`: los patrones quedan como candidatos |
 | `cruces` | carpeta con la configuración de cada cruce (`persona_proceso.json`, …): qué métricas compartidas van a cada lado en los cruces de componentes | `null`: `analisis/cruces/` |
 | `tres_dimensiones` | ajustes del análisis de las tres dimensiones (abajo) | `null`: automático |
@@ -229,10 +229,11 @@ Cuántas releases hacen falta:
 
 | Para | Mínimo | Si no se llega |
 |---|---|---|
-| correlaciones y patrones | **30 releases estables** | `analizar` no empieza (lo comprueba antes) |
+| correlaciones y patrones | **3 períodos de la historia con 15 releases estables o más cada uno** (al menos 45 en total): un patrón tiene que mantener el signo en todos | `analizar` no empieza y dice cuántas releases tiene cada período |
 | PCA de una dimensión (componentes, agrupamiento, cruces de componentes, tres dimensiones) | **3 releases por variable** de esa dimensión: con todas las variables, unas 85 para Persona, 60 para Proceso y 45 para Producto (depende de cuántas queden después de los filtros) | se saltea con un aviso; las correlaciones, los patrones y los reportes salen igual |
 
-Un repositorio con entre 30 y 45 releases da patrones, pero no componentes.
+Los períodos salen solos (`"calendario": "auto"`): hasta cuatro tramos de años seguidos con al menos 15
+releases cada uno. Un repositorio con entre 45 y 85 releases da patrones, pero no todos los componentes.
 
 Cuando termina: `salidas/LEEME.md` es el índice y `salidas/reportes/` tiene los tres HTML. Cómo
 leerlos: [SALIDAS.md](SALIDAS.md).

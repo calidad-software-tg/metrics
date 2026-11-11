@@ -130,8 +130,10 @@ clasifica según las dimensiones que puede conectar (sección 9).
 - **Bases de cálculo.** Cada par se calcula en tres bases:
   - la serie estable (principal);
   - la serie canary (réplica);
-  - cada uno de los cuatro **períodos de calendario**, fijados antes de mirar los datos (`calendario`
-    en `proyecto.json`; con `"auto"` se reparten los años en cuatro).
+  - cada uno de los **períodos de calendario**, fijados antes de mirar las correlaciones (`calendario`
+    en `proyecto.json`; con `"auto"`, hasta cuatro tramos de años seguidos con al menos 15 releases
+    estables cada uno). Un período con menos de 15 releases no se evalúa, y la regla pide al menos 3
+    evaluables: con menos, `tres_p.py analizar` no empieza.
 - **Pares de control.** No se interpretan ni entran en la corrección múltiple los pares relacionados por
   construcción:
   - la misma métrica medida de dos formas;
@@ -300,7 +302,8 @@ La regla de estabilidad temporal depende de cómo se corta la historia. Como pru
 **épocas** en lugar de los períodos de calendario:
 
 - las épocas son tramos contiguos de releases, agrupados con Ward con restricción de contigüidad sobre
-  los valores sin ajustar (`cortes_epocas` en `proyecto.json`; con `"auto"`, cuartos de la serie);
+  los valores sin ajustar (`cortes_epocas` en `proyecto.json`; con `"auto"`, la serie cortada en tantas partes iguales como
+  períodos tenga el calendario);
 - una relación que cumple la regla con las dos divisiones es **estable con los dos cortes**;
 - el calendario se mantiene como criterio principal porque se fijó antes de mirar los datos, y las épocas
   salen de los mismos datos que se analizan.
