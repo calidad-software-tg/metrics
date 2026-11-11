@@ -193,9 +193,10 @@ misma métrica), y solo las ventanas con dato en todas ellas.
 - No se usan entre dimensiones los componentes formados por métricas casi constantes en la historia (por
   ejemplo, una métrica que vale lo mismo en casi todas las releases).
 
-El PCA necesita bastantes más ventanas que variables (n ≥ 3p). Con pocas releases una dimensión puede
-quedar sin componentes. En ese caso, los pasos que dependen de ellos (tres dimensiones, multiverso,
-métricas compartidas) se saltean.
+El PCA necesita al menos 3 ventanas por variable (n ≥ 3p, y nunca menos de 30). Con pocas releases una
+dimensión queda sin componentes: `pca.py` lo avisa y no escribe salidas, y los pasos que dependen de
+ellos (agrupamiento, cruces de componentes, tres dimensiones, multiverso, métricas compartidas) se
+saltean para esa dimensión. Las correlaciones y los patrones (`relaciones.py`) no dependen del PCA.
 
 ## 6. Agrupamiento de métricas (clustering)
 

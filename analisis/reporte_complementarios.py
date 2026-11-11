@@ -36,7 +36,13 @@ esc, fmt, rho_html, tabla, kpis, pagina, guardar = rr.esc, rr.fmt, rr.rho_html, 
 
 
 def leer(ruta):
-    return pd.read_csv(ruta) if Path(ruta).exists() else pd.DataFrame()
+    """CSV como DataFrame; vacío si no existe o no tiene filas (p. ej., un proyecto sin patrones)."""
+    if not Path(ruta).exists():
+        return pd.DataFrame()
+    try:
+        return pd.read_csv(ruta)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
 
 
 def falta(texto):

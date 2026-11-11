@@ -96,7 +96,13 @@ def verdadero(v):
 
 
 def leer(ruta):
-    return pd.read_csv(ruta) if Path(ruta).exists() else pd.DataFrame()
+    """CSV como DataFrame; vacío si no existe o no tiene filas (p. ej., un proyecto sin patrones)."""
+    if not Path(ruta).exists():
+        return pd.DataFrame()
+    try:
+        return pd.read_csv(ruta)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
 
 
 NOMBRES = None

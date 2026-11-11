@@ -113,15 +113,16 @@ Cuántos pares se evaluaron y cuántos patrones quedaron en cada clase se ve al 
 ### Con Docker (recomendado)
 
 Requisitos: Docker y un [token de GitHub](https://github.com/settings/tokens). Alcanza con acceso de
-lectura a repositorios públicos.
+lectura a repositorios públicos. El repositorio a analizar necesita al menos 30 releases estables
+(sección 6).
 
 No hace falta clonar este repositorio: la imagen ya trae la herramienta. Alcanza con dos archivos, en
 una carpeta vacía (una por cada repositorio que se analice, así cada uno tiene su propia base):
 
 ```bash
 mkdir tres-p-mi-proyecto && cd tres-p-mi-proyecto
-curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.0/docker-compose.yml
-curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.0/.env.example
+curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.1/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.1/.env.example
 ```
 
 Después:
@@ -224,9 +225,14 @@ o paso por paso:
 | `python3 tres_p.py exportar` | métricas por persona resumidas por ventana (`datos/`) | minutos |
 | `python3 tres_p.py analizar` | el análisis completo y los tres reportes. `--sin-complementarios` saltea los análisis complementarios (lo más lento); `--sin-reportes`, los HTML | 15 a 40 minutos |
 
-El análisis necesita **al menos 30 releases estables** (el comando lo comprueba antes de empezar), y
-bastantes más para que el PCA de Persona, que tiene muchas variables, pueda calcularse. Con pocas, los
-pasos que necesitan componentes en las tres dimensiones se saltean con un aviso.
+Cuántas releases hacen falta:
+
+| Para | Mínimo | Si no se llega |
+|---|---|---|
+| correlaciones y patrones | **30 releases estables** | `analizar` no empieza (lo comprueba antes) |
+| PCA de una dimensión (componentes, agrupamiento, cruces de componentes, tres dimensiones) | **3 releases por variable** de esa dimensión: con todas las variables, unas 85 para Persona, 60 para Proceso y 45 para Producto (depende de cuántas queden después de los filtros) | se saltea con un aviso; las correlaciones, los patrones y los reportes salen igual |
+
+Un repositorio con entre 30 y 45 releases da patrones, pero no componentes.
 
 Cuando termina: `salidas/LEEME.md` es el índice y `salidas/reportes/` tiene los tres HTML. Cómo
 leerlos: [SALIDAS.md](SALIDAS.md).

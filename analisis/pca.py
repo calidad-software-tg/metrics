@@ -272,7 +272,8 @@ def main():
                     filas, n_bp = tabla(vars_enf, datos, serie_db)
                 res = analizar(vars_enf, filas, enf, args.k, rng) if len(filas) >= 30 else None
                 if res is None:
-                    print(f"  {conj}/{serie}/{enf}: pocos releases ({len(filas)})")
+                    print(f"  {conj}/{serie}/{enf}: pocos releases ({len(filas)}; el PCA necesita al menos "
+                          f"{max(30, 3 * len(vars_enf))} para {len(vars_enf)} variables)")
                     continue
                 res.update(variables=vars_enf, filas=filas, backports=n_bp,
                            excluidas=excluidas + [v for v in vars_serie if v not in vars_enf and v not in excluidas])
@@ -310,6 +311,15 @@ def main():
     destino = rutas.dimension(dim)
     destino.mkdir(parents=True, exist_ok=True)
     base = "pca"
+    if not resultados:
+        # Sin ninguna solución no hay componentes: se borran las salidas de una corrida anterior para
+        # que el agrupamiento, los cruces y los reportes no usen componentes viejos, y se sigue sin PCA.
+        for viejo in destino.glob(f"{base}*"):
+            viejo.unlink()
+        print(f"\n{dim}: sin PCA. Ningún conjunto tiene releases suficientes (hacen falta al menos 3 por "
+              "variable); el agrupamiento y los cruces de componentes con esta dimensión se saltean. "
+              "Las correlaciones y los patrones no dependen del PCA.")
+        return
     nombre = {v: var_dict[v]["nombre_legible"] for v in de_dim}
 
     with open(destino / f"{base}_autovalores.csv", "w", newline="", encoding="utf-8") as f:

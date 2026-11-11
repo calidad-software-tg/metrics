@@ -296,6 +296,10 @@ def clustering_releases(salida=None):
 
     def semestres_parecidos(Z, meta, Zc, metac):
         us, P, sem = perfiles_semestre(Z, meta, 5)
+        if len(us) < 2:
+            # Con pocas releases por semestre (menos de 5) no hay perfiles que comparar
+            print(f"           semestres: menos de dos con al menos 5 releases; no se comparan", flush=True)
+            return [], None, (us, None)
         S = sim_perfiles(P)
         nula = []
         for _ in range(N_NULA_SEM):
@@ -304,6 +308,8 @@ def clustering_releases(salida=None):
         nula = np.array(nula)
         # canary: mismos semestres, su propia transformación
         usc, Pcn, semc = perfiles_semestre(Zc, metac, 20) if Zc is not None else ([], None, None)
+        if len(usc) < 2:
+            usc, Pcn = [], None
         Sc = sim_perfiles(Pcn) if Pcn is not None else None
         ic = {s: i for i, s in enumerate(usc)}
         nula_c = []

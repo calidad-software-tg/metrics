@@ -181,40 +181,58 @@ def cmd_analizar(a):
     rutas.VARIABLES.mkdir(parents=True, exist_ok=True)
     correr("analisis/generar_diccionario.py")
     correr("analisis/correlaciones.py")
+    # El PCA necesita al menos 3 releases por variable: en una dimensión sin componentes se saltean el
+    # agrupamiento y los cruces de componentes con ella. Las correlaciones y los patrones no dependen de esto.
+    con_pca = []
     for d in DIMS:
         correr("analisis/pca.py", d)
-    for d in DIMS:
+        if (rutas.dimension(d) / "pca.json").exists():
+            con_pca.append(d)
+    for d in con_pca:
         correr("analisis/clustering.py", d, "--sin-reporte")
-    for x, y in CRUCES:
+    cruces_pca = [(x, y) for x, y in CRUCES if x in con_pca and y in con_pca]
+    sin = [f"{x}–{y}" for x, y in CRUCES if (x, y) not in cruces_pca]
+    if sin:
+        print(f"\nSin PCA en {', '.join(d for d in DIMS if d not in con_pca)}: se saltean los cruces de "
+              f"componentes {', '.join(sin)}", flush=True)
+    for x, y in cruces_pca:
         cfg = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / f"{x.lower()}_{y.lower()}.json"
         correr("analisis/cruces.py", x, y, "--config", cfg)
         correr("analisis/cruces.py", x, y, "--config", cfg, "--grupos", "propio", opcional=True)
-    # Con pocas releases para las variables de una dimensión no hay componentes y estos pasos se saltean.
-    correr("analisis/tres_dimensiones.py", opcional=True)
-    correr("analisis/multiverso_asignacion.py", opcional=True)
+    # Tres dimensiones, multiverso y bloques usan los componentes de las tres dimensiones.
+    tres = len(con_pca) == len(DIMS)
+    if tres:
+        correr("analisis/tres_dimensiones.py", opcional=True)
+        correr("analisis/multiverso_asignacion.py", opcional=True)
+    else:
+        print("\nSin componentes en las tres dimensiones: se saltean tres_dimensiones, multiverso_asignacion "
+              "y bloques_etiquetas", flush=True)
     correr("analisis/relaciones.py", "--recalcular")
-    correr("analisis/bloques_etiquetas.py", opcional=True)
+    if tres:
+        correr("analisis/bloques_etiquetas.py", opcional=True)
     if not getattr(a, "sin_complementarios", False):
         # Análisis que no son técnica principal (analisis/README.md, secciones 10 y 12); son los más lentos.
         comp = rutas.COMPLEMENTARIOS
         correr("analisis/correlaciones.py", "--periodos", "ambos", "--salida", comp / "periodos", opcional=True)
         correr("analisis/complementarios/temporal.py", "releases", opcional=True)
         correr("analisis/complementarios/temporal.py", "epocas", opcional=True)
-        for x, y in CRUCES:
+        for x, y in cruces_pca:
             cfg = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / f"{x.lower()}_{y.lower()}.json"
             correr("analisis/cruces.py", x, y, "--config", cfg, "--periodos", "epocas", opcional=True)
             correr("analisis/complementarios/cruce_alternativos.py", x, y, "--config", cfg, opcional=True)
-        cfg_pp = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / "proceso_producto.json"
-        correr("analisis/complementarios/cruce_rezago.py", ROOT, cfg_pp, comp / "rezago", opcional=True)
+        if ("Proceso", "Producto") in cruces_pca:
+            cfg_pp = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / "proceso_producto.json"
+            correr("analisis/complementarios/cruce_rezago.py", ROOT, cfg_pp, comp / "rezago", opcional=True)
         correr("analisis/complementarios/pesos_catalogo.py", opcional=True)
     if not a.sin_reportes:
-        for d in DIMS:
+        for d in con_pca:
             correr("analisis/reporte_pca.py", d, opcional=True)
         for d in DIMS:
             correr("analisis/reporte_cruce.py", f"{d}-{d}", opcional=True)
-        for x, y in CRUCES:
+        for x, y in cruces_pca:
             correr("analisis/reporte_cruce_dimensiones.py", x, y, opcional=True)
-        correr("analisis/reporte_tres_dimensiones.py", opcional=True)
+        if tres:
+            correr("analisis/reporte_tres_dimensiones.py", opcional=True)
         correr("analisis/reporte_resultados.py", opcional=True)
         if not getattr(a, "sin_complementarios", False):
             correr("analisis/reporte_complementarios.py", opcional=True)
