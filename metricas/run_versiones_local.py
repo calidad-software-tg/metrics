@@ -7,16 +7,15 @@ es la MISMA: se instancia la clase original y se le carga el estado interno
 desde git, después se llama a su propio por_producto()/por_persona().
 
 Cubre:
-  - archivos : loc_notion, dloc, cd            (git ls-tree + cat-file --batch)
-  - commits  : cdiv, fexp, le, rexp            (git log --numstat)
-  - blame    : developer_ownership_notion      (git blame --line-porcelain)
+  - archivos : dloc, cd, rc                    (git ls-tree + cat-file --batch)
+  - commits  : cdiv, fexp, le, rexp, anmcc, dloc_flujo, commits_doc   (git log --numstat)
 
 Qué cambia respecto a la corrida por API:
   - se van los caps (--max-files / --max-commits) y también el tope propio de
     GitHub de 300 archivos por commit -> conteos completos, no parciales.
   - la atribución por persona pasa a ser el NOMBRE de git del autor en vez del
     login de GitHub (git local no tiene el login). Mismo criterio que ya se
-    aplicó a loc_notion/dloc/cd.
+    aplicó a dloc/cd.
   - las ventanas (periodo_num + fechas) se toman de la API, así las filas de
     `periodo` coinciden y el guardado es UPSERT (borra lo capado y reescribe).
 
@@ -33,11 +32,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _root = Path(__file__).resolve().parent
-for _d in ["10", "15", "16", "extra"]:
-    sys.path.insert(0, str(_root / "metricas" / _d))
+for _d in ["10", "15", "16"]:
+    sys.path.insert(0, str(_root / _d))
 
 # Helpers de conteo de las propias métricas de archivos.
-from loc import _CODE_EXTENSIONS as LOC_EXT, _is_excluded, _count_lines as loc_count
 from dloc import es_documentacion, _count_lines as dloc_count
 from cd import _COMMENT_PATTERNS, _CODE_EXTENSIONS as CD_EXT, _count_lines as cd_count, es_codigo_propio
 from readme_completeness import _score as rc_score, es_readme_raiz
@@ -50,7 +48,6 @@ from fexp import FileExperience
 from le import LearningEase, componente_de
 from rexp import RecentExperience
 from anmcc import AverageNumberOfModifiedComponentsPerCommit
-from developer_ownership import DeveloperOwnership, _CODE_EXTENSIONS as OWN_EXT, _is_excluded as own_excluded
 
 from run_versiones import (
     Base, ventanas_por_version, ventanas_por_version_todas, TIPO_ANALISIS, NOMBRES_METRICA,
@@ -60,12 +57,11 @@ from run_versiones import (
 CD_SKIP = frozenset({".md"})          # igual que el default de cd.fetch
 CLONES_DIR = _root.parent / ".clones"        # donde viven los clones locales
 
-ARCHIVOS = {"loc_notion", "dloc", "cd", "rc"}
+ARCHIVOS = {"dloc", "cd", "rc"}
 # dloc_flujo y commits_doc: versiones de flujo de la documentación (lo que pasó en la
 # ventana), porque DLOC es una foto acumulada desde el comienzo del proyecto.
 COMMITS = {"cdiv", "fexp", "le", "rexp", "anmcc", "dloc_flujo", "commits_doc"}
-BLAME = {"developer_ownership_notion"}
-TODAS = ARCHIVOS | COMMITS | BLAME
+TODAS = ARCHIVOS | COMMITS
 
 
 # --------------------------------------------------------------------------- git
@@ -228,50 +224,19 @@ def commits_en_ventana(dir_repo: Path, ref: str, inicio: datetime, fin: datetime
     return commits
 
 
-def blame_propiedad(dir_repo: Path, ref: str) -> tuple[dict[str, int], int]:
-    """{autor: lineas}, total. Mismo criterio de archivos que developer_ownership
-    (código, sin carpetas de deps), pero sin cap y con git blame local."""
-    propiedad: dict[str, int] = {}
-    total = 0
-    for _sha, path in archivos_en_ref(dir_repo, ref):
-        ext = Path(path).suffix.lower()
-        if ext not in OWN_EXT or own_excluded(path):
-            continue
-        r = subprocess.run(
-            ["git", "-C", str(dir_repo), "blame", "--line-porcelain", ref, "--", path],
-            capture_output=True, text=True,
-        )
-        if r.returncode != 0:
-            continue
-        for l in r.stdout.splitlines():
-            if l.startswith("author "):
-                a = l[len("author "):].strip() or "desconocido"
-                propiedad[a] = propiedad.get(a, 0) + 1
-                total += 1
-    return propiedad, total
-
-
 # ----------------------------------------------------------------- por métrica
-
-def calc_loc(files: dict[str, int]) -> tuple[int, dict]:
-    total = sum(files.values())
-    return total, files
-
 
 def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
     """Devuelve {metrica: {"producto": val, "por_archivo": {path: dato}}} para el ref."""
     blobs = archivos_en_ref(dir_repo, ref)
 
-    quiere_loc = "loc_notion" in quiere
     quiere_dloc = "dloc" in quiere
     quiere_cd = "cd" in quiere
     quiere_rc = "rc" in quiere
 
-    sel_loc, sel_dloc, sel_cd, sel_rc = [], [], [], []
+    sel_dloc, sel_cd, sel_rc = [], [], []
     for sha, path in blobs:
         ext = Path(path).suffix.lower()
-        if quiere_loc and ext in LOC_EXT and not _is_excluded(path):
-            sel_loc.append((sha, path))
         if quiere_dloc and es_documentacion(path):
             sel_dloc.append((sha, path))
         if quiere_cd and ext in CD_EXT and ext not in CD_SKIP and es_codigo_propio(path):
@@ -279,16 +244,12 @@ def procesar_tag(dir_repo: Path, ref: str, quiere: set[str]) -> dict[str, dict]:
         if quiere_rc and es_readme_raiz(path):
             sel_rc.append((sha, path))
 
-    shas_unicos = {s for s, _ in (sel_loc + sel_dloc + sel_cd + sel_rc)}
-    print(f"    archivos: loc={len(sel_loc)} dloc={len(sel_dloc)} cd={len(sel_cd)} rc={len(sel_rc)} "
+    shas_unicos = {s for s, _ in (sel_dloc + sel_cd + sel_rc)}
+    print(f"    archivos: dloc={len(sel_dloc)} cd={len(sel_cd)} rc={len(sel_rc)} "
           f"(blobs a leer: {len(shas_unicos)})")
     cont = contenidos(dir_repo, list(shas_unicos)) if shas_unicos else {}
 
     res: dict[str, dict] = {}
-
-    if quiere_loc:
-        por_archivo = {p: loc_count(cont.get(s, "")) for s, p in sel_loc}
-        res["loc_notion"] = {"producto": sum(por_archivo.values()), "por_archivo": por_archivo}
 
     if quiere_dloc:
         por_archivo = {p: dloc_count(cont.get(s, "")) for s, p in sel_dloc}
@@ -530,7 +491,6 @@ def main():
 
     q_arch = quiere & ARCHIVOS
     q_com = quiere & COMMITS
-    q_blame = quiere & BLAME
 
     for v in ventanas:
         tag = v["version"]
@@ -572,18 +532,6 @@ def main():
                     guardar(k, v, "producto", prod)
                 guardar(k, v, "persona", pers)
                 resumen[k]["ok"] += 1
-
-        # --- blame (developer ownership al cierre de la ventana) ---
-        if q_blame:
-            propiedad, total = blame_propiedad(dir_repo, ref)
-            m = DeveloperOwnership(token, org, repo)
-            m.propiedad, m.total_lineas = propiedad, total
-            prod = m.por_producto(v["inicio"], v["fin"])
-            pers = m.por_persona(v["inicio"], v["fin"])
-            print(f"     developer_ownership  lineas={total}  personas={len(pers)}")
-            guardar("developer_ownership_notion", v, "producto", prod)
-            guardar("developer_ownership_notion", v, "persona", pers)
-            resumen["developer_ownership_notion"]["ok"] += 1
 
     if base is not None:
         base.close()

@@ -1,7 +1,7 @@
 """
 Dónde lee y escribe el análisis. Todas las rutas salen de acá.
 
-    datos/                                   entradas generadas por calculo/ (export_persona.py)
+    datos/                                   entradas generadas por metricas/ (export_persona.py)
     salidas/
       LEEME.md                               índice: qué mirar primero
       1_variables/                           diccionario de variables (qué se mide y cómo)

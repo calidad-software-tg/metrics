@@ -89,9 +89,6 @@ VENTANA_LOCAL        = 21    # releases por grado de libertad del spline de tend
 SOLAPAMIENTO_METRICAS = {frozenset({"dloc", "rc"}), frozenset({"noi", "cfdr"}), frozenset({"noi", "nub"}),
                          frozenset({"cfdr", "nub"})}
 import proyecto  # noqa: E402  (la raíz ya está en sys.path por preprocesamiento)
-ADVERTENCIA_DLOC = ("DLOC no cuenta archivos .mdx: la documentación oficial (docs/) pasó de .md a .mdx "
-                    "en 2023 (v13.4 → v14.0) y desde entonces no se cuenta") if proyecto.REPO == "vercel/next.js" else (
-                    "DLOC no cuenta archivos .mdx")
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -794,8 +791,6 @@ def _calcular(periodos, entre_dimensiones):
                 rho_tamano = ps_sz["rho_corr"]
 
         advertencias = [rx.get("advertencia", ""), ry.get("advertencia", "")]
-        if "dloc" in metricas:
-            advertencias.append(ADVERTENCIA_DLOC)
 
         pair_results[par_id] = dict(
             chequeos_par(rows_e),

@@ -8,7 +8,6 @@ from base_metric import GitHubMetric
 # Reutiliza el mismo filtro de carpetas de dependencias/artefactos generados
 # que loc.py/developer_ownership.py (no tiene sentido que node_modules/vendor
 # infle la composición de lenguajes del repo).
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "extra"))
 from loc import _is_excluded
 
 # Mapeo extensión -> nombre de lenguaje "canónico" de GitHub Linguist, para

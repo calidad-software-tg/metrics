@@ -1,5 +1,5 @@
 """
-calculo/mapear_identidades.py
+metricas/mapear_identidades.py
 
 Construye una tabla de equivalencias nombre_git -> login_github para el repositorio analizado, usando
 exactamente la misma clave que las métricas del runner local (run_versiones_local.py
@@ -15,7 +15,7 @@ Salidas:
     datos/identidades_ambiguas.csv  nombre_git, logins (|-separados), n_commits
 
 Uso:
-    python3 calculo/mapear_identidades.py
+    python3 metricas/mapear_identidades.py
 Flags:
     --repo org/nombre            repositorio (por defecto, el de proyecto.json)
     --repo-dir .clones/<nombre>  dónde está el clon

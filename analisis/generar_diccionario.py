@@ -120,16 +120,17 @@ DIM_NAMES = {(1,0,0): "Persona", (1,1,0): "Persona+Proceso",
 
 # Advertencias que valen para cualquier repositorio (cómo se calcula la métrica).
 ADVERTENCIAS = {
-    "nub": "Cuenta como bug las issues cuyas etiquetas contienen alguna de las palabras de _KEYWORDS_BUG (match de subcadena)",
-    "dis": "DIS: posible falso positivo por etiquetas que contienen 'doc' (ej. 'Docker') debido a match de subcadena en _DOC_KEYWORDS",
+    "nub": ("Cuenta como bug las issues con una etiqueta o un tipo de issue igual a una de las palabras de "
+            "_KEYWORDS_BUG (bug, defect, error…, sin prefijos como 'type:'); depende de que el proyecto clasifique los bugs"),
+    "dis": ("Cuenta como de documentación las issues con una etiqueta o un tipo igual a 'doc', 'docs' o 'documentation' "
+            "(sin prefijos como 'type:'); depende de que el proyecto las etiquete"),
     "ss": ("Lenguajes del usuario tomados hoy (snapshot actual de repos propios), no en cada release; "
            "tope de 15 contribuyentes activos por ventana (bots excluidos del tope)"),
 }
 # Las propias de vercel/next.js, detectadas al revisar sus datos.
 if proyecto.REPO == "vercel/next.js":
     ADVERTENCIAS.update({
-        "nub": ("NUB inflado en 2025-2026: 39 ventanas cuentan 'Error Handling'/'Error Overlay' como bugs "
-                "(substring match en _KEYWORDS_BUG); solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs"),
+        "nub": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
         "cfdr": "Solo releases desde julio de 2019 (v9.0.0) — antes el repo no clasificaba bugs",
     })
 

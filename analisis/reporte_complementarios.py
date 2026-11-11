@@ -3,7 +3,7 @@
 analisis/reporte_complementarios.py
 
 La vista «Complementarios» de cada reporte: los análisis que no son técnica principal pero acompañan
-a cada nivel (metodologia.md, secciones 10 y 12).
+a cada nivel (analisis/README.md, secciones 10 y 12).
 
     intradimensional  sensibilidad a los períodos (calendario frente a épocas), épocas de la dimensión,
                       agrupamiento temporal de releases y cambios de la estructura en el tiempo

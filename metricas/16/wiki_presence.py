@@ -6,7 +6,7 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from base_metric import GitHubMetric
 
-_CLONES = Path(__file__).resolve().parents[3] / ".clones"  # .clones/ de la raíz
+_CLONES = Path(__file__).resolve().parents[2] / ".clones"  # .clones/ de la raíz
 
 
 class WikiPresence(GitHubMetric):

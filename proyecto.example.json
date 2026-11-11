@@ -5,5 +5,7 @@
   "excluir_estable": [],
   "calendario": "auto",
   "cortes_epocas": "auto",
-  "descartados": null
+  "descartados": null,
+  "cruces": null,
+  "tres_dimensiones": null
 }

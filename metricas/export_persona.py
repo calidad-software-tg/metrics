@@ -54,7 +54,7 @@ NON_HUMAN = frozenset({"bot","agente_ia","desconocido"})
 
 _LOGIN_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$')
 
-# ── Tabla de alias nombre_git -> login (ver calculo/mapear_identidades.py) ────────
+# ── Tabla de alias nombre_git -> login (ver metricas/mapear_identidades.py) ────────
 #
 # Las métricas del runner local (run_versiones_local.py) atribuyen por el nombre
 # de git del autor (%an, sin mailmap), mientras que las de la API atribuyen por

@@ -101,6 +101,8 @@ def cmd_iniciar(a):
         "calendario": "auto",
         "cortes_epocas": "auto",
         "descartados": None,
+        "cruces": None,
+        "tres_dimensiones": None,
     }
     PROYECTO.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Proyecto creado en {PROYECTO}:\n{json.dumps(cfg, ensure_ascii=False, indent=2)}")
@@ -144,19 +146,19 @@ def cmd_calcular(a):
     for serie in series:
         canary = ["--con-canary"] if serie == "canary" else []
         if locales:
-            correr("calculo/run_versiones_local.py", "--repo", repo, "--solo", ",".join(locales), *hasta, *canary)
+            correr("metricas/run_versiones_local.py", "--repo", repo, "--solo", ",".join(locales), *hasta, *canary)
         if remotas:
-            correr("calculo/run_versiones.py", ",".join(remotas), "--repo", repo, *hasta, *canary)
+            correr("metricas/run_versiones.py", ",".join(remotas), "--repo", repo, *hasta, *canary)
 
 
 def cmd_identidades(a):
     cfg = leer_proyecto()
-    correr("calculo/mapear_identidades.py", "--repo", cfg["repo"])
+    correr("metricas/mapear_identidades.py", "--repo", cfg["repo"])
 
 
 def cmd_exportar(a):
     leer_proyecto()
-    correr("calculo/export_persona.py")
+    correr("metricas/export_persona.py")
 
 
 MIN_RELEASES = 30   # preprocesamiento excluye las variables con datos en menos de 30 releases
@@ -192,7 +194,7 @@ def cmd_analizar(a):
     correr("analisis/relaciones.py", "--recalcular")
     correr("analisis/bloques_etiquetas.py", opcional=True)
     if not getattr(a, "sin_complementarios", False):
-        # Análisis que no son técnica principal (metodologia.md, secciones 10 y 12); son los más lentos.
+        # Análisis que no son técnica principal (analisis/README.md, secciones 10 y 12); son los más lentos.
         comp = rutas.COMPLEMENTARIOS
         correr("analisis/correlaciones.py", "--periodos", "ambos", "--salida", comp / "periodos", opcional=True)
         correr("analisis/complementarios/temporal.py", "releases", opcional=True)

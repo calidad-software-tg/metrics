@@ -87,7 +87,7 @@ def main():
             hay = sorted(p.name for p in (S / carpeta).iterdir() if p.is_dir())
             L += ["", "Cruces: " + ", ".join(f"[`{h}`]({carpeta}/{h}/resumen.md)" for h in hay)]
         L.append("")
-    L += ["El método de cada paso está en `analisis/metodologia.md` del repositorio de tres_p."]
+    L += ["Cómo interpretar cada archivo: `SALIDAS.md`; el método de cada paso: `analisis/README.md` (repositorio de tres_p)."]
     (S / "LEEME.md").write_text("\n".join(L) + "\n", encoding="utf-8")
     print(f"Índice en {S / 'LEEME.md'}")
 

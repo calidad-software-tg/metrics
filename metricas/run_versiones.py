@@ -20,7 +20,7 @@ Con --por auto (default) cada métrica se prueba en producto y en persona, y se
 guarda lo que aplique. Las claves son las mismas que en run.py / run_batch_anmcc.py.
 
 Por defecto persiste en la base (tablas periodo + resultado, tipo_analisis
-'versiones'). Necesita la base levantada (ver db/README.md) y las variables
+'versiones'). Necesita la base levantada (ver el README principal) y las variables
 POSTGRES_* en .env. Cada corrida hace upsert: volver a correr la misma métrica
 sobre el mismo repo pisa los valores anteriores en vez de duplicarlos.
 """
@@ -65,8 +65,8 @@ if env_path.exists():
             os.environ.setdefault(k.strip(), v.strip())
 
 _root = Path(__file__).resolve().parent
-for _d in ["35", "10", "16", "20", "15", "18", "23", "27", "40", "43", "28", "38", "39", "42", "extra"]:
-    sys.path.insert(0, str(_root / "metricas" / _d))
+for _d in ["35", "10", "16", "20", "15", "18", "23", "27", "40", "43", "28", "38", "39", "42"]:
+    sys.path.insert(0, str(_root / _d))
 
 import requests
 
@@ -94,14 +94,11 @@ from rexprev import RecentReviewExperience
 from cdiv import ContributionDiversity
 from nc import NumberOfComments
 from disc_centrality import DiscussionCentrality
-from sc import SocialContribution as SocialContributionDiscussion
 from schedule_compliance import ScheduleCompliance
 from cfdr import CustomerFoundDefectsAndRegressions
 from process_performance import DevelopmentProcessPerformance
 from noi import NumberOfOpenIssues
-from nci_reuse import NumberOfClosedIssues as NumberOfClosedIssuesProcess
 from tasa_exito import JarczykSuccessRate
-from nci_reuse_43 import NumberOfClosedIssues as NumberOfClosedIssuesResolutionTime
 try:
     from open_issues import NumberOfOpenIssues as NumberOfOpenIssuesRegistro28
 except ImportError:
@@ -118,17 +115,6 @@ try:
     from nob import NumberOfBranches
 except ImportError:
     NumberOfBranches = None
-from loc import LinesOfCode
-from collaborators import NumberOfCollaborators
-from commit_frequency import CommitFrequency
-from commit_entropy import CommitEntropy
-from ci_presence import ContinuousIntegrationPresence
-from commits_per_author import CommitsPerAuthor
-from developer_ownership import DeveloperOwnership
-from forks import NumberOfForks
-from issues_total import TotalIssues
-from pull_requests_summary import PullRequestsSummary
-from core_devs_prs import CoreDevsPullRequests
 
 # --- mismo dict que run.py / run_batch_anmcc.py ----------------------------
 metricas = {
@@ -154,29 +140,15 @@ metricas = {
     "cdiv":    ContributionDiversity,
     "nc":              NumberOfComments,
     "disc_centrality": DiscussionCentrality,
-    "sc_disc":         SocialContributionDiscussion,
     "schedule_compliance": ScheduleCompliance,
     "cfdr": CustomerFoundDefectsAndRegressions,
     "process_performance": DevelopmentProcessPerformance,
     "noi": NumberOfOpenIssues,
-    "nci_process": NumberOfClosedIssuesProcess,
     "jarczyk_success_rate": JarczykSuccessRate,
-    "nci_resolution_time": NumberOfClosedIssuesResolutionTime,
     "noi_28": NumberOfOpenIssuesRegistro28,
     "dev_exp": DevelopmentExperience,
     "nub": NumberOfBugsDetectedByUsers,
     "nob_42": NumberOfBranches,
-    "loc_notion": LinesOfCode,
-    "collab_notion": NumberOfCollaborators,
-    "commit_freq_notion": CommitFrequency,
-    "commit_entropy_notion": CommitEntropy,
-    "ci_presence_notion": ContinuousIntegrationPresence,
-    "commits_per_author_notion": CommitsPerAuthor,
-    "developer_ownership_notion": DeveloperOwnership,
-    "forks_notion": NumberOfForks,
-    "issues_total_notion": TotalIssues,
-    "prs_summary_notion": PullRequestsSummary,
-    "core_devs_prs_notion": CoreDevsPullRequests,
 }
 
 _BASE_URL = "https://api.github.com"
@@ -617,7 +589,6 @@ SLICEABLE = {
     "exprev":          [("eventos", "fecha")],
     "rexprev":         [("eventos", "fecha")],
     "sc":              [("_issues", "created"), ("_prs", "created")],
-    "sc_disc":         [("_issues", "created"), ("_prs", "created")],
     "dev_exp":         [],
     # nob_42: devuelve conteo actual de branches (no histórico); un fetch global
     # evita repetirlo una vez por ventana sin cambiar el resultado.
@@ -730,7 +701,7 @@ def main():
     parser.add_argument("--json", metavar="ARCHIVO", help="volcar todos los resultados a este JSON")
     parser.add_argument("--no-guardar", dest="guardar", action="store_false",
                         default=GUARDAR, help="no persistir en la base, solo imprimir")
-    parser.add_argument("--max-files", type=int, help="tope de archivos para métricas de árbol (cd, dloc, loc_notion...)")
+    parser.add_argument("--max-files", type=int, help="tope de archivos para métricas de árbol (cd, dloc...)")
     parser.add_argument("--max-commits", type=int, help="tope de commits para métricas de historial (fexp, le, rexp...)")
     parser.add_argument("--max-contributors", type=int, help="tope de contribuidores (ss)")
     parser.add_argument("--solo-etiquetas", action="store_true",
@@ -800,7 +771,7 @@ def main():
             base.commit()
         except Exception as exc:
             print(f"No se pudo conectar a la base ({exc}).", file=sys.stderr)
-            print("Corré con --no-guardar, o levantá la base (db/README.md).", file=sys.stderr)
+            print("Corré con --no-guardar, o levantá la base (README principal).", file=sys.stderr)
             sys.exit(1)
 
     ventanas = (ventanas_por_version_todas if args.con_canary else ventanas_por_version)(token, org, repo)

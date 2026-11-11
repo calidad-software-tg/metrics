@@ -494,7 +494,7 @@ líneas punteadas son las que desaparecen.</p>
 <h2 id="perfiles">7. Perfiles y rezago</h2>
 {tabla_perfiles(perf, rez, comps)}
 
-<p class="nota">Método: analisis/metodologia.md, sección 8. Detalle completo: salidas/4_tres_dimensiones/resumen.md.</p>
+<p class="nota">Método: analisis/README.md, sección 8. Detalle completo: salidas/4_tres_dimensiones/resumen.md.</p>
 </main>"""
     pagina = (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
               f'<title>Tres dimensiones</title><style>{rc.ESTILO}{ESTILO_EXTRA}</style></head><body>{cuerpo}'
