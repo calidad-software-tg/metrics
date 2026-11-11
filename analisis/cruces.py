@@ -825,7 +825,7 @@ def grupos_de(dim, cfg, datos, duraciones, corte, var_dict, permitidas=None):
     enf = cfg["componentes"]["enfoque"]
     ke, kc = f"{conj}|estable|{enf}", f"{conj}|canary|{enf}"
     if ke not in C["resultados"] or corte not in C["resultados"][ke]["soluciones"]:
-        sys.exit(f"{dim}: no hay corte '{corte}' para {ke} en {archivo}.")
+        sys.exit(f"{dim}: no hay corte '{corte}' para {ke} en el agrupamiento (sin PCA de referencia para esa dimensión).")
     Ce = C["resultados"][ke]
     sol = Ce["soluciones"][corte]
     vs = Ce["variables"]

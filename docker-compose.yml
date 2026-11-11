@@ -20,7 +20,7 @@ services:
   tres-p:
     # Versión fija de la imagen publicada (amd64 y arm64), para que todos corran la misma; otra con
     # TRES_P_VERSION en .env. `docker compose build` la arma localmente desde este código.
-    image: ghcr.io/calidad-software-tg/tres-p:${TRES_P_VERSION:-1.0.1}
+    image: ghcr.io/calidad-software-tg/tres-p:${TRES_P_VERSION:-1.0.2}
     build: .
     depends_on:
       db:

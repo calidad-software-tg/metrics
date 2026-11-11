@@ -201,6 +201,13 @@ def cmd_analizar(a):
         correr("analisis/pca.py", d)
         if (rutas.dimension(d) / "pca.json").exists():
             con_pca.append(d)
+
+    def con_referencia(d, conj=None):
+        """La dimensión tiene la solución de referencia (serie estable, enfoque ajustado) del conjunto que
+        usan los cruces (todas las variables en Persona, las de producto en las otras) o del indicado."""
+        f = rutas.dimension(d) / "pca.json"
+        conj = conj or ("todas" if d == "Persona" else "producto")
+        return f.exists() and f"{conj}|estable|ajustado" in json.loads(f.read_text(encoding="utf-8")).get("resultados", {})
     for d in con_pca:
         correr("analisis/clustering.py", d, "--sin-reporte")
     cruces_pca = [(x, y) for x, y in CRUCES if x in con_pca and y in con_pca]
@@ -211,18 +218,26 @@ def cmd_analizar(a):
     for x, y in cruces_pca:
         cfg = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / f"{x.lower()}_{y.lower()}.json"
         correr("analisis/cruces.py", x, y, "--config", cfg)
-        correr("analisis/cruces.py", x, y, "--config", cfg, "--grupos", "propio", opcional=True)
+        if con_referencia(x) and con_referencia(y):
+            correr("analisis/cruces.py", x, y, "--config", cfg, "--grupos", "propio", opcional=True)
+        else:
+            print(f"  {x}–{y}: sin la solución de referencia del PCA en las dos dimensiones; se saltea el cruce "
+                  "con grupos", flush=True)
     # Tres dimensiones, multiverso y bloques usan los componentes de las tres dimensiones.
-    tres = len(con_pca) == len(DIMS)
+    tres = all(con_referencia(d) for d in DIMS)
+    faltan = [d for d in DIMS if not con_referencia(d)]
     if tres:
         correr("analisis/tres_dimensiones.py", opcional=True)
-        correr("analisis/multiverso_asignacion.py", opcional=True)
     else:
-        print("\nSin componentes en las tres dimensiones: se saltean tres_dimensiones, multiverso_asignacion "
-              "y bloques_etiquetas", flush=True)
+        print(f"\nSin la solución de referencia del PCA en {', '.join(faltan)} (pocas releases para sus variables): "
+              "se saltea tres_dimensiones", flush=True)
+    correr("analisis/multiverso_asignacion.py", opcional=True)
     correr("analisis/relaciones.py", "--recalcular")
-    if tres:
+    # los bloques usan la solución con todas las variables de cada dimensión
+    if all(con_referencia(d, "todas") for d in DIMS):
         correr("analisis/bloques_etiquetas.py", opcional=True)
+    else:
+        print("Sin PCA con todas las variables en las tres dimensiones: se saltea bloques_etiquetas", flush=True)
     if not getattr(a, "sin_complementarios", False):
         # Análisis que no son técnica principal (analisis/README.md, secciones 10 y 12); son los más lentos.
         comp = rutas.COMPLEMENTARIOS
