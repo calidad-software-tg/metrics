@@ -68,3 +68,18 @@ def dimension(dim):
 
 def cruce(dim_a, dim_b):
     return CRUCES / f"{dim_a.lower()}_{dim_b.lower()}"
+
+
+def omitido(clave, sub=None):
+    """Por qué se salteó un paso en la última corrida de tres_p.py analizar (salidas/omitidos.json), o ""."""
+    import json
+    f = SALIDAS / "omitidos.json"
+    if not f.exists():
+        return ""
+    try:
+        v = json.loads(f.read_text(encoding="utf-8")).get(clave, "")
+    except ValueError:
+        return ""
+    if sub is not None:
+        v = v.get(sub, "") if isinstance(v, dict) else ""
+    return v if isinstance(v, str) else ""

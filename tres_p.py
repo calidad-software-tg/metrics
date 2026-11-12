@@ -196,11 +196,34 @@ def cmd_analizar(a):
     correr("analisis/correlaciones.py")
     # El PCA necesita al menos 3 releases por variable: en una dimensión sin componentes se saltean el
     # agrupamiento y los cruces de componentes con ella. Las correlaciones y los patrones no dependen de esto.
+    # Pasos que se saltean y por qué (salidas/omitidos.json): los reportes lo muestran en lugar de la vista
+    omitidos = {"pca": {}, "cruces": {}, "grupos": {}}
+    archivo_omitidos = rutas.SALIDAS / "omitidos.json"
+    archivo_omitidos.unlink(missing_ok=True)
+
+    def guardar_omitidos():
+        archivo_omitidos.write_text(json.dumps(omitidos, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    def motivo_pca(d, conj=None):
+        """Por qué la dimensión no tiene la solución de referencia: releases que hay y que harían falta."""
+        conj = conj or ("todas" if d == "Persona" else "producto")
+        f = rutas.dimension(d) / "sin_pca.json"
+        o = json.loads(f.read_text(encoding="utf-8")).get("omitidos", {}) if f.exists() else {}
+        x = o.get(f"{conj}|estable|ajustado")
+        que = "con todas sus variables" if conj == "todas" else "con sus variables de producto"
+        if x:
+            return (f"{d} no tiene componentes principales {que} en la serie estable: el PCA necesita al menos "
+                    f"3 releases por variable ({x['necesita']} para {x['variables']} variables) y este proyecto "
+                    f"tiene {x['releases']} con datos en todas ellas.")
+        return f"{d} no tiene componentes principales {que} en la serie estable (pocas releases para sus variables)."
+
     con_pca = []
     for d in DIMS:
         correr("analisis/pca.py", d)
         if (rutas.dimension(d) / "pca.json").exists():
             con_pca.append(d)
+        else:
+            omitidos["pca"][d] = motivo_pca(d)
 
     def con_referencia(d, conj=None):
         """La dimensión tiene la solución de referencia (serie estable, enfoque ajustado) del conjunto que
@@ -215,12 +238,18 @@ def cmd_analizar(a):
     if sin:
         print(f"\nSin PCA en {', '.join(d for d in DIMS if d not in con_pca)}: se saltean los cruces de "
               f"componentes {', '.join(sin)}", flush=True)
+    for x, y in CRUCES:
+        if (x, y) not in cruces_pca:
+            omitidos["cruces"][f"{x}–{y}"] = " ".join(omitidos["pca"][d] for d in (x, y) if d in omitidos["pca"])
     for x, y in cruces_pca:
         cfg = ROOT / (cfg_p.get("cruces") or "analisis/cruces") / f"{x.lower()}_{y.lower()}.json"
         correr("analisis/cruces.py", x, y, "--config", cfg)
         if con_referencia(x) and con_referencia(y):
             correr("analisis/cruces.py", x, y, "--config", cfg, "--grupos", "propio", opcional=True)
         else:
+            omitidos["grupos"][f"{x}–{y}"] = ("Los grupos se cruzan sobre el agrupamiento de la solución de "
+                                              "referencia del PCA. " + " ".join(motivo_pca(d) for d in (x, y)
+                                                                                 if not con_referencia(d)))
             print(f"  {x}–{y}: sin la solución de referencia del PCA en las dos dimensiones; se saltea el cruce "
                   "con grupos", flush=True)
     # Tres dimensiones, multiverso y bloques usan los componentes de las tres dimensiones.
@@ -229,6 +258,9 @@ def cmd_analizar(a):
     if tres:
         correr("analisis/tres_dimensiones.py", opcional=True)
     else:
+        omitidos["tres_dimensiones"] = ("El análisis de las tres dimensiones a la vez (medida global, red de "
+                                        "componentes, triángulos y PCA conjunto) usa los componentes de las tres. "
+                                        + " ".join(motivo_pca(d) for d in faltan))
         print(f"\nSin la solución de referencia del PCA en {', '.join(faltan)} (pocas releases para sus variables): "
               "se saltea tres_dimensiones", flush=True)
     correr("analisis/multiverso_asignacion.py", opcional=True)
@@ -237,7 +269,11 @@ def cmd_analizar(a):
     if all(con_referencia(d, "todas") for d in DIMS):
         correr("analisis/bloques_etiquetas.py", opcional=True)
     else:
+        omitidos["bloques"] = ("Los cruces sin métricas compartidas usan los componentes con todas las variables "
+                               "de cada dimensión. " + " ".join(motivo_pca(d, "todas") for d in DIMS
+                                                                if not con_referencia(d, "todas")))
         print("Sin PCA con todas las variables en las tres dimensiones: se saltea bloques_etiquetas", flush=True)
+    guardar_omitidos()
     if not getattr(a, "sin_complementarios", False):
         # Análisis que no son técnica principal (analisis/README.md, secciones 10 y 12); son los más lentos.
         comp = rutas.COMPLEMENTARIOS

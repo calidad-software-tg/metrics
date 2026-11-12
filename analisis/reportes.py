@@ -113,6 +113,32 @@ def json_seguro(obj):
             .replace("</", "<\\/").replace("<!--", "<\\u0021--"))
 
 
+def motivo_de(archivo):
+    """Por qué falta una vista: el motivo que dejó tres_p.py analizar al saltear el paso que la genera."""
+    n = archivo.name
+    if archivo.parent == rutas.REPORTES_TRES and n in ("tres_dimensiones.html", "conjunto.html"):
+        return rutas.omitido("tres_dimensiones")
+    if archivo.parent == rutas.REPORTES_DIMENSIONES and n.endswith("_pca.html"):
+        return rutas.omitido("pca", n[:-len("_pca.html")].capitalize())
+    for a, b in PARES:
+        base = f"{a.lower()}_{b.lower()}"
+        if archivo.parent == rutas.REPORTES_CRUCES and n.startswith(base):
+            resto = n[len(base):]
+            if resto == ".html":
+                return rutas.omitido("cruces", f"{a}–{b}")
+            if resto == "_grupos.html":
+                return rutas.omitido("grupos", f"{a}–{b}") or rutas.omitido("cruces", f"{a}–{b}")
+            if resto == "_compartidas.html":
+                return rutas.omitido("bloques")
+    return ""
+
+
+def aviso_html(titulo, motivo):
+    return (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><style>{rc.ESTILO}</style></head><body><main>'
+            f'<h1>{html.escape(titulo)}</h1><p class="vacio"><strong>No disponible en este proyecto.</strong> '
+            f'{html.escape(motivo)}</p></main></body></html>')
+
+
 def armar(nivel):
     titulo, desc, pestanas = NIVELES[nivel]
     datos, hay = [], 0
@@ -121,6 +147,8 @@ def armar(nivel):
         for vista, archivo in vistas:
             contenido = archivo.read_text(encoding="utf-8") if archivo.exists() else ""
             hay += bool(contenido)
+            if not contenido and (motivo := motivo_de(archivo)):
+                contenido = aviso_html(vista, motivo)
             vs.append(dict(nombre=vista, html=contenido))
         datos.append(dict(nombre=nombre, vistas=vs))
     if not hay:

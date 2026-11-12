@@ -242,6 +242,7 @@ def main():
         conjuntos.pop("todas", None)
 
     resultados = {}
+    omitidos = {}   # "conjunto|serie|enfoque" -> releases que hay y que harían falta
     for conj, variables in conjuntos.items():
         for serie, serie_db in SERIES:
             # variables con dato en al menos MIN_COBERTURA de las ventanas de la serie
@@ -274,6 +275,8 @@ def main():
                 if res is None:
                     print(f"  {conj}/{serie}/{enf}: pocos releases ({len(filas)}; el PCA necesita al menos "
                           f"{max(30, 3 * len(vars_enf))} para {len(vars_enf)} variables)")
+                    omitidos[f"{conj}|{serie}|{enf}"] = dict(releases=len(filas), necesita=max(30, 3 * len(vars_enf)),
+                                                            variables=len(vars_enf))
                     continue
                 res.update(variables=vars_enf, filas=filas, backports=n_bp,
                            excluidas=excluidas + [v for v in vars_serie if v not in vars_enf and v not in excluidas])
@@ -311,6 +314,8 @@ def main():
     destino = rutas.dimension(dim)
     destino.mkdir(parents=True, exist_ok=True)
     base = "pca"
+    sin_pca = destino / "sin_pca.json"   # lo que no se pudo calcular, para los avisos de los reportes
+    sin_pca.write_text(json.dumps(dict(dimension=dim, omitidos=omitidos), ensure_ascii=False), encoding="utf-8")
     if not resultados:
         # Sin ninguna solución no hay componentes: se borran las salidas de una corrida anterior para
         # que el agrupamiento, los cruces y los reportes no usen componentes viejos, y se sigue sin PCA.

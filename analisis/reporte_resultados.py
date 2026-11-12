@@ -125,6 +125,13 @@ def kpis(items):
         for v, l, d in items) + "</div>"
 
 
+def no_disponible(motivo, generico):
+    """Aviso de una vista vacía: el motivo de salidas/omitidos.json si el paso se salteó, o el genérico."""
+    if motivo:
+        return f"<p class='vacio'><strong>No disponible en este proyecto.</strong> {esc(motivo)}</p>"
+    return f"<p class='vacio'>{esc(generico)}</p>"
+
+
 def pagina(titulo, sub, cuerpo):
     return (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<title>{esc(titulo)}</title><style>{rc.ESTILO}{ESTILO_EXTRA}</style></head><body><main>'
@@ -223,7 +230,8 @@ METODOS = {"promedio": "Promedio de las métricas", "componente": "Primer compon
 def vista_grupos(a, b):
     base = rutas.cruce(a, b) / "clustering_propio"
     if not (base / "resumen.json").exists():
-        return pagina(f"Grupos · {a} – {b}", "", "<p class='vacio'>No se corrió el cruce entre grupos (cruces.py --grupos propio).</p>")
+        return pagina(f"Grupos · {a} – {b}", "", no_disponible(rutas.omitido("grupos", f"{a}–{b}") or rutas.omitido("cruces", f"{a}–{b}"),
+                                                                  "No se corrió el cruce entre grupos (cruces.py --grupos propio)."))
     res = json.loads((base / "resumen.json").read_text(encoding="utf-8"))
     tarjetas = []
     for d in (a, b):
@@ -266,7 +274,7 @@ def vista_grupos(a, b):
 def vista_compartidas(bl, a, b):
     par = f"{a}–{b}"
     if bl.empty:
-        return pagina(f"Sin métricas compartidas · {a} – {b}", "", "<p class='vacio'>No se corrió bloques_etiquetas.py.</p>")
+        return pagina(f"Sin métricas compartidas · {a} – {b}", "", no_disponible(rutas.omitido("bloques"), "No se corrió bloques_etiquetas.py."))
     sub = bl[bl.entre.map(lambda c: contiene(c, par))].copy()
     sub["abs"] = sub.rho_corregida.abs()
     secciones = []
@@ -388,7 +396,7 @@ ENFOQUES = {"ajustado": "Ajustado (sin tendencia ni duración)", "tamano": "Ajus
 def vista_conjunto(res):
     conj = res.get("conjunto", {}) if res else {}
     if not conj:
-        return pagina("PCA y agrupamiento conjunto", "", "<p class='vacio'>No hay PCA conjunto (tres_dimensiones.py).</p>")
+        return pagina("PCA y agrupamiento conjunto", "", no_disponible(rutas.omitido("tres_dimensiones"), "No hay PCA conjunto (tres_dimensiones.py)."))
     secciones = []
     for enf, titulo in ENFOQUES.items():
         c = conj.get(enf)

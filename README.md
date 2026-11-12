@@ -121,8 +121,8 @@ una carpeta vacía (una por cada repositorio que se analice, así cada uno tiene
 
 ```bash
 mkdir tres-p-mi-proyecto && cd tres-p-mi-proyecto
-curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.2/docker-compose.yml
-curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.2/.env.example
+curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.3/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/calidad-software-tg/metrics/v1.0.3/.env.example
 ```
 
 Después:
